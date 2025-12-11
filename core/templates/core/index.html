@@ -1,0 +1,67 @@
+{% extends "master.html" %}
+{% load static %}
+
+{% block title %}Página Principal{% endblock %}
+
+{% block content %}
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-3 fw-bold mb-4">Bienvenido a Mi Proyecto</h1>
+            <p class="lead mb-4">Solución innovadora desarrollada con Django Framework</p>
+            <a href="#features" class="btn btn-light btn-lg">Conocer Más</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Características Principales</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 shadow">
+                        <div class="card-body text-center">
+                            <i class="bi bi-speedometer2 fs-1 text-primary mb-3"></i>
+                            <h5 class="card-title">Rápido y Eficiente</h5>
+                            <p class="card-text">Desarrollado con las mejores prácticas de Django para máximo rendimiento.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 shadow">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check fs-1 text-success mb-3"></i>
+                            <h5 class="card-title">Seguro</h5>
+                            <p class="card-text">Implementación de medidas de seguridad robustas para proteger tus datos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 shadow">
+                        <div class="card-body text-center">
+                            <i class="bi bi-phone fs-1 text-info mb-3"></i>
+                            <h5 class="card-title">Responsive</h5>
+                            <p class="card-text">Diseño adaptable que funciona perfectamente en todos los dispositivos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-light py-5">
+        <div class="container text-center">
+            <h2 class="mb-4">¿Listo para comenzar?</h2>
+            <p class="lead mb-4">Únete a nosotros y descubre todo lo que podemos ofrecerte</p>
+            <a href="#" class="btn btn-primary btn-lg me-2">Registrarse</a>
+            <a href="/" class="btn btn-outline-primary btn-lg">Contactar</a>
+        </div>
+    </section>
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        // JavaScript adicional para la página principal
+        console.log('Página principal cargada');
+    </script>
+{% endblock %}
