@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'APPrendiz',
     'core',
     'bootstrap5',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
