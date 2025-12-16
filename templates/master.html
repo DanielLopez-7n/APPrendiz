@@ -6,57 +6,85 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">            
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 <body>
     <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'core:index' %}">
-                <img src="{% static 'core/img/logo.png' %}" alt="Logo" height="30">
-                Mi Proyecto
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:index' %}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Acerca de</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Contacto</a>
-                    </li>
-                    
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
-                            data-bs-toggle="dropdown">
-                                {{ user.username }}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'core:index' %}">
+                    <img src="{% static 'img/LogoSENA.png' %}" alt="Logo" height="30" class="d-inline-block">
+                    Mi Proyecto SENA
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" 
+                            href="{% url 'core:index' %}">
+                                <i class="bi bi-house"></i> Inicio
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Mi Perfil</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Cerrar Sesión</a></li>
-                            </ul>
                         </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Iniciar Sesión</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-light ms-2" href="#">Registrarse</a>
-                        </li>
-                    {% endif %}
-                </ul>
+                        
+                        {% if user.is_authenticated %}
+                            <!-- Usuario autenticado -->
+                            {% if user.is_staff %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'core:panel_admin_base' %}">
+                                        <i class="bi bi-speedometer2"></i> Panel Admin
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" 
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {% if user.perfil.foto_perfil %}
+                                        <img src="{{ user.perfil.foto_perfil.url }}" 
+                                            alt="{{ user.get_full_name }}" 
+                                            class="rounded-circle" 
+                                            width="30" height="30">
+                                    {% else %}
+                                        <i class="bi bi-person-circle fs-5"></i>
+                                    {% endif %}
+                                    {{ user.get_full_name|default:user.username }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'usuarios:perfil' %}">
+                                            <i class="bi bi-person"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form method="POST" action="{% url 'usuarios:logout' %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- Usuario NO autenticado -->
+                            <li class="nav-item">
+                                <!-- Cambiar el href para que abra el modal -->
+                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
     </header>
     <main> 
         {% block content %}

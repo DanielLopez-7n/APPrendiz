@@ -3,65 +3,237 @@
 
 {% block title %}Página Principal{% endblock %}
 
-{% block content %}
-    <section class="hero-section">
-        <div class="container text-center">
-            <h1 class="display-3 fw-bold mb-4">Bienvenido a Mi Proyecto</h1>
-            <p class="lead mb-4">Solución innovadora desarrollada con Django Framework</p>
-            <a href="#features" class="btn btn-light btn-lg">Conocer Más</a>
-        </div>
-    </section>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
+<style>
+    .modal-content {
+        border-radius: 15px;
+        overflow: hidden;
+    }
 
-    <!-- Features Section -->
-    <section id="features" class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-5">Características Principales</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 shadow">
-                        <div class="card-body text-center">
-                            <i class="bi bi-speedometer2 fs-1 text-primary mb-3"></i>
-                            <h5 class="card-title">Rápido y Eficiente</h5>
-                            <p class="card-text">Desarrollado con las mejores prácticas de Django para máximo rendimiento.</p>
-                        </div>
+    .modal-header.bg-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px 30px;
+    }
+
+    .modal-body {
+        background-color: #ffffff;
+    }
+
+    .form-floating>.form-control {
+        border-radius: 8px;
+    }
+
+    .form-floating>.form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Animación al abrir el modal */
+    .modal.fade .modal-dialog {
+        transform: scale(0.8);
+        opacity: 0;
+        transition: all 0.3s;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+        /* Alertas dentro del modal */
+    #modalMessages .alert {
+        border-radius: 8px;
+        margin-bottom: 15px;
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Estilos para campos con error */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold mb-4" style="color: chartreuse;">Bienvenido a Mi Proyecto</h1>
+
+        <div id="carouselExampleIndicators" class="carousel slide">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                    aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'core/img/experiencia-tech.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'core/img/tienda-tech.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'core/img/vision-tech.jpg' %}" class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+
+        <p class="lead mb-4">Solución innovadora desarrollada con Django Framework</p>
+        <a href="#features" class="btn btn-light btn-lg">Conocer Más</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Características Principales</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-speedometer2 fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title">Rápido y Eficiente</h5>
+                        <p class="card-text">Desarrollado con las mejores prácticas de Django para máximo rendimiento.
+                        </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 shadow">
-                        <div class="card-body text-center">
-                            <i class="bi bi-shield-check fs-1 text-success mb-3"></i>
-                            <h5 class="card-title">Seguro</h5>
-                            <p class="card-text">Implementación de medidas de seguridad robustas para proteger tus datos.</p>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-shield-check fs-1 text-success mb-3"></i>
+                        <h5 class="card-title">Seguro</h5>
+                        <p class="card-text">Implementación de medidas de seguridad robustas para proteger tus datos.
+                        </p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card feature-card h-100 shadow">
-                        <div class="card-body text-center">
-                            <i class="bi bi-phone fs-1 text-info mb-3"></i>
-                            <h5 class="card-title">Responsive</h5>
-                            <p class="card-text">Diseño adaptable que funciona perfectamente en todos los dispositivos.</p>
-                        </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card feature-card h-100 shadow">
+                    <div class="card-body text-center">
+                        <i class="bi bi-phone fs-1 text-info mb-3"></i>
+                        <h5 class="card-title">Responsive</h5>
+                        <p class="card-text">Diseño adaptable que funciona perfectamente en todos los dispositivos.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- CTA Section -->
-    <section class="bg-light py-5">
-        <div class="container text-center">
-            <h2 class="mb-4">¿Listo para comenzar?</h2>
-            <p class="lead mb-4">Únete a nosotros y descubre todo lo que podemos ofrecerte</p>
-            <a href="#" class="btn btn-primary btn-lg me-2">Registrarse</a>
-            <a href="/" class="btn btn-outline-primary btn-lg">Contactar</a>
+<!-- CTA Section -->
+<section class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">¿Listo para comenzar?</h2>
+        <p class="lead mb-4">Únete a nosotros y descubre todo lo que podemos ofrecerte</p>
+        <a href="#" class="btn btn-primary btn-lg me-2">Registrarse</a>
+        <a href="/" class="btn btn-outline-primary btn-lg">Contactar</a>
+    </div>
+</section>
+
+
+<!-- Modal de Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg bg-dark ">
+            <!-- Header del Modal -->
+            <div class="modal-header bg-gradient border-0">
+                <h5 class="modal-title text-white" id="loginModalLabel">
+                    <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+
+            <!-- Body del Modal -->
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4">Ingresa tus credenciales para continuar</p>
+
+                <!-- Contenedor de mensajes dentro del modal -->
+                <div id="modalMessages"></div>
+
+                <!-- Formulario de Login -->
+                <form method="POST" action="{% url 'usuarios:login' %}" id="loginForm">
+                    {% csrf_token %}
+
+                    <!-- Campo Documento -->
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento"
+                            required autofocus>
+                        <label for="id_username">
+                            <i class="bi bi-file-text"></i> Documento
+                        </label>
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="id_password" name="password"
+                            placeholder="Contraseña" required>
+                        <label for="id_password">
+                            <i class="bi bi-lock"></i> Contraseña
+                        </label>
+                    </div>
+
+                    <!-- Checkbox Recordarme -->
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="remember_me" id="id_remember_me" checked>
+                        <label class="text-white form-check-label" for="id_remember_me">
+                            Recordarme
+                        </label>
+                    </div>
+
+                    <!-- Botón Submit -->
+                    <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    </button>
+                </form>
+            </div>
         </div>
-    </section>
-    {% endblock %}
+    </div>
+</div>
+{% endblock %}
 
-    {% block extra_js %}
-    <script>
-        // JavaScript adicional para la página principal
-        console.log('Página principal cargada');
-    </script>
+{% block extra_js %}
+<script>
+
+</script>
 {% endblock %}

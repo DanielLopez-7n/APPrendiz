@@ -1,7 +1,7 @@
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 100px 0;
+    background: linear-gradient(135deg, #1a5f3d 0%, #2d8659 50%, #1e7e4f 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
     }
 
 .feature-card {
@@ -19,6 +19,9 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a5f3d 0%, #2d8659 50%, #1e7e4f 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
     }
 
 .navbar-brand {
