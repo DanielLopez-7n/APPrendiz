@@ -32,3 +32,24 @@ def dashboard_view(request):
         'ultimos_usuarios': ultimos_usuarios,
     }
     return render(request, 'core/dashboard.html', context)
+
+#vistas temporales para el buscador y ayuda
+
+def search(request):
+    return render(request, 'core/search.html')
+
+def help_page(request):
+    return render(request, 'core/help.html')
+
+def index(request):
+    return render(request, 'core/index.html')
+
+def dashboard(request):
+    return render(request, 'core/dashboard.html')
+
+def nosotros(request):
+    return render(request, 'core/nosotros.html')
+
+def contactanos(request):
+    return render(request, 'core/contactanos.html')
+

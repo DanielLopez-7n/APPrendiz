@@ -1,230 +1,222 @@
 {% extends "master.html" %}
 {% load static %}
 
-{% block title %}Página Principal{% endblock %}
+{% block title %}Inicio | APPrendiz{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'core/css/styles.css' %}">
 <style>
+    /* Hero Section con fondo suave */
+    .hero-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 4rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    /* Tarjetas de características */
+    .feature-card {
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 12px;
+        background-color: white;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+
+    .feature-icon-box {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+    }
+
+    /* --- ESTILOS DEL MODAL (Personalizados SENA) --- */
     .modal-content {
         border-radius: 15px;
+        border: none;
         overflow: hidden;
     }
 
-    .modal-header.bg-gradient {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 20px 30px;
+    .modal-header {
+        background-color: var(--sena-green); /* Verde definido en master */
+        color: white;
+        border-bottom: none;
+        padding: 1.5rem 2rem;
     }
 
-    .modal-body {
-        background-color: #ffffff;
+    .btn-close-white {
+        filter: brightness(0) invert(1);
     }
 
-    .form-floating>.form-control {
+    .form-floating > .form-control {
         border-radius: 8px;
+        border: 1px solid #ced4da;
     }
 
-    .form-floating>.form-control:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    .form-floating > .form-control:focus {
+        border-color: var(--sena-green);
+        box-shadow: 0 0 0 0.2rem rgba(57, 169, 0, 0.25);
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 8px;
+    .btn-login {
+        background-color: var(--sena-green);
+        color: white;
         font-weight: 600;
-        transition: transform 0.2s;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    /* Animación al abrir el modal */
-    .modal.fade .modal-dialog {
-        transform: scale(0.8);
-        opacity: 0;
+        border-radius: 8px;
         transition: all 0.3s;
     }
 
-    .modal.show .modal-dialog {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-        /* Alertas dentro del modal */
-    #modalMessages .alert {
-        border-radius: 8px;
-        margin-bottom: 15px;
-        animation: slideDown 0.3s ease;
-    }
-    
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* Estilos para campos con error */
-    .form-control.is-invalid {
-        border-color: #dc3545;
+    .btn-login:hover {
+        background-color: #2d8500;
+        color: white;
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}
 
-{% block content %}
+{% block hero %}
 <section class="hero-section">
-    <div class="container text-center">
-        <h1 class="display-3 fw-bold mb-4" style="color: chartreuse;">Bienvenido a Mi Proyecto</h1>
-
-        <div id="carouselExampleIndicators" class="carousel slide">
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
-                    aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
-                    aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
-                    aria-label="Slide 3"></button>
-            </div>
-            <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <img src="{% static 'core/img/experiencia-tech.jpg' %}" class="d-block w-100" alt="...">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'core/img/tienda-tech.jpg' %}" class="d-block w-100" alt="...">
-                </div>
-                <div class="carousel-item">
-                    <img src="{% static 'core/img/vision-tech.jpg' %}" class="d-block w-100" alt="...">
-                </div>
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
-                data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
-                data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-
-
-        <p class="lead mb-4">Solución innovadora desarrollada con Django Framework</p>
-        <a href="#features" class="btn btn-light btn-lg">Conocer Más</a>
-    </div>
-</section>
-
-<!-- Features Section -->
-<section id="features" class="py-5">
     <div class="container">
-        <h2 class="text-center mb-5">Características Principales</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card feature-card h-100 shadow">
-                    <div class="card-body text-center">
-                        <i class="bi bi-speedometer2 fs-1 text-primary mb-3"></i>
-                        <h5 class="card-title">Rápido y Eficiente</h5>
-                        <p class="card-text">Desarrollado con las mejores prácticas de Django para máximo rendimiento.
-                        </p>
-                    </div>
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-center text-lg-start">
+                <span class="badge bg-success bg-opacity-10 text-success mb-3 px-3 py-2 rounded-pill border border-success border-opacity-25">
+                    Sistema de Gestión
+                </span>
+                <h1 class="display-4 fw-bold text-dark mb-3">
+                    Seguimiento de <span class="text-sena">Etapa Productiva</span>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Plataforma unificada para la gestión de contratos de aprendizaje, bitácoras y visitas de seguimiento entre el SENA y las empresas.
+                </p>
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <button type="button" class="btn btn-sena btn-lg px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                    </button>
+                    <a href="#info" class="btn btn-outline-secondary btn-lg px-4">
+                        Más información
+                    </a>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card feature-card h-100 shadow">
-                    <div class="card-body text-center">
-                        <i class="bi bi-shield-check fs-1 text-success mb-3"></i>
-                        <h5 class="card-title">Seguro</h5>
-                        <p class="card-text">Implementación de medidas de seguridad robustas para proteger tus datos.
-                        </p>
+            
+            <div class="col-lg-6 mt-5 mt-lg-0 text-center">
+                <img src="{% static 'core/img/aprendices_home.jpg' %}" alt="Gestión SENA" class="img-fluid" style="max-height: 380px;">            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div id="info" class="py-5">
+    <div class="row text-center mb-5">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark">Módulos Principales</h2>
+            <p class="text-muted">Herramientas integradas para instructores y aprendices</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card feature-card h-100 shadow-sm p-4">
+                <div class="card-body text-center">
+                    <div class="feature-icon-box bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-mortarboard-fill fs-2"></i>
                     </div>
+                    <h5 class="card-title fw-bold">Aprendices</h5>
+                    <p class="card-text text-muted">
+                        Seguimiento académico, registro de bitácoras y evaluación de desempeño.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card feature-card h-100 shadow">
-                    <div class="card-body text-center">
-                        <i class="bi bi-phone fs-1 text-info mb-3"></i>
-                        <h5 class="card-title">Responsive</h5>
-                        <p class="card-text">Diseño adaptable que funciona perfectamente en todos los dispositivos.</p>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card h-100 shadow-sm p-4">
+                <div class="card-body text-center">
+                    <div class="feature-icon-box bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-buildings-fill fs-2"></i>
                     </div>
+                    <h5 class="card-title fw-bold">Empresas</h5>
+                    <p class="card-text text-muted">
+                        Gestión de coformadores, asignación de jefes inmediatos y convenios activos.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card feature-card h-100 shadow-sm p-4">
+                <div class="card-body text-center">
+                    <div class="feature-icon-box bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-calendar-check-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title fw-bold">Visitas</h5>
+                    <p class="card-text text-muted">
+                        Programación y registro de visitas de seguimiento a la etapa práctica.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- CTA Section -->
-<section class="bg-light py-5">
-    <div class="container text-center">
-        <h2 class="mb-4">¿Listo para comenzar?</h2>
-        <p class="lead mb-4">Únete a nosotros y descubre todo lo que podemos ofrecerte</p>
-        <a href="#" class="btn btn-primary btn-lg me-2">Registrarse</a>
-        <a href="/" class="btn btn-outline-primary btn-lg">Contactar</a>
-    </div>
-</section>
-
-
-<!-- Modal de Login -->
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg bg-dark ">
-            <!-- Header del Modal -->
-            <div class="modal-header bg-gradient border-0">
-                <h5 class="modal-title text-white" id="loginModalLabel">
-                    <i class="bi bi-person-circle me-2"></i>Iniciar Sesión
+        <div class="modal-content shadow-lg">
+            
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="loginModalLabel">
+                    <i class="bi bi-person-circle me-2"></i>Ingreso al Sistema
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Body del Modal -->
-            <div class="modal-body p-4">
-                <p class="text-muted mb-4">Ingresa tus credenciales para continuar</p>
+            <div class="modal-body p-4 bg-white">
+                <div class="text-center mb-4">
+                    <p class="text-muted small">Por favor, ingresa tus credenciales registradas</p>
+                </div>
 
-                <!-- Contenedor de mensajes dentro del modal -->
-                <div id="modalMessages"></div>
+                <div id="modalMessages">
+                    {% if form.errors %}
+                        <div class="alert alert-danger py-2 small">Usuario o contraseña incorrectos.</div>
+                    {% endif %}
+                </div>
 
-                <!-- Formulario de Login -->
                 <form method="POST" action="{% url 'usuarios:login' %}" id="loginForm">
                     {% csrf_token %}
 
-                    <!-- Campo Documento -->
                     <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento"
-                            required autofocus>
-                        <label for="id_username">
-                            <i class="bi bi-file-text"></i> Documento
+                        <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento" required autofocus>
+                        <label for="id_username" class="text-muted">
+                            <i class="bi bi-card-heading me-1"></i> Documento / Usuario
                         </label>
                     </div>
 
-                    <!-- Campo Contraseña -->
                     <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="id_password" name="password"
-                            placeholder="Contraseña" required>
-                        <label for="id_password">
-                            <i class="bi bi-lock"></i> Contraseña
+                        <input type="password" class="form-control" id="id_password" name="password" placeholder="Contraseña" required>
+                        <label for="id_password" class="text-muted">
+                            <i class="bi bi-lock me-1"></i> Contraseña
                         </label>
                     </div>
 
-                    <!-- Checkbox Recordarme -->
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" name="remember_me" id="id_remember_me" checked>
-                        <label class="text-white form-check-label" for="id_remember_me">
-                            Recordarme
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" name="remember_me" id="id_remember_me">
+                        <label class="form-check-label text-muted small" for="id_remember_me">
+                            Recordar mi sesión
                         </label>
                     </div>
 
-                    <!-- Botón Submit -->
-                    <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
-                        <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                    <button type="submit" class="btn btn-login w-100 py-3 mb-3 shadow-sm">
+                        INGRESAR
                     </button>
+                    
+                    <div class="text-center">
+                        <a href="#" class="text-decoration-none small text-muted hover-link">¿Olvidaste tu contraseña?</a>
+                    </div>
                 </form>
             </div>
         </div>
@@ -234,6 +226,11 @@
 
 {% block extra_js %}
 <script>
-
+    // Script opcional: si hay errores en el formulario (django messages), abrir el modal automáticamente
+    document.addEventListener("DOMContentLoaded", function() {
+        // Si hay errores en el bloque de mensajes o en el form, podrías forzar la apertura:
+        // var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
+        // myModal.show();
+    });
 </script>
 {% endblock %}
