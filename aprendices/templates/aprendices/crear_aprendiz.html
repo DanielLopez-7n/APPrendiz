@@ -1,0 +1,92 @@
+{% extends 'core/panel_admin_base.html' %} 
+
+{% block title %}Registrar Aprendiz{% endblock %}
+
+{% block page_title %}Gestión de Aprendices{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="#">Aprendices</a></li>
+    <li class="breadcrumb-item active">Registrar Nuevo</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-primary"><i class="bi bi-person-plus-fill me-2"></i>Información del Aprendiz</h5>
+            </div>
+            <div class="card-body p-4">
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Datos de Acceso (Usuario)</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres *</label>
+                            {{ form_usuario.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos *</label>
+                            {{ form_usuario.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Usuario (Cédula para Login) *</label>
+                            {{ form_usuario.username }}
+                            <div class="form-text">Este será el usuario para entrar al sistema.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Institucional *</label>
+                            {{ form_usuario.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Contraseña *</label>
+                            {{ form_usuario.password }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Confirmar Contraseña *</label>
+                            {{ form_usuario.confirm_password }}
+                        </div>
+                        
+                        {% if form_usuario.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {{ form_usuario.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Académica SENA</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label">Número de Ficha *</label>
+                            {{ form_aprendiz.numero_ficha }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Programa de Formación *</label>
+                            {{ form_aprendiz.programa_formacion }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">Celular de Contacto *</label>
+                            {{ form_aprendiz.telefono }}
+                        </div>
+
+                        {% if form_aprendiz.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {{ form_aprendiz.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-light me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary px-5">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

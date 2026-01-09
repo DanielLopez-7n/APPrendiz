@@ -17,6 +17,8 @@ class PerfilUsuario(models.Model):
     documento = models.CharField(
         max_length=20, 
         unique=True,
+        null=True,
+        blank=True,
         help_text="Número de documento de identidad"
     )
     
