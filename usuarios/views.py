@@ -44,7 +44,7 @@ def login_view(request):
                     messages.success(request, f'¡Bienvenido {user.get_full_name() or user.username}!')
                     
                     # Redirigir según el tipo de usuario
-                    next_url = request.GET.get('next')
+                    next_url = request.POST.get('next') or request.GET.get('next')
                     if next_url:
                         return redirect(next_url)
                     elif user.is_staff:
