@@ -2,15 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Instructor(models.Model):
-    # Relación con el usuario (login)
+    # Relación 1 a 1 con el Usuario (Login)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     
-    # Datos exclusivos del instructor
-    profesion = models.CharField(max_length=100, verbose_name="Profesión / Especialidad")
-    telefono = models.CharField(max_length=20, verbose_name="Celular")
+    cedula = models.CharField(max_length=20, unique=True)
+    profesion = models.CharField(max_length=100)
+    tipo_contrato = models.CharField(
+        max_length=50, 
+        choices=[('PLANTA', 'Planta'), ('CONTRATISTA', 'Contratista')]
+    )
     
-    class Meta:
-        verbose_name_plural = "Instructores" # Para que no diga "Instructors" en el admin
-
     def __str__(self):
-        return f"Instructor: {self.usuario.first_name} {self.usuario.last_name}"
+        return f"{self.usuario.first_name} {self.usuario.last_name} - {self.profesion}"

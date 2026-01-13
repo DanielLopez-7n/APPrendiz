@@ -1,0 +1,67 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Gestión de Instructores{% endblock %}
+{% block page_title %}Equipo de Instructores{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Listado de Instructores</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-person-video3 me-2"></i>Instructores</h5>
+        <button class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg"></i> Nuevo Instructor
+        </button>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Instructor</th>
+                        <th>Cédula</th>
+                        <th>Profesión</th>
+                        <th>Contrato</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for instructor in instructores %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2 bg-light text-primary d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold">{{ instructor.usuario.first_name|slice:":1" }}</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ instructor.usuario.get_full_name }}</h6>
+                                    <small class="text-muted">{{ instructor.usuario.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ instructor.cedula }}</td>
+                        <td>{{ instructor.profesion }}</td>
+                        <td>
+                            <span class="badge {% if instructor.tipo_contrato == 'PLANTA' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {{ instructor.tipo_contrato }}
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            No hay instructores registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
