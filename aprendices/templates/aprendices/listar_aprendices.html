@@ -1,0 +1,75 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Listado de Aprendices{% endblock %}
+{% block page_title %}Gestión de Aprendices{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Listado General</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="bi bi-people-fill me-2"></i>Aprendices Registrados</h5>
+        
+        <a href="{% url 'aprendices:crear_aprendiz' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg"></i> Nuevo Aprendiz
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Aprendiz</th>
+                        <th>Ficha</th>
+                        <th>Programa</th>
+                        <th>Celular</th>
+                        <th class="text-end pe-4">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aprendiz in aprendices %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-2 bg-light text-primary d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold">{{ aprendiz.usuario.first_name|slice:":1" }}</span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h6>
+                                    <small class="text-muted">{{ aprendiz.usuario.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-secondary">{{ aprendiz.numero_ficha }}</span></td>
+                        <td>{{ aprendiz.programa_formacion }}</td>
+                        <td>{{ aprendiz.telefono }}</td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            No hay aprendices registrados todavía.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

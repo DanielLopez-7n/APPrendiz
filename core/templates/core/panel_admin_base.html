@@ -76,6 +76,18 @@
                         <span>Usuarios</span>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link {% if 'aprendices' in request.path %}active{% endif %}">
+                        <i class="bi bi-mortarboard-fill"></i> <span>Aprendices</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'instructores:listar_instructores' %}" class="nav-link {% if 'instructores' in request.path %}active{% endif %}">
+                        <i class="bi bi-person-video3"></i> <span>Instructores</span>
+                    </a>
+                </li>
                 
                 <!-- Sección de Apps del proyecto -->
                 <li class="nav-header">

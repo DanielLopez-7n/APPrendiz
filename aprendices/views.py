@@ -1,8 +1,20 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages # Para mandar mensajes de "Guardado con éxito"
 from .forms import UsuarioForm, AprendizForm
+from django.contrib.auth.decorators import login_required # <--- 1. Importar login requiered
+
+@login_required
+def listar_aprendices(request):
+    # 1. Consultamos todos los aprendices en la base de datos
+    aprendices = Aprendiz.objects.all()
+    
+    context = {
+        'aprendices': aprendices
+    }
+    return render(request, 'aprendices/listar_aprendices.html', context)
 
 # Vista para Registrar un nuevo Aprendiz
+@login_required
 def crear_aprendiz(request):
     if request.method == 'POST':
         # Si el usuario llenó el formulario y le dio "Guardar"
