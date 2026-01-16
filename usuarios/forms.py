@@ -166,3 +166,53 @@ class EditarPerfilForm(forms.ModelForm):
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+        
+# --- Nuevo formulario agregado para usuarios sin contraseña ---
+
+class UsuarioForm(forms.ModelForm):
+    """
+    Formulario simplificado para crear usuarios (Aprendices/Instructores)
+    SIN pedir contraseña (se genera automática).
+    """
+    class Meta:
+        model = User
+        # Solo pedimos estos 4 datos
+        fields = ['first_name', 'last_name', 'email', 'username']
+        
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@misena.edu.co'}),
+            # Al username le ponemos etiqueta de Documento para que se entienda mejor
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de Documento'}),
+        }
+        
+        labels = {
+            'username': 'Número de Documento (Usuario)',
+            'email': 'Correo Institucional',
+            'first_name': 'Nombres',
+            'last_name': 'Apellidos',
+        }
+
+    def clean_email(self):
+        """Validar que el correo no se repita"""
+        email = self.cleaned_data.get('email')
+        # Si estamos editando (self.instance.pk existe), excluimos al usuario actual de la búsqueda
+        if self.instance.pk:
+            if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError('Este correo ya está registrado por otro usuario.')
+        else:
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError('Este correo ya está registrado.')
+        return email
+
+    def clean_username(self):
+        """Validar que el documento no se repita"""
+        username = self.cleaned_data.get('username')
+        if self.instance.pk:
+            if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError('Este documento ya está registrado.')
+        else:
+            if User.objects.filter(username=username).exists():
+                raise forms.ValidationError('Este documento ya está registrado.')
+        return username

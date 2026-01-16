@@ -47,14 +47,29 @@
                         <td>{{ aprendiz.telefono }}</td>
                         <td class="text-end pe-4">
                             <div class="btn-group">
+
+                                <!-- Button Ver detalles -->
                                 <button type="button" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
-                                    <i class="bi bi-eye"></i>
+                                    <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn btn-sm btn-outline-info" title="Ver detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
                                 </button>
+
+                                <!-- Button Editar aprendiz -->
                                 <button type="button" class="btn btn-sm btn-outline-primary" title="Editar">
-                                    <i class="bi bi-pencil"></i>
+                                    <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
                                 </button>
+
+                                <!-- Button Eliminar aprendiz -->
                                 <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
+                                    <a href="{% url 'aprendices:eliminar_aprendiz' aprendiz.id %}" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        title="Eliminar"
+                                        onclick="return confirm('¿Estás seguro de eliminar a este aprendiz?');">
+                                            <i class="bi bi-trash"></i>
+                                    </a>
                                 </button>
                             </div>
                         </td>

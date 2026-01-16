@@ -1,0 +1,80 @@
+{% extends 'core/panel_admin_base.html' %} 
+
+{% block title %}Detalle del Aprendiz{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a></li>
+    <li class="breadcrumb-item active">Ver Detalle</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center h-100">
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <h4 class="fw-bold mb-1">{{ aprendiz.usuario.get_full_name }}</h4>
+                <p class="text-muted mb-3">{{ aprendiz.programa_formacion }}</p>
+                <span class="badge {% if aprendiz.usuario.is_active %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3">
+                    {% if aprendiz.usuario.is_active %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+            <div class="card-footer bg-white border-0 pb-4">
+                <div class="d-grid">
+                    <a href="mailto:{{ aprendiz.usuario.email }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-envelope me-2"></i>Enviar Correo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 text-primary"><i class="bi bi-card-list me-2"></i>Información Completa</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Tipo de Documento</label>
+                        <p class="fw-medium mb-0">Cédula de Ciudadanía</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Número de Documento</label>
+                        <p class="fw-medium mb-0">{{ aprendiz.usuario.username }}</p>
+                    </div>
+
+                    <div class="col-12"><hr class="my-2"></div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Número de Ficha</label>
+                        <p class="fw-medium mb-0">{{ aprendiz.numero_ficha }}</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Teléfono / Celular</label>
+                        <p class="fw-medium mb-0">{{ aprendiz.telefono|default:"No registrado" }}</p>
+                    </div>
+
+                    <div class="col-12"><hr class="my-2"></div>
+
+                    <div class="col-12">
+                        <label class="text-muted small text-uppercase fw-bold">Correo Electrónico</label>
+                        <p class="fw-medium mb-0">{{ aprendiz.usuario.email }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-light py-3 border-0 text-end">
+                <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-secondary me-2">Volver</a>
+                <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn btn-warning">
+                    <i class="bi bi-pencil-square me-1"></i> Editar Datos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
