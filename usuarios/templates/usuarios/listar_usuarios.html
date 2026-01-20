@@ -108,11 +108,11 @@
                             </td>
                             <td class="text-center">
                             <!-- Botón Ver Detalles -->
-                            <a href="/" 
-                               class="btn btn-sm btn-outline-info" 
-                               title="Ver detalles"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-eye-fill"></i>
+                            <a href="{% url 'usuarios:ver_detalle_usuario' usuario.id %}" 
+                                class="btn btn-sm btn-outline-info" 
+                                title="Ver detalles"
+                                data-bs-toggle="tooltip">
+                                 <i class="bi bi-eye-fill"></i>
                             </a>
                             
                             <!-- Botón Editar -->
