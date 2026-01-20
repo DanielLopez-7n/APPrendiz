@@ -18,9 +18,13 @@ def login_view(request):
     """
     Vista para el inicio de sesión de usuarios
     """
-    # Si el usuario ya está autenticado, redirigir al dashboard
+    # 1. MEJORA AL PRINCIPIO:
+    # Si el usuario ya está autenticado, redirigir según su ROL
     if request.user.is_authenticated:
-        return redirect('core:dashboard')
+        if request.user.is_staff:
+            return redirect('core:dashboard')
+        else:
+            return redirect('aprendices:perfil_aprendiz')
     
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -45,12 +49,18 @@ def login_view(request):
                     
                     # Redirigir según el tipo de usuario
                     next_url = request.POST.get('next') or request.GET.get('next')
+                    
                     if next_url:
                         return redirect(next_url)
+                    
+                    # 2. EL CAMBIO QUE PEDISTE AQUÍ 👇
                     elif user.is_staff:
+                        # Si es Instructor/Admin -> Dashboard
                         return redirect('core:dashboard')
                     else:
-                        return redirect('core:index')
+                        # Si es Aprendiz -> Su Perfil Nuevo 🚀
+                        return redirect('aprendices:perfil_aprendiz')
+                        
                 else:
                     messages.error(request, 'Esta cuenta ha sido desactivada.')
             else:
@@ -157,6 +167,23 @@ def lista_usuarios_view(request):
         'filtro_staff': filtro_staff,
     }
     return render(request, 'usuarios/listar_usuarios.html', context)
+
+ # ---ver detalle usuario ---
+@login_required
+@user_passes_test(es_staff, login_url='usuarios:login')
+def ver_detalle_usuario(request, user_id):
+    """
+    Vista para ver el detalle de un usuario específico
+    """
+    usuario = get_object_or_404(User, id=user_id)
+    
+    context = {
+        'titulo': f'Detalle de Usuario: {usuario.get_full_name()}',
+        'usuario': usuario
+    }
+    return render(request, 'usuarios/ver_detalle.html', context)
+
+# --------------------------------------------------
 
 
 @login_required
