@@ -20,28 +20,30 @@ def listar_aprendices(request):
 @login_required
 def crear_aprendiz(request):
     if request.method == 'POST':
-        # Si el usuario llenó el formulario y le dio "Guardar"
         form_usuario = UsuarioForm(request.POST)
         form_aprendiz = AprendizForm(request.POST)
 
-        # Validamos que los dos formularios estén bien
         if form_usuario.is_valid() and form_aprendiz.is_valid():
-            # 1. Guardamos el Usuario primero (pero aún no el aprendiz)
-            usuario = form_usuario.save()
+            # PASO 1: Preparamos el usuario PERO NO LO GUARDAMOS AÚN (commit=False)
+            usuario = form_usuario.save(commit=False)
             
-            # 2. Preparamos el Aprendiz, pero no lo guardamos en bd todavía (commit=False)
+            # PASO 2: Obtenemos el documento y lo convertimos en contraseña
+            # (Esta es la parte que faltaba y por eso no te dejaba entrar)
+            documento = form_usuario.cleaned_data['username']
+            usuario.set_password(documento) 
+            
+            # PASO 3: Ahora sí guardamos el usuario con su contraseña encriptada
+            usuario.save()
+            
+            # PASO 4: Guardamos el aprendiz y lo vinculamos
             aprendiz = form_aprendiz.save(commit=False)
-            
-            # 3. Hacemos la conexión manual. Asignamos el usuario recién creado al aprendiz
             aprendiz.usuario = usuario
-            
-            # 4. Ahora sí guardamos el Aprendiz definitivamente
             aprendiz.save()
 
-            messages.success(request, 'El aprendiz se ha registrado correctamente.')
-            return redirect('aprendices:crear_aprendiz')
+            messages.success(request, f'Aprendiz registrado. Su usuario y contraseña es: {documento}')
+            return redirect('aprendices:listar_aprendices') # Sugiero redirigir a la lista, no a crear otro
+    
     else:
-        # Si entramos a la página por primera vez mostramos los formularios vacíos
         form_usuario = UsuarioForm()
         form_aprendiz = AprendizForm()
 
@@ -105,3 +107,14 @@ def ver_detalle_aprendiz(request, pk):
         'aprendiz': aprendiz
     }
     return render(request, 'aprendices/ver_detalle.html', context)
+
+@login_required
+def perfil_aprendiz(request):
+    # Buscamos al aprendiz que corresponde al usuario logueado
+    # El 'try' es por si entra un admin (que no es aprendiz) no se rompa la página
+    try:
+        aprendiz = request.user.aprendiz
+    except:
+        aprendiz = None 
+        
+    return render(request, 'aprendices/perfil_aprendiz.html', {'aprendiz': aprendiz})
