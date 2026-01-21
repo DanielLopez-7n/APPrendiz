@@ -1,8 +1,13 @@
 from django.contrib import admin
 from .models import Instructor
 
-# Esto habilita la tabla en el panel de control
 @admin.register(Instructor)
 class InstructorAdmin(admin.ModelAdmin):
-    list_display = ('cedula', 'usuario', 'profesion', 'tipo_contrato')
-    search_fields = ('cedula', 'usuario__first_name', 'usuario__last_name')
+    # Aquí cambiamos 'cedula' por 'usuario' y agregamos 'telefono'
+    list_display = ('id', 'usuario', 'profesion', 'telefono', 'tipo_contrato')
+    
+    # Para buscar por nombre de usuario o profesión
+    search_fields = ('usuario__username', 'usuario__first_name', 'usuario__last_name', 'profesion')
+    
+    # Filtros laterales
+    list_filter = ('tipo_contrato',)

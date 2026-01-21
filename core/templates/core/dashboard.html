@@ -140,8 +140,8 @@
                             <tbody>
                                 {% for usuario in ultimos_usuarios %}
                                 <tr>
-                                    <td>{{ usuario.perfil.documento }}</td>
-                                    <td>{{ usuario.get_full_name }}</td>
+                                    <td>{{ usuario.username }}</td>
+                                    <td>{{ usuario.get_full_name|default:usuario.username }}</td>
                                     <td>{{ usuario.email }}</td>
                                     <td>{{ usuario.date_joined|date:"d/m/Y H:i" }}</td>
                                     <td>
