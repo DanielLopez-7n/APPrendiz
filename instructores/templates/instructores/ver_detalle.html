@@ -1,0 +1,83 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Detalle del Instructor{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'instructores:listar_instructores' %}">Instructores</a></li>
+    <li class="breadcrumb-item active">Ficha Técnica</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>Hoja de Vida Instructor</h5>
+                {% if instructor.usuario.is_active %}
+                    <span class="badge bg-success border border-white">Activo</span>
+                {% else %}
+                    <span class="badge bg-danger border border-white">Inactivo</span>
+                {% endif %}
+            </div>
+            
+            <div class="card-body p-5">
+                
+                <div class="text-center mb-5">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px;">
+                        <i class="bi bi-person-video3 display-4"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark">{{ instructor.usuario.get_full_name }}</h2>
+                    <p class="text-muted fs-5">{{ instructor.profesion }}</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6 border-end">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Información de Contacto</h6>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Correo Electrónico</label>
+                            <span class="fw-medium">{{ instructor.usuario.email }}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Celular / Teléfono</label>
+                            <span class="fw-medium">{{ instructor.telefono|default:"No registrado" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 ps-md-4">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Información Contractual</h6>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Usuario (Documento)</label>
+                            <span class="fw-medium font-monospace">{{ instructor.usuario.username }}</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Tipo de Vinculación</label>
+                            {% if instructor.tipo_contrato == 'PLANTA' %}
+                                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">Planta</span>
+                            {% else %}
+                                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2">Contratista</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Fecha de Registro</label>
+                            <span>{{ instructor.usuario.date_joined|date:"d M Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="card-footer bg-light py-3 text-end">
+                <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-secondary me-2">Volver</a>
+                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn btn-primary">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Datos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

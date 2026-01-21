@@ -70,12 +70,14 @@
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link {% if request.resolver_match.url_name == 'lista_usuarios' %}active{% endif %}">
-                        <i class="bi bi-people"></i>
-                        <span>Usuarios</span>
+                {% if user.is_superuser %}
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link text-white">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <span class="nav-link-text ms-1">Usuarios</span>
                     </a>
-                </li>
+                {% endif %}
 
                 <li class="nav-item">
                     <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link {% if 'aprendices' in request.path %}active{% endif %}">
@@ -83,11 +85,11 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{% url 'instructores:listar_instructores' %}" class="nav-link {% if 'instructores' in request.path %}active{% endif %}">
-                        <i class="bi bi-person-video3"></i> <span>Instructores</span>
-                    </a>
-                </li>
+                <a href="{% url 'instructores:listar_instructores' %}" class="nav-link text-white">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-person-video3"></i> </div>
+                    <span class="nav-link-text ms-1">Instructores</span>
+                </a>
                 
                 <!-- Sección de Apps del proyecto -->
                 <li class="nav-header">

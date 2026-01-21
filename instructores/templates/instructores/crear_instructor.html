@@ -1,0 +1,86 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}{{ titulo }} | APPrendiz{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'instructores:listar_instructores' %}">Instructores</a></li>
+    <li class="breadcrumb-item active">{{ titulo }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-person-video3 me-2"></i>{{ titulo }}</h5>
+            </div>
+            <div class="card-body p-4">
+                
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i class="bi bi-shield-lock me-2"></i>Datos de Cuenta y Acceso
+                    </h6>
+                    <div class="alert alert-info py-2 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        El <strong>Usuario</strong> y la <strong>Contraseña</strong> serán el número de documento ingresado.
+                        El instructor tendrá acceso al Panel Administrativo.
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres *</label>
+                            {{ form_usuario.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos *</label>
+                            {{ form_usuario.last_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Documento (Usuario) *</label>
+                            {{ form_usuario.username }}
+                            {% if form_usuario.username.errors %}
+                                <div class="text-danger small">{{ form_usuario.username.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico *</label>
+                            {{ form_usuario.email }}
+                        </div>
+                    </div>
+
+                    <hr class="text-muted">
+
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i class="bi bi-briefcase me-2"></i>Información Profesional
+                    </h6>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Profesión / Especialidad *</label>
+                            {{ form_instructor.profesion }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Celular de Contacto</label>
+                            {{ form_instructor.telefono }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Vinculación</label>
+                            {{ form_instructor.tipo_contrato }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-2"></i>Guardar Instructor
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
