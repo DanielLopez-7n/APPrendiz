@@ -1,0 +1,79 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Gestión de Empresas{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Empresas</li>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-buildings me-2"></i>Listado de Empresas</h5>
+        <a href="{% url 'empresas:crear_empresa' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Empresa
+        </a>
+    </div>
+    
+    <div class="card-body">
+        {% if empresas %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Empresa / NIT</th>
+                        <th>Contacto (Jefe)</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empresa in empresas %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
+                                    <i class="bi bi-building text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ empresa.nombre }}</div>
+                                    <div class="small text-muted">NIT: {{ empresa.nit }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-medium">{{ empresa.encargado }}</div>
+                            <div class="small text-muted">{{ empresa.email_encargado|default:"Sin correo" }}</div>
+                        </td>
+                        <td>{{ empresa.telefono|default:"N/A" }}</td>
+                        <td class="small text-muted">{{ empresa.direccion|truncatechars:30 }}</td>
+                        <td class="text-end">
+                            <div class="btn-group">
+                                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <form action="{% url 'empresas:eliminar_empresa' empresa.id %}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta empresa?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="alert alert-info text-center py-4">
+                <i class="bi bi-building-add display-4 d-block mb-3"></i>
+                <h5>No hay empresas registradas</h5>
+                <p class="text-muted">Comienza registrando las empresas donde los aprendices harán sus prácticas.</p>
+                <a href="{% url 'empresas:crear_empresa' %}" class="btn btn-primary mt-2">Registrar Primera Empresa</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

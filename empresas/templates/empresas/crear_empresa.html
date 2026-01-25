@@ -1,0 +1,76 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'empresas:listar_empresas' %}">Empresas</a></li>
+    <li class="breadcrumb-item active">{{ titulo }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-building-check me-2"></i>{{ titulo }}</h5>
+            </div>
+            <div class="card-body p-4">
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <h6 class="text-primary fw-bold mb-3">Datos de la Organización</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">NIT *</label>
+                            {{ form.nit }}
+                            {% if form.nit.errors %}
+                                <div class="text-danger small">{{ form.nit.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Razón Social (Nombre) *</label>
+                            {{ form.nombre }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Dirección Física</label>
+                            {{ form.direccion }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono General</label>
+                            {{ form.telefono }}
+                        </div>
+                    </div>
+
+                    <hr class="text-muted">
+
+                    <h6 class="text-primary fw-bold mb-3">Contacto / Jefe Inmediato</h6>
+                    <div class="alert alert-light border small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Esta persona será quien firme las bitácoras y evalúe al aprendiz.
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre del Jefe Inmediato *</label>
+                            {{ form.encargado }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo Electrónico (Jefe)</label>
+                            {{ form.email_encargado }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-2"></i>Guardar Empresa
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
