@@ -1,0 +1,54 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 fw-bold">Detalle de la Entrega</h5>
+            </div>
+            <div class="card-body">
+                <h6><strong>Aprendiz:</strong> {{ bitacora.aprendiz.usuario.get_full_name }}</h6>
+                <h6><strong>Empresa:</strong> {{ bitacora.empresa.nombre }}</h6>
+                <hr>
+                <h6>Actividades:</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Fecha</th><th>Descripción</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for act in bitacora.actividades.all %}
+                        <tr>
+                            <td>{{ act.fecha_ejecucion }}</td>
+                            <td>{{ act.descripcion }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Evaluación</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Observaciones</label>
+                        {{ form.observaciones_instructor }}
+                    </div>
+                    <div class="form-check form-switch mb-4">
+                        {{ form.evaluado_instructor }}
+                        <label class="form-check-label">Marcar como Aprobada</label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar Evaluación</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

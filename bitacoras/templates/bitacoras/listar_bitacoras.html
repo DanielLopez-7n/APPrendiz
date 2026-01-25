@@ -52,10 +52,20 @@
                                 <span class="badge bg-warning text-dark">Pendiente</span>
                             {% endif %}
                         </td>
+
+                        <!-- Boton de revisar -->
                         <td class="text-end">
-                            <a href="{% url 'bitacoras:ver_bitacora' bitacora.id %}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
-                                <i class="bi bi-eye"></i> Ver
-                            </a>
+                            <div class="btn-group">
+                                <a href="{% url 'bitacoras:ver_bitacora' bitacora.id %}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                {% if user.is_staff %}
+                                <a href="{% url 'bitacoras:revisar_bitacora' bitacora.id %}" class="btn btn-sm btn-primary" title="Evaluar Bitácora">
+                                    <i class="bi bi-clipboard-check"></i> Revisar
+                                </a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
