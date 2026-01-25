@@ -16,13 +16,13 @@
 <body class="d-flex flex-column min-vh-100 bg-light">
 
 <header class="sticky-top">
-  <nav class="navbar navbar-expand-lg bg-white">
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
     <div class="container">
 
       <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:index' %}">
         <img src="{% static 'img/LogoSENA.png' %}" alt="Logo SENA" height="45"> 
         <div class="d-flex flex-column justify-content-center lh-1">
-          <span class="fs-5 fw-bold text-sena">APPrendiz</span>
+          <span class="fs-5 fw-bold text-success">APPrendiz</span>
           <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Sistema de Gestión de Contratos</span>
         </div>
       </a>
@@ -33,19 +33,22 @@
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav ms-auto align-items-center gap-3">
+          
           <li class="nav-item">
             <a class="nav-link fw-medium" href="{% url 'core:index' %}">Inicio</a>
           </li>
           
-          <li class="nav-item">
-             <a class="nav-link fw-medium" href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a>   
-          </li>  
+          {% if user.is_staff %}
+              <li class="nav-item">
+                  <a class="nav-link fw-medium" href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a>   
+              </li>  
 
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="#">Empresas</a>
-          </li>
-          
-          <li class="d-none d-lg-block border-end mx-2" style="height: 24px;"></li>
+              <li class="nav-item">
+                <a class="nav-link fw-medium" href="{% url 'empresas:listar_empresas' %}">Empresas</a>
+              </li>
+              
+              <li class="d-none d-lg-block border-end mx-2" style="height: 24px;"></li>
+          {% endif %}
 
           <li class="nav-item">
             {% if user.is_authenticated %}
@@ -59,10 +62,9 @@
                             <li><a class="dropdown-item" href="{% url 'core:dashboard' %}">
                                 <i class="bi bi-speedometer2 me-2"></i>Ir al Dashboard
                             </a></li>
+                        
                         {% else %}
-                        <li><a class="dropdown-item" href="{% url 'aprendices:perfil_aprendiz' %}">
-                            <i class="bi bi-person-badge me-2"></i>Mi Perfil
-                        </a></li>
+                            <li><a class="dropdown-item" href="{% url 'aprendices:perfil_aprendiz' %}">
                                 <i class="bi bi-person-badge me-2"></i>Mi Perfil
                             </a></li>
                         {% endif %}
@@ -80,8 +82,8 @@
                     </ul>
                 </div>
             {% else %}
-                <button type="button" class="btn btn-outline-success btn-sm px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#loginModal">
-                  Ingresar <i class="bi bi-person-circle ms-1"></i>
+                <button type="button" class="btn btn-success btn-sm px-3 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
+                  Ingresar <i class="bi bi-box-arrow-in-right ms-1"></i>
                 </button>
             {% endif %}
           </li>
@@ -113,12 +115,12 @@
     </div>
 </main>
 
-<footer class="mt-auto py-4 text-center text-md-start">
+<footer class="mt-auto py-4 text-center text-md-start bg-white border-top">
   <div class="container">
     <div class="row align-items-center gy-3">
       
       <div class="col-md-4">
-        <div class="fw-bold text-dark">APPrendiz</div>
+        <div class="fw-bold text-success">APPrendiz</div>
         <small class="text-muted d-block">Seguimiento etapa productiva</small>
       </div>
 

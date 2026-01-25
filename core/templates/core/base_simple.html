@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SENA APPrendiz{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .simple-header { background: white; border-bottom: 1px solid #dee2e6; padding: 1rem 0; margin-bottom: 2rem;}
+    </style>
+</head>
+<body>
+
+    <header class="simple-header shadow-sm">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h5 class="m-0 text-success fw-bold">
+                <i class="bi bi-journal-text me-2"></i>Gestión de Bitácoras
+            </h5>
+            <div>
+                 Hola, <span class="fw-bold">{{ user.get_full_name }}</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container pb-5">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
