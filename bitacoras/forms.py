@@ -24,7 +24,6 @@ class BitacoraForm(forms.ModelForm):
         }
 
 # --- FormSet: Actividades (Tabla Dinámica) ---
-# Este lo tenías perfecto, no le cambié nada.
 ActividadFormSet = inlineformset_factory(
     Bitacora,             
     ActividadBitacora,    
@@ -41,3 +40,18 @@ ActividadFormSet = inlineformset_factory(
     extra=1,          
     can_delete=True   
 )
+
+# --- Formulario: Evaluación por el Instructor ---
+
+class EvaluacionBitacoraForm(forms.ModelForm):
+    class Meta:
+        model = Bitacora
+        fields = ['evaluado_instructor', 'observaciones_instructor']
+        widgets = {
+            'evaluado_instructor': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'observaciones_instructor': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 3,
+                'placeholder': 'Escriba aquí sus observaciones o correcciones...'
+            }),
+        }

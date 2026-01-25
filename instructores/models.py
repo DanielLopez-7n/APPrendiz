@@ -8,7 +8,7 @@ class Instructor(models.Model):
     profesion = models.CharField(max_length=100, verbose_name="Profesión / Especialidad")
     telefono = models.CharField(max_length=15, blank=True, null=True, verbose_name="Celular")
     
-    # Mantenemos esto por si quieres filtrar por tipo
+    # Nuevo campo para tipo de contrato
     tipo_contrato = models.CharField(
         max_length=50, 
         choices=[('PLANTA', 'Planta'), ('CONTRATISTA', 'Contratista')],

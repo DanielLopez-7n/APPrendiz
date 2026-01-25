@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import transaction # Para asegurar que se guarde todo o nada
 from .models import Bitacora
 from .forms import BitacoraForm, ActividadFormSet
+from django.contrib.auth.decorators import login_required, user_passes_test
+# Importar para la evaluación
+from .models import Bitacora
+from .forms import BitacoraForm, ActividadFormSet, EvaluacionBitacoraForm
 
 @login_required
 def listar_bitacoras(request):
@@ -43,20 +46,17 @@ def crear_bitacora(request):
         template_base = 'core/panel_admin_base.html'
         redirect_url = 'bitacoras:listar_bitacoras'
         titulo_pagina = "Registrar Bitácora (Admin)"
-        aprendiz_usuario = None # El instructor deberá elegir el aprendiz (si habilitamos eso luego)
+        aprendiz_usuario = None 
     else:
-        # Si es aprendiz, usa el diseño simple y redirige a su perfil
         try:
             aprendiz_usuario = request.user.aprendiz
             template_base = 'core/base_simple.html'
-            # ASUMO que la URL de tu perfil es 'aprendices:perfil_aprendiz'. 
-            # Si se llama diferente en tus urls.py, cámbialo aquí.
             redirect_url = 'aprendices:perfil_aprendiz' 
             titulo_pagina = "Nueva Bitácora"
         except AttributeError:
              # Caso raro: Usuario logueado pero sin perfil de aprendiz ni staff
              messages.error(request, 'No tienes permisos para crear bitácoras.')
-             return redirect('home') # O a donde consideres
+             return redirect('home') 
 
     # 2. PROCESAR EL FORMULARIO
     if request.method == 'POST':
@@ -116,3 +116,23 @@ def ver_bitacora(request, pk):
     }
     return render(request, 'bitacoras/ver_detalle.html', context)
 
+@login_required
+@user_passes_test(lambda u: u.is_staff) # Solo para instructores/admin
+def revisar_bitacora(request, pk):
+    bitacora = get_object_or_404(Bitacora, pk=pk)
+    
+    if request.method == 'POST':
+        form = EvaluacionBitacoraForm(request.POST, instance=bitacora)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Bitácora #{bitacora.numero} evaluada correctamente.')
+            return redirect('bitacoras:listar_bitacoras')
+    else:
+        form = EvaluacionBitacoraForm(instance=bitacora)
+
+    context = {
+        'bitacora': bitacora,
+        'form': form,
+        'titulo': f'Revisar Bitácora - {bitacora.aprendiz}'
+    }
+    return render(request, 'bitacoras/revisar_bitacora.html', context)

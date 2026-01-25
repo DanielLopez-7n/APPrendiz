@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404 # <--- AQUÍ ESTÁ EL ARREGLO
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Aprendiz 
@@ -29,7 +29,6 @@ def crear_aprendiz(request):
             usuario = form_usuario.save(commit=False)
             
             # PASO 2: Obtenemos el documento y lo convertimos en contraseña
-            # (Esta es la parte que faltaba y por eso no te dejaba entrar)
             documento = form_usuario.cleaned_data['username']
             usuario.set_password(documento) 
             
@@ -42,7 +41,7 @@ def crear_aprendiz(request):
             aprendiz.save()
 
             messages.success(request, f'Aprendiz registrado. Su usuario y contraseña es: {documento}')
-            return redirect('aprendices:listar_aprendices') # Sugiero redirigir a la lista, no a crear otro
+            return redirect('aprendices:listar_aprendices') 
     
     else:
         form_usuario = UsuarioForm()

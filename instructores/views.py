@@ -93,8 +93,7 @@ def eliminar_instructor(request, pk):
         messages.success(request, 'Instructor eliminado.')
         return redirect('instructores:listar_instructores')
     
-    # --- AGREGAR ESTO AL FINAL DE instructores/views.py ---
-
+# Si es GET, mostramos la confirmación
 @login_required
 @user_passes_test(es_admin)
 def ver_detalle_instructor(request, pk):
