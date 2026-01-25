@@ -6,19 +6,25 @@ from .models import Bitacora, ActividadBitacora
 class BitacoraForm(forms.ModelForm):
     class Meta:
         model = Bitacora
-        fields = ['numero', 'fecha_inicio', 'fecha_fin', 'modalidad']
+        # AGREGAMOS 'empresa' AQUÍ
+        fields = ['empresa', 'numero', 'fecha_inicio', 'fecha_fin', 'modalidad']
+        
         widgets = {
+            # AGREGAMOS EL WIDGET PARA EMPRESA
+            'empresa': forms.Select(attrs={'class': 'form-select'}),
             'numero': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1'}),
             'fecha_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'fecha_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'modalidad': forms.Select(attrs={'class': 'form-select'}),
         }
         labels = {
+            'empresa': 'Empresa Patrocinadora',
             'fecha_inicio': 'Fecha Inicio del Periodo',
             'fecha_fin': 'Fecha Fin del Periodo',
         }
 
 # --- FormSet: Actividades (Tabla Dinámica) ---
+# Este lo tenías perfecto, no le cambié nada.
 ActividadFormSet = inlineformset_factory(
     Bitacora,             
     ActividadBitacora,    
