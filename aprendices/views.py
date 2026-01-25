@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Aprendiz 
 from .forms import UsuarioForm, AprendizForm
 from usuarios.forms import UsuarioForm
+from bitacoras.models import Bitacora
 
 # Vista para Listar todos los Aprendices
 @login_required
@@ -118,3 +119,17 @@ def perfil_aprendiz(request):
         aprendiz = None 
         
     return render(request, 'aprendices/perfil_aprendiz.html', {'aprendiz': aprendiz})
+
+@login_required
+def perfil_aprendiz(request):
+    # Obtenemos el objeto Aprendiz del usuario logueado
+    aprendiz = get_object_or_404(Aprendiz, usuario=request.user)
+    
+    # NUEVO: Buscamos las bitácoras de este aprendiz ordenadas por número
+    mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero')
+    
+    context = {
+        'aprendiz': aprendiz,
+        'bitacoras': mis_bitacoras # Pasamos la lista a la plantilla
+    }
+    return render(request, 'aprendices/perfil_aprendiz.html', context)

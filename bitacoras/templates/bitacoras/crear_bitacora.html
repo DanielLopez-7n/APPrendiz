@@ -1,0 +1,89 @@
+{% extends template_to_extend %} ```
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0"><i class="bi bi-calendar-range me-2"></i>Datos del Periodo</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Empresa Patrocinadora</label>
+                    {{ form.empresa }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Modalidad</label>
+                    {{ form.modalidad }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Número de Bitácora</label>
+                    {{ form.numero }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fecha Inicio</label>
+                    {{ form.fecha_inicio }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Fecha Fin</label>
+                    {{ form.fecha_fin }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-secondary text-white py-2 d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Actividades Realizadas</h6>
+            <small class="text-white-50">Llena los campos requeridos</small>
+        </div>
+        <div class="card-body bg-light">
+            
+            {{ formset.management_form }}
+
+            {% for form_actividad in formset %}
+                <div class="card mb-3 border p-3">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="small text-muted">Descripción de la actividad</label>
+                            {{ form_actividad.descripcion }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted">Fecha de Ejecución</label>
+                            {{ form_actividad.fecha_ejecucion }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted">Evidencia (Opcional)</label>
+                            {{ form_actividad.evidencia }}
+                        </div>
+                        
+                        {% for hidden in form_actividad.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="alert alert-info small mt-3">
+                <i class="bi bi-info-circle me-1"></i>
+                <strong>Nota:</strong> Si necesitas registrar más actividades, guarda esta bitácora y edítala luego (o pide al admin que aumente el número de filas por defecto).
+            </div>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 pb-5">
+        <a href="{% if es_instructor %}{% url 'bitacoras:listar_bitacoras' %}{% else %}{% url 'aprendices:perfil_aprendiz' %}{% endif %}" class="btn btn-secondary">
+            Cancelar
+        </a>
+        <button type="submit" class="btn btn-success px-4 fw-bold">
+            <i class="bi bi-save me-2"></i>Guardar Bitácora
+        </button>
+    </div>
+
+</form>
+{% endblock %}

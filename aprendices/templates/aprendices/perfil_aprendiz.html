@@ -24,30 +24,45 @@
         </div>
 
         <div class="col-md-8">
-            <div class="card shadow border-0 mb-4">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text me-2 text-warning"></i>Mis Bitácoras</h5>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-journal-text me-2"></i>Mis Bitácoras</h5>
                 </div>
-                <div class="card-body text-center py-5">
-                    <div class="text-muted mb-4">
-                        <i class="bi bi-folder2-open display-4"></i>
-                        <p class="mt-2">Aún no tienes bitácoras registradas.</p>
+                <div class="card-body">
+                    
+                    <div class="mb-3 text-end">
+                        <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-warning fw-bold text-dark btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>Nueva Bitácora
+                        </a>
                     </div>
-                    <button class="btn btn-warning px-4 rounded-pill">
-                        <i class="bi bi-plus-circle me-2"></i>Nueva Bitácora
-                    </button>
+
+                    {% if bitacoras %}
+                        <div class="list-group list-group-flush">
+                            {% for bit in bitacoras %}
+                            <a href="{% url 'bitacoras:ver_bitacora' bit.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold">Bitácora N° {{ bit.numero }}</div>
+                                    <small class="text-muted">Del {{ bit.fecha_inicio|date:"d/M" }} al {{ bit.fecha_fin|date:"d/M/Y" }}</small>
+                                </div>
+                                <div>
+                                    {% if bit.evaluado_instructor %}
+                                        <span class="badge bg-success rounded-pill">Evaluada</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rounded-pill">Pendiente</span>
+                                    {% endif %}
+                                    <i class="bi bi-chevron-right ms-2 text-muted"></i>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-folder2-open display-4 text-muted"></i>
+                            <p class="mt-2 text-muted">Aún no tienes bitácoras registradas.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <h6 class="fw-bold"><i class="bi bi-building me-2 text-info"></i>Mi Empresa</h6>
-                            <p class="small text-muted">Aún no tienes una empresa asignada.</p>
-                        </div>
-                    </div>
-                </div>
                 <div class="col-md-6">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body">
