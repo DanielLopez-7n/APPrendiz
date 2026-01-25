@@ -4,19 +4,20 @@ from .models import Empresa
 class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
-        fields = ['nombre', 'nit', 'direccion', 'telefono', 
-                 'nombre_jefe', 'cargo_jefe', 'telefono_jefe', 'correo_jefe']
+        fields = ['nit', 'nombre', 'direccion', 'telefono', 'encargado', 'email_encargado']
+        
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Tech Solutions S.A.S'}),
-            'nit': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 900.123.456-1'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre_jefe': forms.TextInput(attrs={'class': 'form-control'}),
-            'cargo_jefe': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono_jefe': forms.TextInput(attrs={'class': 'form-control'}),
-            'correo_jefe': forms.EmailInput(attrs={'class': 'form-control'}),
+            'nit': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 900.123.456-7'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la empresa S.A.S'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección física'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono fijo o celular'}),
+            'encargado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del jefe inmediato'}),
+            'email_encargado': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'contacto@empresa.com'}),
         }
+        
         labels = {
-            'nombre': 'Razón Social de la Empresa',
-            'nombre_jefe': 'Nombre del Coformador (Jefe)',
+            'nit': 'NIT de la Empresa',
+            'nombre': 'Razón Social',
+            'encargado': 'Nombre del Jefe Inmediato',
+            'email_encargado': 'Correo Electrónico (Jefe)',
         }
