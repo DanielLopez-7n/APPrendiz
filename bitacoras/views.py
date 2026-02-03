@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
 from django.contrib import messages
-from django.db import transaction # Para asegurar que se guarde todo o nada
+from django.db import transaction
 from .models import Bitacora
 from .forms import BitacoraForm, ActividadFormSet
 from django.contrib.auth.decorators import login_required, user_passes_test
+from .utils import render_to_pdf
 # Importar para la evaluación
 from .models import Bitacora
 from .forms import BitacoraForm, ActividadFormSet, EvaluacionBitacoraForm
@@ -136,3 +138,40 @@ def revisar_bitacora(request, pk):
         'titulo': f'Revisar Bitácora - {bitacora.aprendiz}'
     }
     return render(request, 'bitacoras/revisar_bitacora.html', context)
+
+# Generar PDF de la bitácora
+
+@login_required
+def exportar_pdf(request, pk):
+    """
+    Genera el reporte PDF de una bitácora específica
+    """
+    # 1. Buscamos la bitácora (asegurando que sea del usuario o que sea staff)
+    bitacora = get_object_or_404(Bitacora, pk=pk)
+    
+    # Seguridad básica: Solo el dueño o un instructor puede descargarla
+    if not request.user.is_staff and bitacora.aprendiz.usuario != request.user:
+        messages.error(request, "No tienes permiso para ver este documento.")
+        return redirect('core:index')
+
+    # 2. Preparamos los datos para el reporte
+    context = {
+        'bitacora': bitacora,
+        'aprendiz': bitacora.aprendiz,
+        'empresa': bitacora.empresa,
+        'actividades': bitacora.actividades.all(),
+        'request': request # Útil si necesitamos construir URLs absolutas
+    }
+    
+    # 3. Generamos el PDF usando el template específico
+    pdf = render_to_pdf('bitacoras/pdf_template.html', context)
+    
+    if pdf:
+        # Esto hace que el navegador lo muestre en lugar de descargarlo directo
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = f"Bitacora_{bitacora.numero}_{bitacora.aprendiz.usuario.username}.pdf"
+        content = f"inline; filename={filename}"
+        response['Content-Disposition'] = content
+        return response
+        
+    return HttpResponse("Error al generar el PDF", status=404)

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Bitácora {{ bitacora.numero }}</title>
+    <style type="text/css">
+        body {
+            font-family: Helvetica, sans-serif;
+            font-size: 12px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #39A900; /* Verde SENA */
+            padding-bottom: 10px;
+        }
+        h1 { color: #39A900; font-size: 18px; text-transform: uppercase; }
+        h2 { font-size: 14px; margin-top: 0; }
+        
+        .info-box {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .info-box td { padding: 4px; }
+        .label { font-weight: bold; color: #555; }
+
+        /* Estilos de la tabla de actividades */
+        .table-actividades {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table-actividades th {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .table-actividades td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            text-align: center;
+            font-size: 10px;
+            color: #aaa;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Bitácora de Seguimiento - Etapa Productiva</h1>
+        <h2>SENA - Gestión de Aprendices</h2>
+    </div>
+
+    <table class="info-box">
+        <tr>
+            <td class="label" width="15%">Aprendiz:</td>
+            <td width="35%">{{ aprendiz.usuario.get_full_name }}</td>
+            <td class="label" width="15%">Documento:</td>
+            <td width="35%">{{ aprendiz.documento }}</td>
+        </tr>
+        <tr>
+            <td class="label">Programa:</td>
+            <td>{{ aprendiz.programa_formacion }}</td>
+            <td class="label">Bitácora N°:</td>
+            <td><strong>{{ bitacora.numero }}</strong></td>
+        </tr>
+        <tr>
+            <td class="label">Empresa:</td>
+            <td>{{ empresa.nombre }}</td>
+            <td class="label">Periodo:</td>
+            <td>{{ bitacora.fecha_inicio }} al {{ bitacora.fecha_fin }}</td>
+        </tr>
+    </table>
+
+    <h3>Detalle de Actividades</h3>
+    <table class="table-actividades">
+        <thead>
+            <tr>
+                <th width="20%">Fecha</th>
+                <th width="80%">Descripción de la Actividad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for act in actividades %}
+            <tr>
+                <td>{{ act.fecha_ejecucion }}</td>
+                <td>
+                    {{ act.descripcion|linebreaksbr }}
+                    {% if act.evidencia %}
+                    <br><br>
+                    <small style="color: #666;">
+                        * Evidencia adjunta en plataforma: {{ act.evidencia.name }}
+                    </small>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br><br>
+    <div style="border: 1px solid #ddd; padding: 10px; background-color: #fafafa;">
+        <strong>Estado de Evaluación:</strong>
+        {% if bitacora.evaluado_instructor %}
+            <span style="color: green;">APROBADA POR INSTRUCTOR</span>
+        {% else %}
+            <span style="color: red;">PENDIENTE DE REVISIÓN</span>
+        {% endif %}
+        
+        {% if bitacora.observaciones_instructor %}
+        <br><br>
+        <strong>Observaciones del Instructor:</strong><br>
+        {{ bitacora.observaciones_instructor }}
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        Generado automáticamente por el sistema APPrendiz - {{ bitacora.fecha_creacion }}
+    </div>
+
+</body>
+</html>

@@ -8,4 +8,5 @@ urlpatterns = [
     path('nueva/', views.crear_bitacora, name='crear_bitacora'),
     path('detalle/<int:pk>/', views.ver_bitacora, name='ver_bitacora'),
     path('revisar/<int:pk>/', views.revisar_bitacora, name='revisar_bitacora'),
+    path('exportar-pdf/<int:pk>/', views.exportar_pdf, name='exportar_pdf'),
 ]

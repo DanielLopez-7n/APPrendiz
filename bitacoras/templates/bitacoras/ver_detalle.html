@@ -62,8 +62,8 @@
                             <td>{{ actividad.descripcion|linebreaks }}</td>
                             <td>
                                 {% if actividad.evidencia %}
-                                    <a href="{{ actividad.evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-download me-1"></i>Descargar
+                                    <a href="{% url 'bitacoras:exportar_pdf' bitacora.id %}" class="btn btn-danger" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
                                     </a>
                                 {% else %}
                                     <span class="text-muted small">Sin evidencia</span>
