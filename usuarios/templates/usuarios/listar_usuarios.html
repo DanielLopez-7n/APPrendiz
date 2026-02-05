@@ -77,67 +77,97 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
+                    
                     <tbody>
                         {% for usuario in usuarios %}
                         <tr>
-                            <td><strong>{{ usuario.perfil.documento }}</strong></td>
                             <td>
-                                {% if usuario.perfil.foto_perfil %}
-                                    <img src="{{ usuario.perfil.foto_perfil.url }}" 
-                                         alt="{{ usuario.get_full_name }}" 
-                                         class="rounded-circle me-2" 
-                                         width="35" height="35">
+                                {% if usuario.aprendiz %}
+                                    {% if usuario.aprendiz.documento %}
+                                        <strong>{{ usuario.aprendiz.documento }}</strong>
+                                    {% else %}
+                                        <span class="text-muted small fst-italic">Sin registrar</span>
+                                    {% endif %}
+                                
+                                {% elif usuario.instructor %}
+                                    {% if usuario.instructor.cedula %}
+                                        <strong>{{ usuario.instructor.cedula }}</strong>
+                                    {% else %}
+                                        <span class="text-muted small fst-italic">Sin registrar</span>
+                                    {% endif %}
+                                
                                 {% else %}
-                                    <i class="bi bi-person-circle fs-4 me-2"></i>
+                                    {% if usuario.perfil.documento %}
+                                        {{ usuario.perfil.documento }}
+                                    {% else %}
+                                        <span class="text-muted small">--</span>
+                                    {% endif %}
                                 {% endif %}
-                                {{ usuario.get_full_name }}
                             </td>
+
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if usuario.perfil.foto_perfil %}
+                                        <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle me-2" width="40" height="40">
+                                    {% else %}
+                                        <div class="rounded-circle bg-light d-flex justify-content-center align-items-center me-2" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-person text-secondary h5 mb-0"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <div class="fw-bold">{{ usuario.get_full_name }}</div>
+                                        
+                                        {% if usuario.aprendiz %}
+                                            <div class="small text-primary">
+                                                <i class="bi bi-mortarboard-fill"></i> Ficha: {{ usuario.aprendiz.numero_ficha }}
+                                            </div>
+                                        {% elif usuario.instructor %}
+                                            <div class="small text-warning text-dark">
+                                                <i class="bi bi-person-video3"></i> Instructor
+                                            </div>
+                                        {% elif usuario.is_superuser %}
+                                            <div class="small text-danger">
+                                                <i class="bi bi-shield-lock-fill"></i> Administrador
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+
                             <td>{{ usuario.email }}</td>
-                            <td>{{ usuario.perfil.telefono|default:"N/A" }}</td>
+
+                            <td>
+                                {% if usuario.aprendiz %}
+                                    {{ usuario.aprendiz.telefono|default:"--" }}
+                                {% elif usuario.instructor %}
+                                    {{ usuario.instructor.telefono|default:"--" }}
+                                {% else %}
+                                    {{ usuario.perfil.telefono|default:"--" }}
+                                {% endif %}
+                            </td>
+
                             <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
+                            
                             <td>
                                 {% if usuario.is_active %}
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle"></i> Activo
-                                    </span>
+                                    <span class="badge bg-success bg-opacity-10 text-success border border-success">Activo</span>
                                 {% else %}
-                                    <span class="badge bg-danger">
-                                        <i class="bi bi-x-circle"></i> Inactivo
-                                    </span>
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Inactivo</span>
                                 {% endif %}
                             </td>
-                            <td class="text-center">
-                            <!-- Botón Ver Detalles -->
-                            <a href="{% url 'usuarios:ver_detalle_usuario' usuario.id %}" 
-                                class="btn btn-sm btn-outline-info" 
-                                title="Ver detalles"
-                                data-bs-toggle="tooltip">
-                                 <i class="bi bi-eye-fill"></i>
-                            </a>
                             
-                            <!-- Botón Editar -->
-                            <a href="{% url 'usuarios:editar_usuario' usuario.id %}" 
-                               class="btn btn-sm btn-outline-primary" 
-                               title="Editar instructor"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            
-                            <!-- Botón Eliminar -->
-                            <a href="{% url 'usuarios:eliminar_usuario' usuario.id %}" 
-                               class="btn btn-sm btn-outline-danger" 
-                               title="Eliminar instructor"
-                               data-bs-toggle="tooltip">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </td>
+                            <td>
+                                <div class="btn-group shadow-sm">
+                                    <a href="{% url 'usuarios:ver_detalle_usuario' usuario.id %}" class="btn btn-sm btn-light text-primary" title="Ver" data-bs-toggle="tooltip"><i class="bi bi-eye"></i></a>
+                                    <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn btn-sm btn-light text-info" title="Editar" data-bs-toggle="tooltip"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'usuarios:eliminar_usuario' usuario.id %}" class="btn btn-sm btn-light text-danger" title="Eliminar" data-bs-toggle="tooltip"><i class="bi bi-trash"></i></a>
+                                </div>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-5">
-                                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                                No se encontraron usuarios
-                            </td>
+                            <td colspan="7" class="text-center py-5 text-muted">No se encontraron usuarios</td>
                         </tr>
                         {% endfor %}
                     </tbody>
