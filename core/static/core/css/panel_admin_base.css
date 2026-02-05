@@ -780,3 +780,31 @@
         transform: rotate(360deg);
     }
 }
+
+/* Estilos para ocultar el sidebar dinámicamente */
+#sidebar {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+#sidebar.collapsed {
+    margin-left: -260px; /* Ajusta este valor al ancho de tu sidebar si es necesario */
+}
+
+#main-content {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Cuando el sidebar se esconde, el contenido se expande */
+#main-content.expanded {
+    margin-left: 0 !important;
+}
+
+/* En móviles funciona al revés (normalmente oculto) */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -260px;
+    }
+    #sidebar.collapsed {
+        margin-left: 0; /* Al hacer click, aparece */
+    }
+}

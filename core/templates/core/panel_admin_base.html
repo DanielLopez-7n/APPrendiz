@@ -64,7 +64,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="{% url 'core:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <a href="{% url 'core:dashboard' %}" class="nav-link">
                         <i class="bi bi-speedometer2"></i>
                         <span>Dashboard</span>
                     </a>
@@ -79,11 +79,11 @@
                     </a>
                 {% endif %}
 
-                <li class="nav-item">
-                    <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link {% if 'aprendices' in request.path %}active{% endif %}">
+                
+                <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link text-white">
                         <i class="bi bi-mortarboard-fill"></i> <span>Aprendices</span>
-                    </a>
-                </li>
+                </a>
+                
 
                 <a href="{% url 'instructores:listar_instructores' %}" class="nav-link text-white">
                     <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
@@ -172,10 +172,10 @@
             
             <div class="topbar-right">
                 <!-- Barra de búsqueda -->
-                <div class="search-box">
+                <form class="search-box" method="GET" action="{% url 'core:busqueda' %}">
                     <i class="bi bi-search"></i>
-                    <input type="text" class="form-control" placeholder="Buscar...">
-                </div>
+                    <input type="text" name="q" class="form-control" placeholder="Buscar..." value="{{ request.GET.q|default:'' }}">
+                </form>
                 
                 <!-- Notificaciones -->
                 <div class="dropdown">
@@ -306,8 +306,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <!-- JavaScript del dashboard -->
-    <script src="{% static 'js/dashboard.js' %}"></script>
-    
+    <script src="{% static 'core/js/main.js' %}"></script>    
     <!-- JavaScript adicional de cada página -->
     {% block extra_js %}{% endblock %}
 </body>
