@@ -13,4 +13,4 @@ class InstructorForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '300 123 4567'}),
             'tipo_contrato': forms.Select(attrs={'class': 'form-select'}),
         }
-        1
+        
