@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Instructor(models.Model):
     # Relación 1 a 1 con el Usuario
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    
+    cedula = models.CharField(max_length=20, verbose_name="Cédula de Ciudadanía")
     profesion = models.CharField(max_length=100, verbose_name="Profesión / Especialidad")
     telefono = models.CharField(max_length=15, blank=True, null=True, verbose_name="Celular")
     
@@ -17,3 +17,4 @@ class Instructor(models.Model):
     
     def __str__(self):
         return f"{self.usuario.get_full_name()} - {self.profesion}"
+    
