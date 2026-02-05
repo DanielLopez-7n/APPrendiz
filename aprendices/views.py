@@ -124,7 +124,7 @@ def perfil_aprendiz(request):
     # Obtenemos el objeto Aprendiz del usuario logueado
     aprendiz = get_object_or_404(Aprendiz, usuario=request.user)
     
-    # NUEVO: Buscamos las bitácoras de este aprendiz ordenadas por número
+    # Buscamos las bitácoras de este aprendiz ordenadas por número
     mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero')
     
     context = {

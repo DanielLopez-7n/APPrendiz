@@ -2,10 +2,8 @@
 
 {% block title %}
     {% if editar %}
-        Editar Aprendiz
-    {% else %}
-        Registrar Aprendiz
-    {% endif %}
+        Editar Aprendiz {% else %}
+        Registrar Aprendiz {% endif %}
 {% endblock %}
 
 {% block page_title %}Gestión de Aprendices{% endblock %}
@@ -19,8 +17,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-        <div class="card shadow-sm border-0">
+    <div class="col-md-10 col-lg-8"> <div class="card shadow-sm border-0">
             
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 text-primary">
@@ -35,25 +32,29 @@
             <div class="card-body p-4">
                 
                 <form method="POST" action="">
+                    
                     {% csrf_token %}
                     
                     <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Datos de Acceso (Usuario)</h6>
+                    
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombres *</label>
+                        
+                        <div class="col-md-6"> <label class="form-label">Nombres *</label>
                             {{ form_usuario.first_name }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Apellidos *</label>
+
+                        <div class="col-md-6"> <label class="form-label">Apellidos *</label>
                             {{ form_usuario.last_name }}
                         </div>
+
                         <div class="col-md-6">
-                            <label class="form-label">Usuario (Cédula para Login) *</label>
+                            <label class="form-label">Usuario (Login) *</label>
                             {{ form_usuario.username }}
                             {% if not editar %}
                                 <div class="form-text">Este será el usuario para entrar al sistema.</div>
                             {% endif %}
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label">Correo Institucional *</label>
                             {{ form_usuario.email }}
@@ -70,16 +71,21 @@
 
                     <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Académica SENA</h6>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label class="form-label">Número de Ficha *</label>
+                        
+                        <div class="col-md-6"> <label class="form-label">Documento de Identidad *</label>
+                            {{ form_aprendiz.documento }} 
+                            <div class="text-danger small">{{ form_aprendiz.documento.errors }}</div>
+                        </div>
+
+                        <div class="col-md-6"> <label class="form-label">Número de Ficha *</label>
                             {{ form_aprendiz.numero_ficha }}
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Programa de Formación *</label>
+                        
+                        <div class="col-md-12"> <label class="form-label">Programa de Formación *</label>
                             {{ form_aprendiz.programa_formacion }}
                         </div>
-                        <div class="col-md-12">
-                            <label class="form-label">Celular de Contacto *</label>
+                        
+                        <div class="col-md-12"> <label class="form-label">Celular de Contacto *</label>
                             {{ form_aprendiz.telefono }}
                         </div>
 
@@ -91,6 +97,7 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        
                         <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-md-2">Cancelar</a>
                         
                         <button type="submit" class="btn btn-primary px-5">
@@ -101,8 +108,8 @@
                             {% endif %}
                         </button>
                     </div>
-                </form>
-            </div>
+
+                </form> </div>
         </div>
     </div>
 </div>

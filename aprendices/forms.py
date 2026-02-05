@@ -36,9 +36,10 @@ class UsuarioForm(forms.ModelForm):
 class AprendizForm(forms.ModelForm):
     class Meta:
         model = Aprendiz
-        fields = ['numero_ficha', 'programa_formacion', 'telefono']
+        fields = ['numero_ficha', 'documento', 'programa_formacion', 'telefono']
         widgets = {
             'numero_ficha': forms.TextInput(attrs={'class': 'form-control'}),
+            'documento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cédula o T.I'}),
             'programa_formacion': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
         }

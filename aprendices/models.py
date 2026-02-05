@@ -9,6 +9,7 @@ class Aprendiz(models.Model):
     numero_ficha = models.CharField(max_length=20, verbose_name="Número de Ficha")
     programa_formacion = models.CharField(max_length=150, verbose_name="Programa de Formación")
     telefono = models.CharField(max_length=20, verbose_name="Celular")
+    documento = models.CharField(max_length=20, null=True, blank=True, verbose_name="Documento de Identidad")
     
     def __str__(self):
         return f"{self.usuario.first_name} {self.usuario.last_name} - Ficha: {self.numero_ficha}"
