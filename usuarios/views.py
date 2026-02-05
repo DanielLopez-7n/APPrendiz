@@ -5,10 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.http import JsonResponse
 from django.db.models import Q
-from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm
-from .models import PerfilUsuario
+from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm, MiPerfilForm
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -212,12 +210,11 @@ def crear_usuario_view(request):
     return render(request, 'usuarios/panel_admin/crear_usuario.html', context)
 
 
+# usuarios/views.py
+
 @login_required
 @user_passes_test(es_staff, login_url='usuarios:login')
 def editar_usuario_view(request, user_id):
-    """
-    Vista para editar un usuario existente
-    """
     usuario = get_object_or_404(User, id=user_id)
     
     if request.method == 'POST':
@@ -228,13 +225,44 @@ def editar_usuario_view(request, user_id):
             form_usuario.save()
             form_perfil.save()
             messages.success(request, f'Usuario {usuario.get_full_name()} actualizado exitosamente.')
-            return redirect('usuarios:lista_usuarios')
+            
+            # CORRECCIÓN DEL REDIRECT (sin la 'r' extra)
+            return redirect('usuarios:lista_usuarios') 
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
-    else:
-        form_usuario = EditarUsuarioForm(instance=usuario)
-        form_perfil = EditarPerfilForm(instance=usuario.perfil)
     
+    else:
+        # --- LÓGICA GET (MOSTRAR DATOS) ---
+        form_usuario = EditarUsuarioForm(instance=usuario)
+        
+        # 1. Variables para guardar los datos reales
+        documento_real = ''
+        telefono_real = ''
+        
+        # 2. Buscamos en Aprendiz
+        if hasattr(usuario, 'aprendiz'):
+            documento_real = usuario.aprendiz.documento
+            telefono_real = usuario.aprendiz.telefono
+            
+        # 3. Buscamos en Instructor
+        elif hasattr(usuario, 'instructor'):
+            documento_real = usuario.instructor.cedula
+            telefono_real = usuario.instructor.telefono
+            
+        # 4. Si es Admin o Staff (usamos los del perfil base)
+        else:
+            documento_real = usuario.perfil.documento
+            telefono_real = usuario.perfil.telefono
+
+        # 5. Inyectamos AMBOS datos en el formulario visual
+        form_perfil = EditarPerfilForm(
+            instance=usuario.perfil, 
+            initial={
+                'documento': documento_real,
+                'telefono': telefono_real
+            }
+        )
+
     context = {
         'titulo': f'Editar Usuario: {usuario.get_full_name()}',
         'form_usuario': form_usuario,
@@ -242,8 +270,7 @@ def editar_usuario_view(request, user_id):
         'usuario': usuario,
         'accion': 'Actualizar'
     }
-    return render(request, 'usuarios/panel_admin/editar_usuario.html', context)
-
+    return render(request, 'usuarios/editar_usuario.html', context)
 
 @login_required
 @user_passes_test(es_staff, login_url='usuarios:login')
@@ -302,3 +329,24 @@ def perfil_view(request):
         'form_perfil': form_perfil,
     }
     return render(request, 'usuarios/perfil.html', context)
+
+@login_required
+def editar_mi_perfil(request):
+    usuario = request.user
+    perfil = usuario.perfil
+    
+    if request.method == 'POST':
+        # Pasamos POST, FILES (para la foto) y la instancia del perfil
+        form = MiPerfilForm(request.POST, request.FILES, instance=usuario, perfil_instance=perfil)
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Tu perfil ha sido actualizado!')
+            return redirect('usuarios:ver_perfil') # Redirige a la vista de "Ver Perfil" (solo lectura)
+    else:
+        form = MiPerfilForm(instance=usuario, perfil_instance=perfil)
+    
+    return render(request, 'usuarios/editar_mi_perfil.html', {
+        'form': form
+    })
+    

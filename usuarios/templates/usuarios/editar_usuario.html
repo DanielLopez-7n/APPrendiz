@@ -1,0 +1,89 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Editar Usuario | Panel Admin{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item"><a href="{% url 'usuarios:lista_usuarios' %}">Usuarios</a></li>
+    <li class="breadcrumb-item active">Editar: {{ usuario.username }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow border-0">
+            
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>{{ titulo }}
+                </h5>
+            </div>
+
+            <div class="card-body p-4">
+                
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="p-3 mb-4 bg-light border rounded d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-power me-2"></i>Estado de la Cuenta</h6>
+                            <small class="text-muted">Si desactivas la cuenta, el usuario no podrá ingresar.</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            {{ form_usuario.is_active }}
+                            <label class="form-check-label" for="{{ form_usuario.is_active.id_for_label }}">
+                                ¿Usuario Activo?
+                            </label>
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-person me-2"></i>Datos Básicos</h6>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombres</label>
+                            {{ form_usuario.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Apellidos</label>
+                            {{ form_usuario.last_name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Correo Electrónico</label>
+                            {{ form_usuario.email }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-card-image me-2"></i>Perfil y Contacto</h6>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Foto de Perfil</label>
+                            {{ form_perfil.foto_perfil }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Teléfono / Celular (No editable)</label> {{ form_perfil.telefono }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Documento de Identidad (No editable)</label>
+                            {{ form_perfil.documento }}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-secondary me-md-2">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-save me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

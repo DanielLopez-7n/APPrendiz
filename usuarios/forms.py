@@ -133,15 +133,21 @@ class EditarUsuarioForm(forms.ModelForm):
     """
     Formulario para editar información del usuario
     """
+    # usuarios/forms.py
+
+class EditarUsuarioForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'is_active', 'is_staff']
+        # 1. AQUÍ: Agrega el campo is_active para activar/desactivar usuario
+        fields = ['first_name', 'last_name', 'email', 'is_active']
+        
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            
+            # 2. AQUÍ: Define el estilo para que se vea como switch
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'is_staff': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
             'first_name': 'Nombre',
@@ -161,7 +167,7 @@ class EditarPerfilForm(forms.ModelForm):
         fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']
         widgets = {
             'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -216,3 +222,44 @@ class UsuarioForm(forms.ModelForm):
             if User.objects.filter(username=username).exists():
                 raise forms.ValidationError('Este documento ya está registrado.')
         return username
+    
+    # Nuevo formulario para que los usuarios editen su propio perfil
+
+class MiPerfilForm(forms.ModelForm):
+    # Campos del modelo User (Nombre, Apellido, Email)
+    first_name = forms.CharField(label='Nombres', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(label='Apellidos', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(label='Correo', widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    
+    # Campo del modelo Perfil (Foto) - ¡Lo agregamos aquí mismo para facilitar todo!
+    foto_perfil = forms.ImageField(label='Foto de Perfil', required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
+    
+    # Campo Teléfono (Opcional, si quieres que lo editen aquí)
+    telefono = forms.CharField(label='Teléfono', required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+    def __init__(self, *args, **kwargs):
+        # Necesitamos recibir la instancia del perfil para cargar la foto/telefono actual
+        self.perfil_instance = kwargs.pop('perfil_instance', None)
+        super(MiPerfilForm, self).__init__(*args, **kwargs)
+        
+        # Si el perfil existe, cargamos los valores iniciales
+        if self.perfil_instance:
+            self.fields['foto_perfil'].initial = self.perfil_instance.foto_perfil
+            self.fields['telefono'].initial = self.perfil_instance.telefono
+
+    def save(self, commit=True):
+        # Guardamos el usuario (User)
+        user = super(MiPerfilForm, self).save(commit=commit)
+        
+        # Guardamos manualmente los datos extra en el Perfil
+        if self.perfil_instance:
+            self.perfil_instance.foto_perfil = self.cleaned_data['foto_perfil']
+            self.perfil_instance.telefono = self.cleaned_data['telefono']
+            if commit:
+                self.perfil_instance.save()
+        return user
+    
