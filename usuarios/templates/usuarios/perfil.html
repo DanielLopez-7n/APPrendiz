@@ -1,0 +1,123 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Mi Perfil | Panel Admin{% endblock %}
+
+{% block page_title %}Mi Perfil{% endblock %}
+
+{% block breadcrumb_items %}
+    <li class="breadcrumb-item active">Mi Perfil</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    
+    <div class="col-md-4 mb-4">
+        <div class="card shadow border-0 text-center h-100">
+            <div class="card-body p-5">
+                <div class="mb-4 position-relative d-inline-block">
+                    {% if user.perfil.foto_perfil %}
+                        <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle img-thumbnail shadow-sm" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 150px; height: 150px;">
+                            <i class="bi bi-person text-secondary display-1"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h4 class="fw-bold mb-1">{{ user.get_full_name }}</h4>
+                <p class="text-muted mb-3">{{ user.email }}</p>
+
+                <div class="mb-4">
+                    {% if user.is_superuser %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Administrador</span>
+                    {% elif user.instructor %}
+                        <span class="badge bg-warning bg-opacity-10 text-dark px-3 py-2 rounded-pill">Instructor</span>
+                    {% elif user.aprendiz %}
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Aprendiz</span>
+                    {% else %}
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">Usuario</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-primary"><i class="bi bi-person-lines-fill me-2"></i>Información Detallada</h5>
+                <a href="{% url 'usuarios:editar_mi_perfil' %}" class="btn btn-sm btn-outline-primary rounded-pill">
+                    <i class="bi bi-pencil-square me-1"></i>Editar Datos
+                </a>
+            </div>
+            <div class="card-body p-4">
+                
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Usuario</label>
+                        <p class="fs-5 fw-medium mb-0">{{ user.username }}</p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Miembro Desde</label>
+                        <p class="fs-5 fw-medium mb-0">{{ user.date_joined|date:"d de F, Y" }}</p>
+                    </div>
+
+                    <div class="col-12"><hr class="text-muted opacity-25"></div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Documento de Identidad</label>
+                        <p class="fs-5 fw-medium mb-0">
+                            {% if user.aprendiz %}
+                                {{ user.aprendiz.documento|default:"No registrado" }}
+                            {% elif user.instructor %}
+                                {{ user.instructor.cedula|default:"No registrado" }}
+                            {% else %}
+                                {{ user.perfil.documento|default:"No registrado" }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label class="text-muted small text-uppercase fw-bold">Teléfono / Celular</label>
+                        <p class="fs-5 fw-medium mb-0">
+                            {% if user.aprendiz %}
+                                {{ user.aprendiz.telefono|default:"No registrado" }}
+                            {% elif user.instructor %}
+                                {{ user.instructor.telefono|default:"No registrado" }}
+                            {% else %}
+                                {{ user.perfil.telefono|default:"No registrado" }}
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if user.aprendiz %}
+                        <div class="col-12"><hr class="text-muted opacity-25"></div>
+                        <div class="col-12">
+                            <label class="text-muted small text-uppercase fw-bold">Programa de Formación</label>
+                            <p class="fs-5 fw-medium mb-0">{{ user.aprendiz.programa_formacion }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Ficha</label>
+                            <p class="fs-5 fw-medium mb-0">{{ user.aprendiz.numero_ficha }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if user.instructor %}
+                        <div class="col-12"><hr class="text-muted opacity-25"></div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Profesión</label>
+                            <p class="fs-5 fw-medium mb-0">{{ user.instructor.profesion }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted small text-uppercase fw-bold">Vinculación</label>
+                            <p class="fs-5 fw-medium mb-0">{{ user.instructor.tipo_contrato|default:"No especificado" }}</p>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
