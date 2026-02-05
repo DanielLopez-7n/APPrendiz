@@ -11,6 +11,7 @@ urlpatterns = [
     path('help/', views.help_page, name='help'),
     path('nosotros/', views.nosotros, name='nosotros'),
     path('contactanos/', views.contactanos, name='contactanos'),
+    path('busqueda/', views.busqueda_global, name='busqueda'),
 
 
     ]
