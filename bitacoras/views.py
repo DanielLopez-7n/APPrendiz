@@ -175,3 +175,14 @@ def exportar_pdf(request, pk):
         return response
         
     return HttpResponse("Error al generar el PDF", status=404)
+
+@login_required
+def ver_bitacora_aprendiz(request, pk):
+    # 1. Buscamos la bitácora, PERO aseguramos que pertenezca al usuario logueado
+    # El filtro 'aprendiz__usuario=request.user' es el candado de seguridad
+    bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz__usuario=request.user)
+    
+    return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {
+        'bitacora': bitacora
+    })
+    
