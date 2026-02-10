@@ -30,28 +30,28 @@ def dashboard(request):
     Vista principal del panel de administración (Dashboard).
     Reúne estadísticas de todas las apps.
     """
-    # 1. Estadísticas de APPRENDIZ (Lo que necesita el HTML nuevo)
+    # 1. Estadísticas de APPRENDIZ
     total_aprendices = Aprendiz.objects.count()
     total_empresas = Empresa.objects.count()
     
-    # Contamos bitácoras que NO han sido evaluadas por instructor
-    bitacoras_pendientes = Bitacora.objects.filter(evaluado_instructor=False).count()
+    # --- CORRECCIÓN 1: Usamos el campo 'estado' para saber cuáles faltan ---
+    # Antes buscabas 'instructor_seguimiento=False', ahora es por estado:
+    bitacoras_pendientes = Bitacora.objects.filter(estado='Pendiente').count()
     
-    # Traemos las últimas 5 para la tabla de resumen
-    ultimas_bitacoras = Bitacora.objects.all().order_by('-fecha_creacion')[:5]
+    # --- CORRECCIÓN 2: Usamos 'fecha_entrega' para ordenar ---
+    # 'fecha_creacion' ya no existe en el modelo V5
+    ultimas_bitacoras = Bitacora.objects.all().order_by('-fecha_entrega')[:5]
 
-    # 2. Estadísticas de Usuarios (Lo que tenías antes, por si lo quieres usar)
+    # 2. Estadísticas de Usuarios
     total_usuarios = User.objects.count()
     usuarios_activos = User.objects.filter(is_active=True).count()
 
     context = {
         'titulo': 'Panel de Control',
-        # Datos para las Tarjetas (Cards)
         'total_aprendices': total_aprendices,
         'total_empresas': total_empresas,
         'bitacoras_pendientes': bitacoras_pendientes,
         'ultimas_bitacoras': ultimas_bitacoras,
-        # Datos extra de sistema
         'total_usuarios': total_usuarios,
         'usuarios_activos': usuarios_activos,
     }
@@ -120,7 +120,7 @@ def busqueda_global(request):
         'aprendices': aprendices,
         'instructores': instructores,
         'empresas': empresas,
-        'usuarios': usuarios,   # <--- Agregamos al contexto
+        'usuarios': usuarios,  
         'total_resultados': total
     }
     

@@ -110,22 +110,19 @@ def ver_detalle_aprendiz(request, pk):
 
 @login_required
 def perfil_aprendiz(request):
-    # Buscamos al aprendiz que corresponde al usuario logueado
-    # El 'try' es por si entra un admin (que no es aprendiz) no se rompa la página
-    try:
-        aprendiz = request.user.aprendiz
-    except:
-        aprendiz = None 
-        
-    return render(request, 'aprendices/perfil_aprendiz.html', {'aprendiz': aprendiz})
+    # 1. Seguridad: Verificamos si el usuario logueado es realmente un Aprendiz
+    # Si entra un Admin o Instructor aquí, lo mandamos al home para evitar errores
+    if not hasattr(request.user, 'aprendiz'):
+        return redirect('core:home') 
 
-@login_required
-def perfil_aprendiz(request):
-    # Obtenemos el objeto Aprendiz del usuario logueado
-    aprendiz = get_object_or_404(Aprendiz, usuario=request.user)
+    # 2. Obtenemos el perfil del aprendiz
+    aprendiz = request.user.aprendiz
     
-    # Buscamos las bitácoras de este aprendiz ordenadas por número
-    mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero')
+    # 3. Buscamos SUS bitácoras
+    # CORRECCIÓN CLAVE: 
+    # - Cambiamos 'numero' por 'numero_bitacora' (el campo nuevo)
+    # - Ordenamos descendente (-) para que la bitácora 2 salga antes que la 1
+    mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero_bitacora')
     
     context = {
         'aprendiz': aprendiz,
