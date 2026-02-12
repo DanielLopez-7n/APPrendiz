@@ -2,7 +2,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.contrib.auth.models import User # <--- Importante
+from django.contrib.auth.models import User 
+from fichas.models import Ficha
+from programas.models import Programa
 
 
 # Importamos los modelos de nuestras Apps para las estadísticas
@@ -45,6 +47,8 @@ def dashboard(request):
     # 2. Estadísticas de Usuarios
     total_usuarios = User.objects.count()
     usuarios_activos = User.objects.filter(is_active=True).count()
+    total_fichas = Ficha.objects.count()
+    total_programas = Programa.objects.count()
 
     context = {
         'titulo': 'Panel de Control',
@@ -54,6 +58,8 @@ def dashboard(request):
         'ultimas_bitacoras': ultimas_bitacoras,
         'total_usuarios': total_usuarios,
         'usuarios_activos': usuarios_activos,
+        'total_fichas': total_fichas,
+        'total_programas': total_programas,
     }
     return render(request, 'core/dashboard.html', context)
 

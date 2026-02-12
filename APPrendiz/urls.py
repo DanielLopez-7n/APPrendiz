@@ -27,6 +27,9 @@ urlpatterns = [
     path('instructores/', include('instructores.urls')),
     path('empresas/', include('empresas.urls')),
     path('bitacoras/', include('bitacoras.urls')),
+    path('programas/', include('programas.urls')),
+    path('fichas/', include('fichas.urls')),
+    path('actividades/', include('actividades.urls')),
 ]
 
 if settings.DEBUG:
