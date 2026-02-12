@@ -11,6 +11,8 @@
         margin-bottom: 20px;
         color: white;
         transition: transform 0.3s;
+        position: relative; /* Para que el icono se posicione bien */
+        overflow: hidden;
     }
     
     .stats-card:hover {
@@ -19,7 +21,7 @@
     
     .stats-card .icon {
         font-size: 3rem;
-        opacity: 0.3;
+        opacity: 0.2; /* Un poco más sutil */
         position: absolute;
         right: 20px;
         top: 20px;
@@ -28,22 +30,29 @@
     .stats-card h3 {
         font-size: 2.5rem;
         font-weight: bold;
+        margin-bottom: 0;
     }
+
+    /* GRADIENTES CON IDENTIDAD SENA */
     
+    /* Verde SENA principal */
     .card-usuarios {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #39a900 0%, #2d8600 100%);
     }
     
+    /* Naranja SENA (complementario oficial) */
     .card-activos {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, #ff671f 0%, #e65100 100%);
     }
     
+    /* Verde oscuro para contraste */
     .card-staff {
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        background: linear-gradient(135deg, #2d8600 0%, #1e5a00 100%);
     }
     
+    /* Verde brillante / lima */
     .card-nuevos {
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        background: linear-gradient(135deg, #a2cf00 0%, #39a900 100%);
     }
 </style>
 {% endblock %}

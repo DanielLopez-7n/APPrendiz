@@ -16,7 +16,445 @@
     <link rel="stylesheet" href="{% static 'core/css/panel_admin_base.css' %}">
     
     <!-- CSS adicional de cada página -->
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+    
+    <style>
+    /* 1. VARIABLES GLOBALES */
+    :root {
+        --sena-green: #39a900;
+        --sena-dark-green: #2d8600;
+        --sena-orange: #ff671f;
+        --sena-white: #ffffff;
+    }
+
+    /* 2. SIDEBAR: USAMOS EL ID #sidebar PARA MÁXIMA PRIORIDAD */
+    #sidebar.sidebar {
+        background-color: var(--sena-green) !important;
+        background-image: none !important; /* Elimina degradados previos */
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 3. HEADER DEL USUARIO (Foto y Nombre) */
+    .sidebar-header {
+        background-color: var(--sena-dark-green) !important;
+        padding: 20px 15px !important;
+    }
+
+    .sidebar-header .user-name {
+        color: white !important;
+        font-weight: bold !important;
+        margin-top: 10px !important;
+    }
+
+    .sidebar-header .user-role {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 0.85rem !important;
+    }
+
+    .sidebar-header .divider {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        height: 1px !important;
+        margin: 15px 0 !important;
+    }
+
+    /* 4. ELEMENTOS DE NAVEGACIÓN */
+    .sidebar-nav .nav-link {
+        color: white !important;
+        border-radius: 8px !important;
+        margin: 4px 15px !important;
+        display: flex !important;
+        align-items: center !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .sidebar-nav .nav-link i {
+        color: white !important;
+        font-size: 1.2rem !important;
+        margin-right: 10px !important;
+    }
+
+    .sidebar-nav .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        transform: translateX(5px) !important;
+    }
+
+    /* Títulos de sección (ej: CONFIGURACIÓN) */
+    .sidebar-nav .nav-header, .nav-header span {
+        color: rgba(255, 255, 255, 0.5) !important;
+        font-size: 0.75rem !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        padding-left: 25px !important;
+        margin-top: 20px !important;
+        display: block !important;
+    }
+
+    /* 5. TOPBAR (Barra Superior Blanca) */
+    .topbar {
+        background-color: white !important;
+        border-bottom: 3px solid var(--sena-green) !important;
+    }
+
+    .page-title {
+        color: var(--sena-green) !important;
+        font-weight: bold !important;
+    }
+
+    .btn-toggle i {
+        color: var(--sena-green) !important;
+    }
+
+    /* 6. BOTONES Y NOTIFICACIONES */
+    .badge-dot {
+        background-color: var(--sena-orange) !important;
+    }
+
+    .bg-primary {
+        background-color: var(--sena-green) !important;
+    }
+
+    /* Ajuste especial para el Logout para que sea legible */
+    .nav-link.text-danger {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        margin-top: 10px !important;
+    }
+    
+    .nav-link.text-danger i, .nav-link.text-danger span {
+        color: #ffcccc !important; /* Rojo claro sobre fondo verde */
+    }
+
+    /* =========================================
+   CORRECCIONES DE ESTILO SENA - HEADER USUARIO
+   ========================================= */
+
+    /* 1. ELIMINAR LA LÍNEA AZUL */
+    /* Apuntamos a cualquier divisor o elemento 'after' que pueda estar creando esa línea */
+    .sidebar-header .divider,
+    .sidebar-header hr,
+    .sidebar-header::after,
+    .user-role::after {
+        background-color: transparent !important;
+        height: 0 !important;
+        border: none !important;
+        display: none !important;
+        content: none !important;
+    }
+
+    /* 2. ARREGLAR EL CÍRCULO AZUL DEL AVATAR */
+    /* Buscamos el contenedor de la imagen o el placeholder del icono */
+    .sidebar-header .avatar-placeholder, 
+    .sidebar-header .user-avatar-circle,
+    .sidebar-header .img-circle {
+        /* Cambiamos el degradado azul por un degradado SENA vibrante */
+        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
+        /* Quitamos cualquier borde azul si lo hubiera */
+        border: 2px solid var(--sena-white) !important; 
+        /* Una sombra suave para darle profundidad */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    }
+
+    /* OPCIONAL: Asegurar que el icono dentro del círculo sea blanco */
+    .sidebar-header .avatar-placeholder i,
+    .sidebar-header .user-avatar-circle i {
+        color: #ffffff !important;
+    }
+
+    /* 3. AJUSTE FINO DEL FONDO DEL HEADER (Opcional pero recomendado) */
+    /* Hacemos que el fondo de esta sección sea un verde un poco más oscuro 
+    para que el círculo brillante del avatar resalte más */
+    .sidebar-header {
+        background-color: #2d8600 !important; /* Verde SENA oscuro */
+        border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+    }
+{% endblock %}
+
+    <style>
+
+    /* 1. FUERZA BRUTA PARA EL SIDEBAR (No importa qué página sea) */
+    body.dashboard-body #sidebar.sidebar {
+        background-color: #39a900 !important; /* Verde SENA */
+        background-image: none !important;
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1) !important;
+    }
+
+    /* 2. HEADER DONDE ESTÁ TU FOTO (Daniel_7) */
+    body.dashboard-body #sidebar .sidebar-header {
+        background-color: #2d8600 !important; /* Verde más oscuro */
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    /* 3. ICONOS Y TEXTOS SIEMPRE BLANCOS */
+    #sidebar .nav-link, 
+    #sidebar .nav-link i, 
+    #sidebar .nav-link span,
+    #sidebar .user-name {
+        color: #ffffff !important;
+    }
+
+    /* 4. ELIMINAR EL AZUL CUANDO EL BOTÓN ESTÁ ACTIVO */
+    #sidebar .nav-link.active, 
+    #sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+    }
+
+    /* 5. TOPBAR (La línea verde de arriba que ya te funcionaba) */
+    .topbar {
+        border-bottom: 3px solid #39a900 !important;
+    }
+    .page-title {
+        color: #39a900 !important;
+    }
+
+    <style>
+    /* 1. ELIMINAR LA LÍNEA AZUL Y EL CÍRCULO AZUL (ESTILO NUCLEAR) */
+    
+    /* Atacamos el círculo del avatar */
+    html body.dashboard-body #sidebar .avatar-placeholder,
+    html body.dashboard-body #sidebar .user-avatar {
+        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    }
+
+    /* 1. ELIMINAR LA LÍNEA AZUL Y EL CÍRCULO AZUL (ESTILO NUCLEAR) */
+    
+    /* Atacamos el círculo del avatar */
+    html body.dashboard-body #sidebar .avatar-placeholder,
+    html body.dashboard-body #sidebar .user-avatar {
+        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
+        border: 2px solid #ffffff !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    }
+
+    /* Eliminamos la línea azul (el div .divider) */
+    html body.dashboard-body #sidebar .divider {
+        display: none !important;
+        height: 0 !important;
+        background-color: transparent !important;
+        margin: 0 !important;
+    }
+
+    /* 2. FORZAR EL SIDEBAR VERDE EN EL DASHBOARD */
+    html body.dashboard-body #sidebar.sidebar {
+        background-color: #39a900 !important;
+        background-image: none !important;
+    }
+
+    /* 3. LIMPIEZA DEL HEADER DEL USUARIO */
+    html body.dashboard-body #sidebar .sidebar-header {
+        background-color: #2d8600 !important; /* Verde oscuro para que resalte el avatar */
+        padding-bottom: 20px !important;
+    }
+
+    /* Asegurar que el rol (Superadministrador) no tenga sombras ni líneas raras */
+    html body.dashboard-body #sidebar .user-role {
+        color: rgba(255, 255, 255, 0.8) !important;
+        border: none !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* 4. ICONOS Y TEXTOS SIEMPRE BLANCOS */
+    html body.dashboard-body #sidebar .nav-link,
+    html body.dashboard-body #sidebar .nav-link i,
+    html body.dashboard-body #sidebar .nav-link span,
+    html body.dashboard-body #sidebar .user-name {
+        color: #ffffff !important;
+    }
+
+    /* Hover para que no se ponga azul al pasar el mouse */
+    html body.dashboard-body #sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* 1. CAMBIAR EL COLOR DE LOS TEXTOS PRIMARIOS (Títulos) */
+    .text-primary, 
+    .breadcrumb-item a, 
+    h2.text-primary, 
+    h5.text-primary {
+        color: #39a900 !important;
+    }
+
+    /* 2. CAMBIAR EL COLOR DEL BOTÓN "NUEVO APRENDIZ" (Y todos los primary) */
+    .btn-primary {
+        background-color: #39a900 !important;
+        border-color: #39a900 !important;
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+
+    /* Efecto cuando pasas el mouse por el botón */
+    .btn-primary:hover {
+        background-color: #2d8600 !important;
+        border-color: #2d8600 !important;
+    }
+
+    /* 3. CAMBIAR LOS LINKS DE LOS BREADCRUMBS (La ruta arriba) */
+    .breadcrumb-item a {
+        text-decoration: none !important;
+        color: #39a900 !important;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #2d8600 !important;
+        text-decoration: underline !important;
+    }
+
+    /* 4. LÍNEAS DEBAJO DE LOS TÍTULOS */
+    .border-primary {
+        border-color: #39a900 !important;
+    }
+
+    /* VARIABLES GLOBALES */
+    :root {
+        --sena-green: #39a900;
+        --sena-dark-green: #2d8600;
+        --sena-orange: #ff671f;
+    }
+
+    /* 1. INTERCEPTAR TODOS LOS BOTONES AZULES/CELESTES */
+    .btn-primary, .btn-info, .btn-outline-primary, .btn-outline-info {
+        background-color: var(--sena-green) !important;
+        border-color: var(--sena-green) !important;
+        color: #ffffff !important;
+    }
+
+    .btn-primary:hover, .btn-info:hover {
+        background-color: var(--sena-dark-green) !important;
+        border-color: var(--sena-dark-green) !important;
+    }
+
+    /* 2. TEXTOS E ICONOS QUE SIGUEN SIENDO AZULES */
+    .text-primary, .text-info, .bi-primary, .bi-info {
+        color: var(--sena-green) !important;
+    }
+
+    /* 3. BORDES Y ESTADOS DE FOCUS (PARA QUE NO SE PONGAN AZULES AL DAR CLICK) */
+    .form-control:focus, .form-select:focus {
+        border-color: var(--sena-green) !important;
+        box-shadow: 0 0 0 0.25rem rgba(57, 169, 0, 0.25) !important;
+    }
+
+    /* 4. BADGES (ETIQUETAS) */
+    .bg-primary, .bg-info {
+        background-color: var(--sena-green) !important;
+    }
+    
+    /* REFUERZO TOTAL DE COLORES SENA */
+    
+    /* 1. Forzar que bg-success sea nuestro verde SENA */
+    .bg-success {
+        background-color: #39a900 !important;
+        background-opacity: 1 !important;
+    }
+
+    /* 2. Forzar que btn-success y btn-primary sean verdes */
+    .btn-success, .btn-primary, .btn-info {
+        background-color: #39a900 !important;
+        border-color: #39a900 !important;
+        color: white !important;
+    }
+
+    .btn-success:hover, .btn-primary:hover, .btn-info:hover {
+        background-color: #2d8600 !important;
+        border-color: #2d8600 !important;
+    }
+
+    /* 3. Cambiar el color de los iconos informativos y textos azules */
+    .text-success, .text-primary, .text-info, .bi-info-circle, .bi-person-plus {
+        color: #39a900 !important;
+    }
+
+    /* 4. Arreglar el Breadcrumb (Navegación de arriba) */
+    .breadcrumb-item a {
+        color: #39a900 !important;
+        text-decoration: none !important;
+    }
+
+    .breadcrumb-item.active {
+        color: #666 !important;
+    }
+
+    /* RECONFIGURACIÓN DE RAÍZ - ESTILO SENA */
+    :root {
+        --sena-green: #39a900;
+        --sena-dark-green: #2d8600;
+        --sena-orange: #ff671f;
+        
+        /* Esto obliga a Bootstrap a creer que el azul ahora es verde */
+        --bs-primary: #39a900 !important;
+        --bs-primary-rgb: 57, 169, 0 !important;
+        --bs-success: #39a900 !important;
+    }
+
+    /* FORZAR SIDEBAR (NUCLEAR) */
+    body.dashboard-body #sidebar.sidebar {
+        background-color: var(--sena-green) !important;
+        background-image: none !important;
+    }
+
+    /* ELIMINAR CÍRCULO AZUL Y LÍNEA BAJO "SUPERADMINISTRADOR" */
+    #sidebar .avatar-placeholder, #sidebar .user-avatar {
+        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
+        border: 2px solid white !important;
+    }
+
+    #sidebar .divider {
+        display: none !important; /* Adiós a la línea azul */
+    }
+
+    /* BOTONES Y TEXTOS */
+    .btn-primary, .bg-primary {
+        background-color: var(--sena-green) !important;
+        border-color: var(--sena-green) !important;
+        color: white !important;
+    }
+
+    .btn-outline-primary {
+        color: var(--sena-green) !important;
+        border-color: var(--sena-green) !important;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--sena-green) !important;
+        color: white !important;
+    }
+
+    .text-primary {
+        color: var(--sena-green) !important;
+    }
+
+    /* FORZAR VISIBILIDAD EN BOTONES DE ACCIONES RÁPIDAS */
+    
+    /* Botón "Crear Usuario" (btn-primary) */
+    .btn-primary, .bg-primary {
+        background-color: #39a900 !important;
+        border-color: #39a900 !important;
+        color: #ffffff !important; /* Forzamos texto blanco */
+    }
+
+    /* Botón "Ver Usuarios" (btn-outline-primary) */
+    .btn-outline-primary {
+        /* Si quieres que sea VERDE con texto BLANCO desde el inicio: */
+        background-color: #39a900 !important;
+        color: #ffffff !important; 
+        border-color: #39a900 !important;
+    }
+
+    /* Aseguramos que los ICONOS dentro de los botones también sean blancos */
+    .btn-primary i, .btn-outline-primary i {
+        color: #ffffff !important;
+    }
+
+    /* Efecto al pasar el mouse para ambos */
+    .btn-primary:hover, .btn-outline-primary:hover {
+        background-color: #2d8600 !important;
+        border-color: #2d8600 !important;
+        color: #ffffff !important;
+    }
+</style>
+
+    
 
     {% load bootstrap5 %}
     {% bootstrap_css %}
@@ -104,6 +542,31 @@
                     </div>
                     <span class="nav-link-text ms-1">Bitácoras</span>
                 </a>
+
+                <a href="{% url 'programas:listar_programas' %}" class="nav-link text-white">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-book"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Programas</span>
+                </a>
+                
+
+                <a href="{% url 'fichas:listar_fichas' %}" class="nav-link text-white">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-collection"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Fichas</span>
+                </a>
+
+                <a href="{% url 'actividades:listar_actividades' %}" class="nav-link text-white">
+                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-card-checklist"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Actividades</span>
+                </a>
+                
+
+
                 
                 <!-- Configuración -->
                 <li class="nav-header">
