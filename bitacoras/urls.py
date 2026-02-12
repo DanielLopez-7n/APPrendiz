@@ -10,4 +10,6 @@ urlpatterns = [
     path('revisar/<int:pk>/', views.revisar_bitacora, name='revisar_bitacora'),
     path('exportar-pdf/<int:pk>/', views.exportar_pdf, name='exportar_pdf'),
     path('mi-bitacora/<int:pk>/', views.ver_bitacora_aprendiz, name='ver_bitacora_aprendiz'),
+    path('editar/<int:pk>/', views.editar_bitacora, name='editar_bitacora'),
+    path('eliminar/<int:pk>/', views.eliminar_bitacora, name='eliminar_bitacora'),
 ]

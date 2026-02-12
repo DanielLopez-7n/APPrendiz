@@ -1,72 +1,112 @@
-# bitacoras/forms.py
-
 from django import forms
-from .models import Bitacora
+from django.forms import inlineformset_factory
+from .models import Bitacora, ActividadBitacora
 from instructores.models import Instructor
+from fichas.models import Ficha
 
+# --- 1. EL FORMULARIO PRINCIPAL (ENCABEZADO) ---
 class CrearBitacoraForm(forms.ModelForm):
+    # Campo especial para seleccionar la Ficha (Lista Desplegable)
+    ficha = forms.ModelChoiceField(
+        queryset=Ficha.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Ficha de Caracterización",
+        empty_label="-- Seleccione su Ficha --"
+    )
+
     class Meta:
         model = Bitacora
-        fields = [
-            'numero_bitacora',
-            'fecha_inicio', 'fecha_fin',
-            'instructor_seguimiento', # Esto será una lista desplegable automática
-            'razon_social_empresa', 'nit_empresa', 'direccion_empresa',
-            'nombre_jefe_inmediato', 'cargo_jefe', 'telefono_jefe', 'email_jefe',
-            'modalidad', 'pais_etapa',
-            'afiliado_arl', 'nivel_riesgo', 'riesgo_corresponde', 'uso_epp',
-            'descripcion_actividades',
-            'archivo_evidencia'
+        # Excluimos los campos que se llenan solos o que van en el formset
+        exclude = [
+            'aprendiz', 
+            'numero_bitacora',  # Se calcula solo
+            'estado', 
+            'fecha_entrega', 
+            'observaciones_instructor',
+            # IMPORTANTE: Quitamos 'descripcion_actividades' y 'evidencia' de aquí
+            # porque ahora las manejaremos en las filas dinámicas (abajo)
         ]
+        
         widgets = {
-            # FECHAS (Calendario)
+            # FECHAS
             'fecha_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'fecha_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             
             # SELECTORES (Listas desplegables)
             'instructor_seguimiento': forms.Select(attrs={'class': 'form-select'}),
             'modalidad': forms.Select(attrs={'class': 'form-select'}),
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'afiliado_arl': forms.Select(attrs={'class': 'form-select'}),
             'nivel_riesgo': forms.Select(attrs={'class': 'form-select'}),
-            'riesgo_corresponde': forms.Select(attrs={'class': 'form-select'}),
             'uso_epp': forms.Select(attrs={'class': 'form-select'}),
             
-            # TEXTO (Inputs normales con estilo Bootstrap)
-            'numero_bitacora': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1'}),
+            # CAMPOS DE TEXTO (EMPRESA)
             'razon_social_empresa': forms.TextInput(attrs={'class': 'form-control'}),
             'nit_empresa': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion_empresa': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre_jefe_inmediato': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre_jefe': forms.TextInput(attrs={'class': 'form-control'}),
             'cargo_jefe': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono_jefe': forms.TextInput(attrs={'class': 'form-control'}),
             'email_jefe': forms.EmailInput(attrs={'class': 'form-control'}),
-            'pais_etapa': forms.TextInput(attrs={'class': 'form-control', 'value': 'Colombia'}),
-            
-            # ÁREA DE TEXTO GRANDE
-            'descripcion_actividades': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Describa las actividades realizadas en este periodo...'}),
-            'archivo_evidencia': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
-        # Recibimos el aprendiz para intentar pre-llenar datos si ya hizo bitácoras antes
-        aprendiz = kwargs.pop('aprendiz', None)
+        # 1. SACAMOS (pop) las variables personalizadas del diccionario kwargs
+        # Si no hacemos esto, al llamar a super(), Django dará error porque no las reconoce.
+        self.user = kwargs.pop('user', None)      # Sacamos 'user' si viene
+        self.aprendiz = kwargs.pop('aprendiz', None) # Sacamos 'aprendiz' si viene
+        
+        # 2. Ahora que kwargs está "limpio", llamamos al constructor de Django
         super().__init__(*args, **kwargs)
         
-        # Etiqueta amigable para el instructor
-        self.fields['instructor_seguimiento'].label = "Seleccione su Instructor"
-        self.fields['instructor_seguimiento'].queryset = Instructor.objects.all() # Aquí podrías filtrar si quisieras
+        # 3. Configuraciones visuales y lógica
+        self.fields['instructor_seguimiento'].label = "Instructor de Seguimiento"
+        
+        # LÓGICA DE AUTOCOMPLETADO
+        # Usamos self.user o self.aprendiz dependiendo de qué nos mandó la vista
+        usuario_a_consultar = self.user if self.user else (self.aprendiz.usuario if self.aprendiz else None)
 
-        # Lógica de "Autocompletar" (Si ya existe una bitácora anterior)
-        if aprendiz:
-            ultima_bitacora = Bitacora.objects.filter(aprendiz=aprendiz).last()
+        if usuario_a_consultar and hasattr(usuario_a_consultar, 'aprendiz'):
+            aprendiz_obj = usuario_a_consultar.aprendiz
+            ultima_bitacora = Bitacora.objects.filter(aprendiz=aprendiz_obj).last()
+            
             if ultima_bitacora:
-                # Pre-llenamos los datos de la empresa y el instructor para que no los escriba de nuevo
+                # Pre-llenamos los datos si existen
                 self.fields['razon_social_empresa'].initial = ultima_bitacora.razon_social_empresa
                 self.fields['nit_empresa'].initial = ultima_bitacora.nit_empresa
                 self.fields['direccion_empresa'].initial = ultima_bitacora.direccion_empresa
-                self.fields['nombre_jefe_inmediato'].initial = ultima_bitacora.nombre_jefe_inmediato
+                self.fields['nombre_jefe'].initial = ultima_bitacora.nombre_jefe
                 self.fields['cargo_jefe'].initial = ultima_bitacora.cargo_jefe
                 self.fields['telefono_jefe'].initial = ultima_bitacora.telefono_jefe
                 self.fields['email_jefe'].initial = ultima_bitacora.email_jefe
+                self.fields['ficha'].initial = ultima_bitacora.ficha
                 self.fields['instructor_seguimiento'].initial = ultima_bitacora.instructor_seguimiento
-                self.fields['nivel_riesgo'].initial = ultima_bitacora.nivel_riesgo
+
+
+# --- 2. EL FORMULARIO PARA LAS FILAS (ACTIVIDADES) ---
+class ActividadForm(forms.ModelForm):
+    class Meta:
+        model = ActividadBitacora
+        fields = ['descripcion', 'fecha_ejecucion', 'evidencia']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 2, 
+                'placeholder': 'Describa la actividad realizada...'
+            }),
+            'fecha_ejecucion': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'evidencia': forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Nombre del archivo o evidencia'
+            }),
+        }
+
+# --- 3. EL FORMSET (LA FÁBRICA DE FILAS) ---
+# Esto crea la magia de "Agregar más filas"
+ActividadFormSet = inlineformset_factory(
+    Bitacora,               # Modelo Padre
+    ActividadBitacora,      # Modelo Hijo
+    form=ActividadForm,     # El formulario de la fila
+    extra=1,                # Muestra 1 fila vacía al principio
+    can_delete=True         # Permite borrar filas
+)
