@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views 
+from . import views
+from django.contrib.auth import views as auth_views
 
 app_name = 'core'
 
@@ -12,6 +13,8 @@ urlpatterns = [
     path('nosotros/', views.nosotros, name='nosotros'),
     path('contactanos/', views.contactanos, name='contactanos'),
     path('busqueda/', views.busqueda_global, name='busqueda'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='core:index'), name='logout'),
+    
 
 
     ]

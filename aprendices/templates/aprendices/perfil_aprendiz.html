@@ -1,79 +1,200 @@
-{% extends 'master.html' %}
+{% extends 'core/base_simple.html' %}
+{% load static %}
 
-{% block title %}Mi Perfil | APPrendiz{% endblock %}
+{% block title %}Mi Panel - SENA{% endblock %}
 
 {% block content %}
+<style>
+    :root {
+        --sena-green: #39a900;
+        --sena-dark-green: #2d8600;
+        --sena-orange: #ff671f;
+    }
+
+    /* Sobrescribir colores base */
+    .text-sena { color: var(--sena-green) !important; }
+    .bg-sena { background-color: var(--sena-green) !important; color: white; }
+    .btn-sena { background-color: var(--sena-green); color: white; border: none; }
+    .btn-sena:hover { background-color: var(--sena-dark-green); color: white; }
+    
+    .card-dashboard {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+    }
+    .card-dashboard:hover { transform: translateY(-3px); }
+
+    .status-badge { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; }
+    .status-pendiente { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .status-evaluada { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+    .status-rechazada { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+
+    .action-btn { width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.2s; }
+    .action-btn:hover { transform: scale(1.1); }
+</style>
+
 <div class="container py-5">
-    <div class="row">
-        
-        <div class="col-md-4 mb-4">
-            <div class="card shadow border-0 text-center h-100">
-                <div class="card-body p-4">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-person-fill fs-1"></i>
-                    </div>
-                    <h4 class="card-title fw-bold">Hola, {{ user.first_name }}</h4>
-                    <p class="text-muted">Aprendiz SENA</p>
-                    <hr>
-                    <div class="text-start mt-4">
-                        <p class="mb-1"><strong class="text-primary">Ficha:</strong> {{ aprendiz.numero_ficha }}</p>
-                        <p class="mb-1"><strong class="text-primary">Programa:</strong> {{ aprendiz.programa_formacion }}</p>
-                        <p class="mb-0"><strong class="text-primary">Documento:</strong> {{ user.username }}</p>
+    
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
+        <div class="d-flex align-items-center">
+            <h5 class="mb-0 text-sena fw-bold"><i class="bi bi-person-workspace me-2"></i>Espacio del Aprendiz</h5>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'core:index' %}" class="btn btn-outline-secondary btn-sm px-3 fw-bold">
+                <i class="bi bi-house-door-fill me-2"></i>Inicio
+            </a>
+            
+            <form action="{% url 'core:logout' %}" method="post" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm px-3 fw-bold">
+                    <i class="bi bi-power me-2"></i>Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row align-items-center mb-5">
+        <div class="col-md-8">
+            <h6 class="text-muted text-uppercase fw-bold ls-1 mb-1">Sistema de Gestión de Etapa Productiva</h6>
+            <h2 class="fw-bold text-sena display-6">Hola, {{ request.user.first_name }}</h2>
+            <p class="text-muted">Aquí tienes el resumen de tus bitácoras y actividades.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-sena btn-lg fw-bold shadow-sm px-4 rounded-pill">
+                <i class="bi bi-plus-lg me-2"></i>Nueva Bitácora
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 border-start border-4 border-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Total Bitácoras</h6>
+                            <h3 class="fw-bold text-dark mb-0">{{ bitacoras.count }}</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                            <i class="bi bi-folder2-open fs-3"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-8">
-            
-            <div class="card shadow-sm border-0 mb-4"> <div class="card-header bg-white py-3">
-                    <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-journal-text me-2"></i>Mis Bitácoras</h5>
-                </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 border-start border-4 border-warning">
                 <div class="card-body">
-                    
-                    <div class="mb-3 text-end">
-                        <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-warning fw-bold text-dark btn-sm">
-                            <i class="bi bi-plus-circle me-1"></i>Nueva Bitácora
-                        </a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Pendientes</h6>
+                            <h3 class="fw-bold text-dark mb-0">
+                                {{ bitacoras_pendientes_count|default:"0" }} 
+                            </h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                            <i class="bi bi-hourglass-split fs-3"></i>
+                        </div>
                     </div>
-
-                    {% if bitacoras %}
-                        <div class="list-group list-group-flush">
-                            {% for bit in bitacoras %}
-                            
-                            <a href="{% url 'bitacoras:ver_bitacora_aprendiz' bit.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="fw-bold">Bitácora N° {{ bit.numero_bitacora }}</div> <small class="text-muted">Del {{ bit.fecha_inicio|date:"d/M" }} al {{ bit.fecha_fin|date:"d/M/Y" }}</small>
-                                </div>
-                                <div>
-                                    {% if bit.estado == 'Evaluada' or bit.estado == 'Aprobada' %}
-                                        <span class="badge bg-success rounded-pill">Evaluada</span>
-                                    {% elif bit.estado == 'Rechazada' %}
-                                        <span class="badge bg-danger rounded-pill">Rechazada</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary rounded-pill">Pendiente</span>
-                                    {% endif %}
-                                    
-                                    <i class="bi bi-chevron-right ms-2 text-muted"></i>
-                                </div>
-                            </a>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="bi bi-folder2-open display-4 text-muted"></i>
-                            <p class="mt-2 text-muted">Aún no tienes bitácoras registradas.</p>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
-
-            <div class="card shadow-sm border-0">
+        </div>
+        <div class="col-md-4">
+            <div class="card card-dashboard h-100 border-start border-4 border-primary">
                 <div class="card-body">
-                    <h6 class="fw-bold"><i class="bi bi-calendar-check me-2 text-success"></i>Próxima Visita</h6>
-                    <p class="small text-muted mb-0">No hay visitas programadas por el instructor.</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Ficha Actual</h6>
+                            <h4 class="fw-bold text-dark mb-0">{{ request.user.aprendiz.ficha.numero|default:"Sin asignar" }}</h4>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                            <i class="bi bi-people fs-3"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-        </div> </div> </div>
+    <div class="card card-dashboard shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+            <h5 class="fw-bold text-sena mb-0"><i class="bi bi-list-check me-2"></i>Historial de Envíos</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted">
+                        <tr>
+                            <th class="ps-4"># Bitácora</th>
+                            <th>Periodo</th>
+                            <th>Instructor</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bitacora in bitacoras %}
+                        <tr>
+                            <td class="ps-4 fw-bold">Bitácora N° {{ bitacora.numero_bitacora }}</td>
+                            <td>
+                                <span class="d-block small text-muted">Inicio: {{ bitacora.fecha_inicio|date:"d M Y" }}</span>
+                                <span class="d-block small text-muted">Fin: {{ bitacora.fecha_fin|date:"d M Y" }}</span>
+                            </td>
+                            <td>
+                                {% if bitacora.instructor_seguimiento %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light rounded-circle p-2 me-2 text-secondary">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <span class="small">{{ bitacora.instructor_seguimiento.usuario.get_full_name }}</span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted small">--</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <span class="status-badge 
+                                    {% if bitacora.estado == 'Pendiente' %}status-pendiente
+                                    {% elif bitacora.estado == 'Evaluada' %}status-evaluada
+                                    {% else %}status-rechazada{% endif %}">
+                                    {{ bitacora.estado }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a href="{% url 'bitacoras:ver_bitacora_aprendiz' bitacora.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 me-1" title="Ver detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+
+                                {% if bitacora.estado == 'Pendiente' %}
+                                    <a href="{% url 'bitacoras:editar_bitacora' bitacora.id %}" class="btn btn-outline-warning btn-sm rounded-pill px-3 me-1" title="Editar">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a href="{% url 'bitacoras:eliminar_bitacora' bitacora.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-3" 
+                                       onclick="return confirm('¿Estás seguro de eliminar la Bitácora N° {{ bitacora.numero_bitacora }}? Esta acción no se puede deshacer.');" 
+                                       title="Eliminar">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small ms-2"><i class="bi bi-lock-fill"></i> Cerrada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                    <p class="mb-0">Aún no has registrado ninguna bitácora.</p>
+                                    <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-link text-sena">Crear la primera ahora</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
