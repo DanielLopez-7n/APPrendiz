@@ -3,69 +3,113 @@
 {% block title %}Editar Mi Perfil{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0">
-            
-            <div class="card-header bg-success bg-opacity-75 text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>Actualizar mis Datos</h5>
-            </div>
+<style>
+    :root {
+        --sena-green: #39a900;
+        --sena-dark-green: #2d8600;
+    }
+    
+    /* Personalización local para este formulario */
+    .card-sena-header {
+        background-color: var(--sena-green) !important;
+        border-bottom: none;
+    }
+    
+    .btn-sena-save {
+        background-color: var(--sena-green) !important;
+        border-color: var(--sena-green) !important;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-sena-save:hover {
+        background-color: var(--sena-dark-green) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
 
-            <div class="card-body p-4">
+    .form-label {
+        color: #444;
+        font-size: 0.9rem;
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar-wrapper img, .avatar-wrapper .avatar-placeholder {
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0 overflow-hidden">
                 
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+                <div class="card-header card-sena-header text-white py-4 text-center">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-person-gear me-2"></i>Actualizar mis Datos
+                    </h4>
+                    <p class="mb-0 opacity-75 small">Mantén tu información personal al día</p>
+                </div>
 
-                    <div class="text-center mb-4">
-                        <label class="d-block fw-bold text-muted mb-2">Tu Foto Actual</label>
-                        
-                        <div class="mb-3">
-                            {% if user.perfil.foto_perfil %}
-                                <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover;">
-                            {% else %}
-                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 120px; height: 120px;">
-                                    <i class="bi bi-camera text-secondary fs-1"></i>
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="input-group">
-                            {{ form.foto_perfil }}
-                        </div>
-                        <small class="text-muted">Sube una foto cuadrada (JPG, PNG).</small>
-                    </div>
-
-                    <hr>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Nombres</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Apellidos</label>
-                            {{ form.last_name }}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Correo Electrónico</label>
-                            {{ form.email }}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold">Teléfono de Contacto</label>
-                            {{ form.telefono }}
-                        </div>
-                    </div>
+                <div class="card-body p-4 p-md-5">
                     
-                    <div class="mt-4 d-grid gap-2">
-                        <button type="submit" class="btn btn-success text-white fw-bold">
-                            <i class="bi bi-check-lg me-2"></i>Guardar Cambios
-                        </button>
-                        <a href="{% url 'usuarios:ver_perfil' %}" class="btn btn-light text-muted border">
-                            Cancelar
-                        </a>
-                    </div>
+                    <form method="post" enctype="multipart/form-data" id="form-editar-perfil">
+                        {% csrf_token %}
 
-                </form>
+                        <div class="text-center mb-5">
+                            <div class="avatar-wrapper mb-3">
+                                {% if user.perfil.foto_perfil %}
+                                    <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle" style="width: 140px; height: 140px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 140px; height: 140px; border: 2px dashed #ccc;">
+                                        <i class="bi bi-camera text-muted fs-1"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mx-auto" style="max-width: 300px;">
+                                <label class="form-label d-block fw-bold text-sena mb-2">Cambiar foto de perfil</label>
+                                {{ form.foto_perfil }}
+                                <div class="form-text mt-2 text-muted">Formatos sugeridos: JPG o PNG cuadrados.</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 opacity-25">
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="bi bi-person me-1"></i>Nombres</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold"><i class="bi bi-person me-1"></i>Apellidos</label>
+                                {{ form.last_name }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold"><i class="bi bi-telephone me-1"></i>Teléfono de Contacto</label>
+                                {{ form.telefono }}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-5 d-grid gap-2">
+                            <button type="submit" class="btn btn-sena-save text-white btn-lg fw-bold shadow-sm">
+                                <i class="bi bi-check2-all me-2"></i>Guardar Cambios
+                            </button>
+                            <a href="{% url 'usuarios:perfil' %}" class="btn btn-link text-muted mt-2">
+                                <i class="bi bi-x-circle me-1"></i>Descartar Cambios
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
             </div>
         </div>
     </div>

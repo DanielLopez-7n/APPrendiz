@@ -1,0 +1,64 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}Banco de Actividades{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow border-0" style="border-top: 5px solid #39a900;">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-card-checklist me-2 text-success"></i>Banco de Actividades Sugeridas
+                    </h5>
+                    <button class="btn btn-primary btn-sm fw-bold">
+                        <i class="bi bi-plus-lg me-1"></i> Nueva Actividad
+                    </button>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-4">
+                        Este banco contiene las actividades estandarizadas que los aprendices pueden seleccionar en sus bitácoras.
+                    </p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre de la Actividad</th>
+                                    <th>Descripción Breve</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge bg-light text-dark border">ACT-001</span></td>
+                                    <td class="fw-bold">Documentación de requerimientos</td>
+                                    <td class="text-muted">Levantamiento y análisis de necesidades del cliente...</td>
+                                    <td class="text-center"><span class="badge rounded-pill bg-success">Disponible</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-light text-dark border">ACT-002</span></td>
+                                    <td class="fw-bold">Pruebas unitarias de software</td>
+                                    <td class="text-muted">Ejecución de test de componentes y lógica de negocio...</td>
+                                    <td class="text-center"><span class="badge rounded-pill bg-success">Disponible</span></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-0 py-3">
+                    <small class="text-muted">Módulo en fase de desarrollo - Prototipo para exposición</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
