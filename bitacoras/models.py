@@ -36,7 +36,7 @@ class Bitacora(models.Model):
     # --- RELACIONES PRINCIPALES ---
     aprendiz = models.ForeignKey(Aprendiz, on_delete=models.CASCADE)
     
-    # Aquí conectamos con tu nueva App de Fichas
+    # Aquí conectamos con lax| nueva App de Fichas
     ficha = models.ForeignKey(
         Ficha, 
         on_delete=models.SET_NULL, 
@@ -71,8 +71,7 @@ class Bitacora(models.Model):
 
     # --- MÓDULO 3: MODALIDAD Y SEGURIDAD (SST) ---
     modalidad = models.CharField(max_length=20, choices=MODALIDAD_CHOICES, default='Presencial')
-    pais_etapa = models.CharField(max_length=50, default='Colombia')
-    
+    pais_etapa = models.CharField(max_length=50, default='Colombia', blank=True, null=True)    
     afiliado_arl = models.CharField(max_length=2, choices=SI_NO_NA_CHOICES, verbose_name="¿Afiliado a ARL?")
     nivel_riesgo = models.CharField(max_length=3, choices=RIESGO_ARL_CHOICES, verbose_name="Nivel de Riesgo")
     uso_epp = models.CharField(max_length=3, choices=SI_NO_NA_CHOICES, verbose_name="¿Cuenta con EPP?")
@@ -105,8 +104,7 @@ class ActividadBitacora(models.Model):
     
     descripcion = models.TextField(verbose_name="Descripción de la actividad")
     fecha_ejecucion = models.DateField(verbose_name="Fecha de Ejecución")
-    evidencia = models.CharField(max_length=255, verbose_name="Evidencia / Producto", blank=True, null=True)
-
+    evidencia = models.FileField(upload_to='evidencias_bitacoras/', verbose_name="Evidencia / Producto", blank=True, null=True)
     def __str__(self):
         return f"Actividad {self.id} de Bitácora {self.bitacora.numero_bitacora}"
     

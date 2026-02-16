@@ -95,7 +95,7 @@ class ActividadForm(forms.ModelForm):
                 'placeholder': 'Describa la actividad realizada...'
             }),
             'fecha_ejecucion': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'evidencia': forms.TextInput(attrs={
+            'evidencia': forms.FileInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Nombre del archivo o evidencia'
             }),

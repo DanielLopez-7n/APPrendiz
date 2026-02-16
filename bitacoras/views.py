@@ -2,8 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db import transaction # Para asegurar que guardamos todo o nada
-
+from django.db import transaction
 
 # Importamos Modelos y Formularios
 from .models import Bitacora
@@ -55,13 +54,12 @@ def crear_bitacora(request):
         form = CrearBitacoraForm(request.POST, request.FILES, user=request.user)
         
         # 2. Recibimos el Formset (Las filas de actividades)
-        # IMPORTANTE: prefix='actividades' conecta con el JavaScript
-        formset = ActividadFormSet(request.POST, prefix='actividades')
+        formset = ActividadFormSet(request.POST, request.FILES, prefix='actividades')
 
         # 3. Validamos AMBOS
         if form.is_valid() and formset.is_valid():
             try:
-                with transaction.atomic(): # Si algo falla, no guarda nada
+                with transaction.atomic():
                     # Guardar Bitácora
                     bitacora = form.save(commit=False)
                     if aprendiz_usuario:
@@ -78,6 +76,11 @@ def crear_bitacora(request):
             except Exception as e:
                 messages.error(request, f'Error al guardar: {e}')
         else:
+            # AQUÍ ESTÁ LA TRAMPA PARA VER EL ERROR REAL EN LA TERMINAL:
+            print("--- ERRORES DETECTADOS ---")
+            print("Errores de la Bitácora:", form.errors)
+            print("Errores de las Actividades:", formset.errors)
+            
             messages.error(request, 'Hay errores en el formulario. Revisa los campos en rojo.')
     else:
         form = CrearBitacoraForm(user=request.user)
@@ -85,7 +88,7 @@ def crear_bitacora(request):
 
     context = {
         'form': form,
-        'formset': formset, # <--- OBLIGATORIO ENVIARLO AL HTML
+        'formset': formset,
         'titulo': "Nueva Bitácora",
         'template_to_extend': template_base,
         'es_instructor': es_instructor
@@ -95,18 +98,15 @@ def crear_bitacora(request):
 # --- VISTA: EDITAR BITÁCORA (CORREGIDA PARA V5) ---
 @login_required
 def editar_bitacora(request, pk):
-    # Buscamos la bitácora
     bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz=request.user.aprendiz)
 
-    # Seguridad: Solo editar si está pendiente
     if bitacora.estado != 'Pendiente':
         messages.error(request, "No puedes editar una bitácora evaluada.")
         return redirect('aprendices:perfil_aprendiz')
 
     if request.method == 'POST':
         form = CrearBitacoraForm(request.POST, request.FILES, instance=bitacora, user=request.user)
-        # IMPORTANTE: prefix='actividades' y instance=bitacora
-        formset = ActividadFormSet(request.POST, instance=bitacora, prefix='actividades')
+        formset = ActividadFormSet(request.POST, request.FILES, instance=bitacora, prefix='actividades')
 
         if form.is_valid() and formset.is_valid():
             with transaction.atomic():
@@ -115,7 +115,6 @@ def editar_bitacora(request, pk):
             messages.success(request, "Bitácora actualizada correctamente.")
             return redirect('aprendices:perfil_aprendiz')
     else:
-        # GET: Cargar datos existentes
         form = CrearBitacoraForm(instance=bitacora, user=request.user)
         formset = ActividadFormSet(instance=bitacora, prefix='actividades')
 
@@ -125,7 +124,6 @@ def editar_bitacora(request, pk):
         'titulo': f'Editar Bitácora N° {bitacora.numero_bitacora}',
         'template_to_extend': 'core/base_simple.html'
     }
-    # Reutilizamos el HTML de crear
     return render(request, 'bitacoras/crear_bitacora.html', context)
 
 # --- VISTA: ELIMINAR BITÁCORA ---
@@ -145,27 +143,21 @@ def eliminar_bitacora(request, pk):
 @login_required
 def ver_bitacora_aprendiz(request, pk):
     bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz__usuario=request.user)
-    return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {
-        'bitacora': bitacora
-    })
+    return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {'bitacora': bitacora})
 
 # --- VISTA: VER DETALLE (INSTRUCTOR/ADMIN) ---
 @login_required
 def ver_bitacora(request, pk):
     bitacora = get_object_or_404(Bitacora, pk=pk)
-    # Seguridad básica
     if hasattr(request.user, 'aprendiz') and bitacora.aprendiz != request.user.aprendiz:
         messages.error(request, "No tienes permiso para ver esta bitácora.")
         return redirect('bitacoras:listar_bitacoras')
     
-    return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {
-        'bitacora': bitacora
-    })
+    return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {'bitacora': bitacora})
     
-    # --- VISTA: REVISAR BITÁCORA (SOLO INSTRUCTOR) ---
+# --- VISTA: REVISAR BITÁCORA (SOLO INSTRUCTOR) ---
 @login_required
 def revisar_bitacora(request, pk):
-    # 1. Seguridad: Solo Staff (Instructores)
     if not request.user.is_staff:
         messages.error(request, "No tienes permisos para revisar bitácoras.")
         return redirect('bitacoras:listar_bitacoras')
@@ -173,7 +165,6 @@ def revisar_bitacora(request, pk):
     bitacora = get_object_or_404(Bitacora, pk=pk)
 
     if request.method == 'POST':
-        # Recibimos la calificación del instructor
         nuevo_estado = request.POST.get('estado')
         observaciones = request.POST.get('observaciones_instructor')
 
@@ -195,10 +186,8 @@ def revisar_bitacora(request, pk):
 # --- VISTA: EXPORTAR PDF ---
 @login_required
 def exportar_pdf(request, pk):
-    # 1. Buscamos la bitácora
     bitacora = get_object_or_404(Bitacora, pk=pk)
     
-    # 2. Seguridad: Solo el dueño o un instructor pueden verla
     es_dueno = hasattr(request.user, 'aprendiz') and bitacora.aprendiz == request.user.aprendiz
     es_instructor = request.user.is_staff
     
