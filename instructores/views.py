@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Instructor
 from .forms import InstructorForm
-from usuarios.forms import UsuarioForm
 
 # Filtro de seguridad: Solo entra Staff o Superuser
 def es_admin(user):
@@ -20,34 +19,26 @@ def listar_instructores(request):
 @user_passes_test(es_admin)
 def crear_instructor(request):
     if request.method == 'POST':
-        form_usuario = UsuarioForm(request.POST)
-        form_instructor = InstructorForm(request.POST)
+        # Solo recibimos el formulario del instructor
+        form = InstructorForm(request.POST)
 
-        if form_usuario.is_valid() and form_instructor.is_valid():
-            # 1. Preparar Usuario
-            usuario = form_usuario.save(commit=False)
-            documento = form_usuario.cleaned_data['username']
+        if form.is_valid():
+            # 1. Guardamos el perfil del instructor
+            instructor = form.save()
             
-            # 2. Asignar contraseña automática y PERMISO STAFF
-            usuario.set_password(documento)
-            usuario.is_staff = True  # <--- ¡VITAL PARA INSTRUCTORES!
+            # 2. ¡EL TOQUE MÁGICO! Le damos permisos de STAFF al usuario vinculado
+            usuario = instructor.usuario
+            usuario.is_staff = True
             usuario.save()
-            
-            # 3. Guardar Instructor
-            instructor = form_instructor.save(commit=False)
-            instructor.usuario = usuario
-            instructor.save()
 
-            messages.success(request, f'Instructor creado. Usuario y Clave: {documento}')
+            messages.success(request, f'Perfil de instructor vinculado exitosamente. ¡Se le han otorgado permisos de Staff a {usuario.get_full_name()}!')
             return redirect('instructores:listar_instructores')
     else:
-        form_usuario = UsuarioForm()
-        form_instructor = InstructorForm()
+        form = InstructorForm()
 
     context = {
-        'titulo': 'Registrar Instructor',
-        'form_usuario': form_usuario,
-        'form_instructor': form_instructor,
+        'titulo': 'Vincular Perfil de Instructor',
+        'form': form, # Cambiamos form_instructor a simplemente 'form'
         'editar': False
     }
     return render(request, 'instructores/crear_instructor.html', context)
@@ -56,29 +47,24 @@ def crear_instructor(request):
 @user_passes_test(es_admin)
 def editar_instructor(request, pk):
     instructor = get_object_or_404(Instructor, pk=pk)
-    usuario = instructor.usuario
     
     if request.method == 'POST':
-        form_usuario = UsuarioForm(request.POST, instance=usuario)
-        form_instructor = InstructorForm(request.POST, instance=instructor)
+        # Solo actualizamos los datos del perfil del instructor
+        form = InstructorForm(request.POST, instance=instructor)
         
-        if form_usuario.is_valid() and form_instructor.is_valid():
-            form_usuario.save()
-            form_instructor.save()
-            messages.success(request, 'Datos actualizados correctamente.')
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Datos del instructor actualizados correctamente.')
             return redirect('instructores:listar_instructores')
     else:
-        form_usuario = UsuarioForm(instance=usuario)
-        form_instructor = InstructorForm(instance=instructor)
+        form = InstructorForm(instance=instructor)
 
     context = {
-        'titulo': 'Editar Instructor',
-        'form_usuario': form_usuario,
-        'form_instructor': form_instructor,
+        'titulo': 'Editar Perfil de Instructor',
+        'form': form,
         'editar': True
     }
     return render(request, 'instructores/crear_instructor.html', context)
-
 @login_required
 @user_passes_test(es_admin)
 def eliminar_instructor(request, pk):

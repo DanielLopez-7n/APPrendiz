@@ -1,93 +1,88 @@
-{% extends 'core/panel_admin_base.html' %}
+{% extends 'core/panel_admin_base.html' %} 
 
-{% block title %}{{ titulo }} | APPrendiz{% endblock %}
+{% block title %}
+    {% if editar %}Editar Instructor{% else %}Vincular Instructor{% endif %}
+{% endblock %}
+
+{% block page_title %}Gestión de Instructores{% endblock %}
 
 {% block breadcrumb_items %}
     <li class="breadcrumb-item"><a href="{% url 'instructores:listar_instructores' %}">Instructores</a></li>
-    <li class="breadcrumb-item active">{{ titulo }}</li>
+    <li class="breadcrumb-item active">{% if editar %}Edición{% else %}Nuevo{% endif %}</li>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-person-video3 me-2"></i>{{ titulo }}</h5>
+    <div class="col-md-10 col-lg-8"> 
+        <div class="card shadow-sm border-0">
+            
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-primary">
+                    {% if editar %}
+                        <i class="bi bi-pencil-square me-2"></i>Editar Perfil de Instructor
+                    {% else %}
+                        <i class="bi bi-person-badge-fill me-2"></i>Vincular Perfil de Instructor
+                    {% endif %}
+                </h5>
             </div>
+
             <div class="card-body p-4">
-                
-                <form method="post" class="needs-validation" novalidate>
+                <form method="POST" action="">
                     {% csrf_token %}
                     
-                    <h6 class="text-primary fw-bold mb-3">
-                        <i class="bi bi-shield-lock me-2"></i>Datos de Cuenta y Acceso
-                    </h6>
-                    <div class="alert alert-info py-2 small">
-                        <i class="bi bi-info-circle me-1"></i>
-                        El <strong>Usuario</strong> y la <strong>Contraseña</strong> serán el número de documento ingresado.
-                        El instructor tendrá acceso al Panel Administrativo.
-                    </div>
-
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Cuenta de Acceso</h6>
+                    
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombres *</label>
-                            {{ form_usuario.first_name }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Apellidos *</label>
-                            {{ form_usuario.last_name }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Documento (Usuario Login) *</label>
-                            {{ form_usuario.username }}
-                            {% if form_usuario.username.errors %}
-                                <div class="text-danger small">{{ form_usuario.username.errors }}</div>
+                        <div class="col-md-12"> 
+                            <label class="form-label fw-bold">{{ form.usuario.label }} *</label>
+                            {{ form.usuario }}
+                            {% if not editar %}
+                                <div class="form-text text-primary"><i class="bi bi-info-circle"></i> Al guardar, este usuario recibirá automáticamente permisos de <strong>Staff</strong> para acceder al panel.</div>
                             {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Correo Electrónico *</label>
-                            {{ form_usuario.email }}
+                            <div class="text-danger small">{{ form.usuario.errors }}</div>
                         </div>
                     </div>
 
-                    <hr class="text-muted">
+                    <hr class="my-4">
 
-                    <h6 class="text-primary fw-bold mb-3">
-                        <i class="bi bi-briefcase me-2"></i>Información Profesional
-                    </h6>
-
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Contractual</h6>
                     <div class="row g-3 mb-4">
                         
-                        <div class="col-md-6">
-                            <label class="form-label">Cédula de Ciudadanía *</label>
-                            {{ form_instructor.cedula }}
-                            {% if form_instructor.cedula.errors %}
-                                <div class="text-danger small">{{ form_instructor.cedula.errors }}</div>
-                            {% endif %}
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.cedula.label }} *</label>
+                            {{ form.cedula }} 
+                            <div class="text-danger small">{{ form.cedula.errors }}</div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Profesión / Especialidad *</label>
-                            {{ form_instructor.profesion }}
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">Profesión / Especialidad *</label>
+                            {{ form.profesion }}
+                            <div class="text-danger small">{{ form.profesion.errors }}</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Celular de Contacto</label>
-                            {{ form_instructor.telefono }}
+                        
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">Teléfono Celular *</label>
+                            {{ form.telefono }}
+                            <div class="text-danger small">{{ form.telefono.errors }}</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tipo de Vinculación</label>
-                            {{ form_instructor.tipo_contrato }}
+
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">Tipo de Contrato *</label>
+                            {{ form.tipo_contrato }}
+                            <div class="text-danger small">{{ form.tipo_contrato.errors }}</div>
                         </div>
+
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-4">
-                            <i class="bi bi-save me-2"></i>Guardar Instructor
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-5">
+                            <i class="bi bi-check-circle me-1"></i> 
+                            {% if editar %}Actualizar Datos{% else %}Vincular Perfil{% endif %}
                         </button>
                     </div>
-                </form>
 
+                </form> 
             </div>
         </div>
     </div>
