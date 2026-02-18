@@ -17,14 +17,15 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8"> <div class="card shadow-sm border-0">
+    <div class="col-md-10 col-lg-8"> 
+        <div class="card shadow-sm border-0">
             
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 text-primary">
                     {% if editar %}
-                        <i class="bi bi-pencil-square me-2"></i>Editar Aprendiz
+                        <i class="bi bi-pencil-square me-2"></i>Editar Perfil del Aprendiz
                     {% else %}
-                        <i class="bi bi-person-plus-fill me-2"></i>Información del Aprendiz
+                        <i class="bi bi-person-plus-fill me-2"></i>Vincular Perfil de Aprendiz
                     {% endif %}
                 </h5>
             </div>
@@ -35,36 +36,19 @@
                     
                     {% csrf_token %}
                     
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Datos de Acceso (Usuario)</h6>
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Cuenta de Acceso</h6>
                     
                     <div class="row g-3 mb-4">
                         
-                        <div class="col-md-6"> <label class="form-label">Nombres *</label>
-                            {{ form_usuario.first_name }}
-                        </div>
-
-                        <div class="col-md-6"> <label class="form-label">Apellidos *</label>
-                            {{ form_usuario.last_name }}
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Usuario (Login) *</label>
-                            {{ form_usuario.username }}
+                        <div class="col-md-12"> 
+                            <label class="form-label">Seleccione el Usuario del Sistema *</label>
+                            {{ form.usuario }}
                             {% if not editar %}
-                                <div class="form-text">Este será el usuario para entrar al sistema.</div>
+                                <div class="form-text text-primary"><i class="bi bi-info-circle"></i> Seleccione la cuenta base. Si no aparece en la lista, el administrador debe crearla primero en el módulo de Usuarios.</div>
                             {% endif %}
+                            <div class="text-danger small">{{ form.usuario.errors }}</div>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Correo Institucional *</label>
-                            {{ form_usuario.email }}
-                        </div>
-                        
-                        {% if form_usuario.errors %}
-                            <div class="alert alert-danger mt-2">
-                                {{ form_usuario.errors }}
-                            </div>
-                        {% endif %}
                     </div>
 
                     <hr class="my-4">
@@ -73,25 +57,28 @@
                     <div class="row g-3 mb-4">
                         
                         <div class="col-md-6"> <label class="form-label">Documento de Identidad *</label>
-                            {{ form_aprendiz.documento }} 
-                            <div class="text-danger small">{{ form_aprendiz.documento.errors }}</div>
+                            {{ form.documento }} 
+                            <div class="text-danger small">{{ form.documento.errors }}</div>
                         </div>
 
                         <div class="col-md-6"> <label class="form-label">Número de Ficha *</label>
-                            {{ form_aprendiz.numero_ficha }}
+                            {{ form.numero_ficha }}
+                            <div class="text-danger small">{{ form.numero_ficha.errors }}</div>
                         </div>
                         
                         <div class="col-md-12"> <label class="form-label">Programa de Formación *</label>
-                            {{ form_aprendiz.programa_formacion }}
+                            {{ form.programa_formacion }}
+                            <div class="text-danger small">{{ form.programa_formacion.errors }}</div>
                         </div>
                         
                         <div class="col-md-12"> <label class="form-label">Celular de Contacto *</label>
-                            {{ form_aprendiz.telefono }}
+                            {{ form.telefono }}
+                            <div class="text-danger small">{{ form.telefono.errors }}</div>
                         </div>
 
-                        {% if form_aprendiz.errors %}
+                        {% if form.non_field_errors %}
                             <div class="alert alert-danger mt-2">
-                                {{ form_aprendiz.errors }}
+                                {{ form.non_field_errors }}
                             </div>
                         {% endif %}
                     </div>
@@ -100,7 +87,7 @@
                         
                         <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-md-2">Cancelar</a>
                         
-                        <button type="submit" class="btn btn-primary px-5">
+                        <button type="submit" class="btn btn-success px-5">
                             {% if editar %}
                                 Actualizar Datos
                             {% else %}
@@ -109,7 +96,8 @@
                         </button>
                     </div>
 
-                </form> </div>
+                </form> 
+            </div>
         </div>
     </div>
 </div>
