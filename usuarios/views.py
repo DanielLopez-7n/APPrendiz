@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
-from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm, MiPerfilForm
+from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm, MiPerfilForm, UsuarioForm
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -188,28 +188,43 @@ def ver_detalle_usuario(request, user_id):
 @user_passes_test(es_staff, login_url='usuarios:login')
 def crear_usuario_view(request):
     """
-    Vista para crear un nuevo usuario desde el panel admin
+    Vista para crear un nuevo usuario base (Aprendiz/Instructor)
+    sin pedir contraseña (se asigna el documento por defecto).
     """
     if request.method == 'POST':
-        form = RegistroForm(request.POST)
+        # USAMOS EL NUEVO FORMULARIO SIMPLIFICADO
+        form = UsuarioForm(request.POST) 
         
         if form.is_valid():
-            user = form.save()
-            messages.success(request, f'Usuario {user.get_full_name()} creado exitosamente.')
+            # 1. Preparamos el usuario pero no lo guardamos aún
+            user = form.save(commit=False)
+            
+            # 2. La contraseña será el mismo número de documento (username)
+            documento = form.cleaned_data['username']
+            user.set_password(documento)
+            
+            # 3. Guardamos el User. ¡Magia! Esto dispara tu señal en models.py
+            # y crea el PerfilUsuario automáticamente en el fondo.
+            user.save()
+            
+            # 4. Ahora tomamos ese perfil recién creado y le asignamos el documento real
+            user.perfil.documento = documento
+            user.perfil.save()
+            
+            messages.success(request, f'¡Cuenta de acceso creada! La contraseña temporal es el documento: {documento}. Ahora puedes ir a vincularla en Aprendices o Instructores.')
             return redirect('usuarios:lista_usuarios')
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
     else:
-        form = RegistroForm()
+        form = UsuarioForm()
     
     context = {
-        'titulo': 'Crear Nuevo Usuario',
+        'titulo': 'Crear Cuenta de Acceso (Base)',
         'form': form,
         'accion': 'Crear'
     }
-    return render(request, 'usuarios/panel_admin/crear_usuario.html', context)
-
-
+    
+    return render(request, 'usuarios/crear_usuario.html', context)
 # usuarios/views.py
 
 @login_required
@@ -276,31 +291,31 @@ def editar_usuario_view(request, user_id):
 @user_passes_test(es_staff, login_url='usuarios:login')
 def eliminar_usuario_view(request, user_id):
     """
-    Vista para eliminar (desactivar) un usuario
+    Vista para eliminar DEFINITIVAMENTE un usuario de la base de datos
     """
     usuario = get_object_or_404(User, id=user_id)
     
     # No permitir eliminar al superusuario
     if usuario.is_superuser:
-        messages.error(request, 'No se puede eliminar un superusuario.')
+        messages.error(request, 'No se puede eliminar un administrador principal.')
         return redirect('usuarios:lista_usuarios')
     
     # No permitir que se elimine a sí mismo
     if usuario == request.user:
-        messages.error(request, 'No puedes eliminarte a ti mismo.')
+        messages.error(request, 'No puedes eliminar tu propia cuenta en uso.')
         return redirect('usuarios:lista_usuarios')
     
     if request.method == 'POST':
-        usuario.is_active = False
-        usuario.save()
-        messages.success(request, f'Usuario {usuario.get_full_name()} desactivado exitosamente.')
+        nombre = usuario.get_full_name() or usuario.username
+        
+        # ¡LA INSTRUCCIÓN DE BORRADO DEFINITIVO!
+        usuario.delete() 
+        
+        messages.success(request, f'El usuario {nombre} fue eliminado permanentemente de la base de datos.')
         return redirect('usuarios:lista_usuarios')
     
-    context = {
-        'titulo': 'Eliminar Usuario',
-        'usuario': usuario
-    }
-    return render(request, 'usuarios/panel_admin/eliminar_usuario.html', context)
+    # Si intentan entrar por URL directa (GET), los devolvemos a la lista
+    return redirect('usuarios:lista_usuarios')
 
 
 @login_required

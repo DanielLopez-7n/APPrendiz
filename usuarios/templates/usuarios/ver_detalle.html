@@ -40,8 +40,10 @@
                                         <span class="badge bg-danger">Superadmin</span>
                                     {% elif usuario.is_staff %}
                                         <span class="badge bg-warning text-dark">Instructor/Staff</span>
-                                    {% else %}
+                                    {%elif usuario.aprendiz %}
                                         <span class="badge bg-info text-dark">Aprendiz</span>
+                                    {% else %}
+                                        <span class="badge bg-info text-dark">Usuario</span>
                                     {% endif %}
                                 </div>
                             </li>
