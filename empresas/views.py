@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Empresa
 from .forms import EmpresaForm
+from django.db.models import Q
+
 
 # Función de seguridad: Solo permite entrar a Staff (Instructores y Admins)
 def es_staff(user):
@@ -11,11 +13,18 @@ def es_staff(user):
 @login_required
 @user_passes_test(es_staff)
 def listar_empresas(request):
-    # Traemos todas las empresas para mostrarlas en la tabla
     empresas = Empresa.objects.all()
+    query = request.GET.get('q', '')
+
+    if query:
+        empresas = empresas.filter(
+            Q(nombre__icontains=query) |
+            Q(nit__icontains=query) 
+        )
+
     context = {
         'empresas': empresas,
-        'titulo': 'Gestión de Empresas'
+        'query': query,
     }
     return render(request, 'empresas/listar_empresas.html', context)
 

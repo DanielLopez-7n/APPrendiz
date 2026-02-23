@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
+from django.db.models import Q
+
 
 # Importamos Modelos y Formularios
 from .models import Bitacora
@@ -11,24 +13,24 @@ from .forms import CrearBitacoraForm, ActividadFormSet
 # --- VISTA: LISTAR BITÁCORAS ---
 @login_required
 def listar_bitacoras(request):
-    # CASO 1: Aprendiz
-    if hasattr(request.user, 'aprendiz'):
-        bitacoras = Bitacora.objects.filter(aprendiz=request.user.aprendiz)
-        es_aprendiz = True
-    # CASO 2: Instructor o Admin
-    elif request.user.is_staff:
-        bitacoras = Bitacora.objects.all().order_by('-fecha_entrega')
-        es_aprendiz = False
-    else:
-        bitacoras = []
-        es_aprendiz = False
+    bitacoras = Bitacora.objects.all()
+    query = request.GET.get('q', '')
+
+    if query:
+        bitacoras = bitacoras.filter(
+            # Viajamos: Bitácora -> Aprendiz -> Usuario -> Nombre
+            Q(aprendiz__usuario__first_name__icontains=query) |
+            Q(aprendiz__usuario__last_name__icontains=query) |
+            Q(aprendiz__documento__icontains=query) |
+            Q(titulo__icontains=query) # Si tus bitácoras tienen un título o número
+        )
 
     context = {
         'bitacoras': bitacoras,
-        'es_aprendiz': es_aprendiz,
-        'titulo': 'Historial de Bitácoras'
+        'query': query,
     }
     return render(request, 'bitacoras/listar_bitacoras.html', context)
+
 
 # --- VISTA: CREAR BITÁCORA (CORREGIDA PARA V5) ---
 @login_required

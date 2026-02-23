@@ -5,42 +5,38 @@ from .forms import AprendizForm
 from .models import Aprendiz
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from usuarios.forms import UsuarioForm
 from bitacoras.models import Bitacora
+from django.db.models import Q
 
 # Vista para Listar todos los Aprendices
 @login_required
 def listar_aprendices(request):
-    # 1. Consultamos todos los aprendices en la base de datos
     aprendices = Aprendiz.objects.all()
     
+    # 1. Capturamos lo que el usuario escribió en la barra
+    query = request.GET.get('q', '')
+    modalidad = request.GET.get('modalidad', '')
+
+    # 2. Si escribió algo, filtramos por nombre, apellido, documento o ficha
+    if query:
+        aprendices = aprendices.filter(
+            Q(documento__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query) |
+            Q(numero_ficha__numero__icontains=query)
+        )
+    
+    # 3. Si seleccionó un filtro del desplegable
+    if modalidad:
+        aprendices = aprendices.filter(modalidad_formacion=modalidad)
+
     context = {
-        'aprendices': aprendices
+        'aprendices': aprendices,
+        # Opcional: mandamos la query de vuelta para que no se borre de la barra
+        'query': query, 
+        'modalidad': modalidad
     }
     return render(request, 'aprendices/listar_aprendices.html', context)
-
-# Vista para Registrar un nuevo Aprendiz
-@login_required
-def crear_aprendiz(request):
-    if request.method == 'POST':
-        # Solo recibimos el formulario del aprendiz
-        form = AprendizForm(request.POST)
-
-        if form.is_valid():
-            # Como el usuario se elige en el formulario, se guarda directo
-            form.save()
-            messages.success(request, 'Perfil de aprendiz registrado y vinculado exitosamente.')
-            return redirect('aprendices:listar_aprendices') 
-        else:
-            messages.error(request, 'Por favor, corrige los errores en el formulario.')
-    else:
-        form = AprendizForm()
-
-    context = {
-        'form': form # Simplificamos el nombre a 'form'
-    }
-    
-    return render(request, 'aprendices/crear_aprendiz.html', context)
 
 # --- VISTA PARA EDITAR (UPDATE) ---
 @login_required

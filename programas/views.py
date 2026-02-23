@@ -2,17 +2,23 @@ from django.shortcuts import render
 from .models import Programa # Importamos el modelo para mostrar los datos
 from .forms import ProgramaForm # Importamos el formulario para crear nuevos programas
 from django.shortcuts import render, redirect
+from django.db.models import Q
+
 
 def listar_programas(request):
-    # Traemos todos los programas de la base de datos
     programas = Programa.objects.all()
-    
+    query = request.GET.get('q', '')
+
+    if query:
+        programas = programas.filter(
+            Q(nombre__icontains=query) 
+        )
+
     context = {
-        'titulo': 'Programas de Formación',
         'programas': programas,
+        'query': query
     }
     return render(request, 'programas/listar_programas.html', context)
-
 def crear_programa(request):
     """Vista para registrar un nuevo programa de formación."""
     

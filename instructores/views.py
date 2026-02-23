@@ -1,8 +1,11 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Instructor
 from .forms import InstructorForm
+from django.db.models import Q
+
 
 # Filtro de seguridad: Solo entra Staff o Superuser
 def es_admin(user):
@@ -11,37 +14,27 @@ def es_admin(user):
 @login_required
 @user_passes_test(es_admin)
 def listar_instructores(request):
-    instructores = Instructor.objects.select_related('usuario').all()
-    context = {'instructores': instructores}
-    return render(request, 'instructores/listar_instructores.html', context)
+    instructores = Instructor.objects.all()
+    
+    query = request.GET.get('q', '')
+    tipo_contrato = request.GET.get('tipo_contrato', '')
 
-@login_required
-@user_passes_test(es_admin)
-def crear_instructor(request):
-    if request.method == 'POST':
-        # Solo recibimos el formulario del instructor
-        form = InstructorForm(request.POST)
-
-        if form.is_valid():
-            # 1. Guardamos el perfil del instructor
-            instructor = form.save()
-            
-            # 2. ¡EL TOQUE MÁGICO! Le damos permisos de STAFF al usuario vinculado
-            usuario = instructor.usuario
-            usuario.is_staff = True
-            usuario.save()
-
-            messages.success(request, f'Perfil de instructor vinculado exitosamente. ¡Se le han otorgado permisos de Staff a {usuario.get_full_name()}!')
-            return redirect('instructores:listar_instructores')
-    else:
-        form = InstructorForm()
+    if query:
+        instructores = instructores.filter(
+            Q(cedula__icontains=query) |
+            Q(usuario__first_name__icontains=query) |
+            Q(usuario__last_name__icontains=query) |
+            Q(profesion__icontains=query)
+        )
+        
+    if tipo_contrato:
+        instructores = instructores.filter(tipo_contrato=tipo_contrato)
 
     context = {
-        'titulo': 'Vincular Perfil de Instructor',
-        'form': form, # Cambiamos form_instructor a simplemente 'form'
-        'editar': False
+        'instructores': instructores,
     }
-    return render(request, 'instructores/crear_instructor.html', context)
+    return render(request, 'instructores/listar_instructores.html', context)
+
 
 @login_required
 @user_passes_test(es_admin)
@@ -65,6 +58,8 @@ def editar_instructor(request, pk):
         'editar': True
     }
     return render(request, 'instructores/crear_instructor.html', context)
+
+
 @login_required
 @user_passes_test(es_admin)
 def eliminar_instructor(request, pk):
@@ -77,7 +72,8 @@ def eliminar_instructor(request, pk):
     if request.method == 'POST':
         instructor.usuario.delete()
         messages.success(request, 'Instructor eliminado.')
-        return redirect('instructores:listar_instructores')
+    
+    return redirect('instructores:listar_instructores')
     
 # Si es GET, mostramos la confirmación
 @login_required

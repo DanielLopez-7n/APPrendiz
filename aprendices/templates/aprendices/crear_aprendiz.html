@@ -1,18 +1,11 @@
-{% extends 'core/panel_admin_base.html' %} 
+{% extends 'core/panel_admin_base.html' %}
 
-{% block title %}
-    {% if editar %}
-        Editar Aprendiz {% else %}
-        Registrar Aprendiz {% endif %}
-{% endblock %}
-
+{% block title %}{% if editar %}Editar{% else %}Registrar{% endif %} Aprendiz{% endblock %}
 {% block page_title %}Gestión de Aprendices{% endblock %}
 
 {% block breadcrumb_items %}
     <li class="breadcrumb-item"><a href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a></li>
-    <li class="breadcrumb-item active">
-        {% if editar %}Edición de Datos{% else %}Registrar Nuevo{% endif %}
-    </li>
+    <li class="breadcrumb-item active">{% if editar %}Edición de Datos{% else %}Nuevo Registro{% endif %}</li>
 {% endblock %}
 
 {% block content %}
@@ -21,78 +14,97 @@
         <div class="card shadow-sm border-0">
             
             <div class="card-header bg-white py-3">
-                <h5 class="mb-0 text-primary">
-                    {% if editar %}
-                        <i class="bi bi-pencil-square me-2"></i>Editar Perfil del Aprendiz
-                    {% else %}
-                        <i class="bi bi-person-plus-fill me-2"></i>Vincular Perfil de Aprendiz
-                    {% endif %}
+                <h5 class="mb-0 text-success">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Perfil del Aprendiz
                 </h5>
             </div>
 
             <div class="card-body p-4">
-                
                 <form method="POST" action="">
-                    
                     {% csrf_token %}
                     
                     <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Cuenta de Acceso</h6>
-                    
-                    <div class="row g-3 mb-4">
-                        
-                        <div class="col-md-12"> 
-                            <label class="form-label">Seleccione el Usuario del Sistema *</label>
-                            {{ form.usuario }}
-                            {% if not editar %}
-                                <div class="form-text text-primary"><i class="bi bi-info-circle"></i> Seleccione la cuenta base. Si no aparece en la lista, el administrador debe crearla primero en el módulo de Usuarios.</div>
-                            {% endif %}
-                            <div class="text-danger small">{{ form.usuario.errors }}</div>
-                        </div>
 
+                    <div class="bg-light border rounded p-3 mb-4 d-flex align-items-center shadow-sm">
+                        <i class="bi bi-person-circle fs-3 text-secondary me-3"></i>
+                        <div>
+                            <div class="fw-bold fs-5 text-dark">{{ form.instance.usuario.get_full_name }}</div>
+                            <div class="text-muted small">
+                                {{ form.instance.usuario.email }} | Usuario: {{ form.instance.usuario.username }}
+                            </div>
+                        </div>
                     </div>
 
                     <hr class="my-4">
 
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Académica SENA</h6>
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Personal</h6>
                     <div class="row g-3 mb-4">
-                        
-                        <div class="col-md-6"> <label class="form-label">Documento de Identidad *</label>
-                            {{ form.documento }} 
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.tipo_documento.label }} *</label>
+                            {{ form.tipo_documento }}
+                            <div class="text-danger small">{{ form.tipo_documento.errors }}</div>
+                        </div>
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.documento.label }} *</label>
+                            {{ form.documento }}
                             <div class="text-danger small">{{ form.documento.errors }}</div>
                         </div>
-
-                        <div class="col-md-6"> <label class="form-label">Número de Ficha *</label>
-                            {{ form.numero_ficha }}
-                            <div class="text-danger small">{{ form.numero_ficha.errors }}</div>
-                        </div>
-                        
-                        <div class="col-md-12"> <label class="form-label">Programa de Formación *</label>
-                            {{ form.programa_formacion }}
-                            <div class="text-danger small">{{ form.programa_formacion.errors }}</div>
-                        </div>
-                        
-                        <div class="col-md-12"> <label class="form-label">Celular de Contacto *</label>
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.telefono.label }} *</label>
                             {{ form.telefono }}
                             <div class="text-danger small">{{ form.telefono.errors }}</div>
                         </div>
-
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger mt-2">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.correo_personal.label }}</label>
+                            {{ form.correo_personal }}
+                            <div class="text-danger small">{{ form.correo_personal.errors }}</div>
+                        </div>
+                        <div class="col-md-12"> 
+                            <label class="form-label fw-bold">{{ form.direccion_residencia.label }}</label>
+                            {{ form.direccion_residencia }}
+                        </div>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Académica SENA</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.numero_ficha.label }} *</label>
+                            {{ form.numero_ficha }}
+                        </div>
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.programa_formacion.label }} *</label>
+                            {{ form.programa_formacion }}
+                        </div>
+                        <div class="col-md-12"> 
+                            <label class="form-label fw-bold">{{ form.modalidad_formacion.label }} *</label>
+                            {{ form.modalidad_formacion }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Etapa Productiva</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.modalidad_etapa.label }} *</label>
+                            {{ form.modalidad_etapa }}
+                        </div>
+                        <div class="col-md-6"> 
+                            <label class="form-label fw-bold">{{ form.pais_etapa.label }} *</label>
+                            {{ form.pais_etapa }}
+                        </div>
+                        <div class="col-md-12 mt-3"> 
+                            <div class="form-check form-switch">
+                                {{ form.etapa_exterior }}
+                                <label class="form-check-label fw-bold" for="{{ form.etapa_exterior.id_for_label }}">
+                                    {{ form.etapa_exterior.label }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                         <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-md-2">Cancelar</a>
-                        
                         <button type="submit" class="btn btn-success px-5">
-                            {% if editar %}
-                                Actualizar Datos
-                            {% else %}
-                                Guardar Registro
-                            {% endif %}
+                            Actualizar Datos
                         </button>
                     </div>
 

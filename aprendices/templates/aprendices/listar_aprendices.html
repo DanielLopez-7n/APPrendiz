@@ -8,13 +8,44 @@
 {% endblock %}
 
 {% block content %}
+
+<form method="GET" action="" class="mb-4">
+    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
+        
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" 
+                       placeholder="Buscar por documento, nombre, ficha..." 
+                       value="{{ request.GET.q }}">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <select name="modalidad" class="form-select text-muted">
+                <option value="">Todas las modalidades</option>
+                <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
+                <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
+            </select>
+        </div>
+
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-2">Limpiar</a>
+            <button type="submit" class="btn btn-success px-4">
+                <i class="bi bi-funnel-fill me-1"></i> Filtrar
+            </button>
+        </div>
+        
+    </div>
+</form>
+
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 text-primary"><i class="bi bi-people-fill me-2"></i>Aprendices Registrados</h5>
         
-        <a href="{% url 'aprendices:crear_aprendiz' %}" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-lg"></i> Nuevo Aprendiz
-        </a>
+        
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">

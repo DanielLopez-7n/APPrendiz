@@ -1,13 +1,19 @@
 from django.shortcuts import render
 from .models import Ficha
+from django.db.models import Q
+
 
 def listar_fichas(request):
-    # Traemos todas las fichas
     fichas = Ficha.objects.all()
-    
+    query = request.GET.get('q', '')
+
+    if query:
+        fichas = fichas.filter(
+            Q(numero__icontains=query) |
+            Q(programa__nombre__icontains=query)
+        )
+
     context = {
-        'titulo': 'Fichas SENA',
         'fichas': fichas,
     }
     return render(request, 'fichas/listar_fichas.html', context)
-

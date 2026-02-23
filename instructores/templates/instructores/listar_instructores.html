@@ -7,12 +7,39 @@
 {% endblock %}
 
 {% block content %}
+
+<form method="GET" action="" class="mb-4">
+    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
+        
+        <div class="col-md-5">
+            <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Buscar por cédula, nombre, profesión..." value="{{ request.GET.q }}">
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <select name="tipo_contrato" class="form-select text-muted">
+                <option value="">Todos los contratos</option>
+                <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
+                <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
+            </select>
+        </div>
+
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light me-2">Limpiar</a>
+            <button type="submit" class="btn btn-success px-4">
+                <i class="bi bi-funnel-fill me-1"></i> Filtrar
+            </button>
+        </div>
+        
+    </div>
+</form>
+
 <div class="card shadow border-0">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-people me-2"></i>Listado de Instructores</h5>
-        <a href="{% url 'instructores:crear_instructor' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Nuevo Instructor
-        </a>
+        
     </div>
     
     <div class="card-body">
@@ -69,9 +96,39 @@
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
 
-                                <a href="{% url 'instructores:eliminar_instructor' instructor.id %}" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar a este instructor? Esta acción es irreversible.');">
+                                <button type="button" class="btn btn-sm btn-light text-danger" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}" title="Eliminar">
                                     <i class="bi bi-trash"></i>
-                                </a>
+                                </button>
+
+                                <div class="modal fade text-start" id="eliminarInstructorModal{{ instructor.pk }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 shadow">
+                                            
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="bi bi-exclamation-octagon-fill me-2"></i>Eliminar Definitivamente
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            
+                                            <div class="modal-body text-center p-4">
+                                                <p class="mb-1 text-dark">¿Estás seguro de que deseas <strong>ELIMINAR</strong> a este instructor?</p>
+                                                <h5 class="text-danger fw-bold my-3">{{ instructor.usuario.get_full_name }}</h5>
+                                                <p class="text-muted small mb-0">Esta acción borrará el perfil de instructor y su cuenta de acceso de forma permanente.</p>
+                                            </div>
+                                            
+                                            <div class="modal-footer bg-light justify-content-center">
+                                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                                                
+                                                <form action="{% url 'instructores:eliminar_instructor' instructor.pk %}" method="POST" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger px-4">Sí, Eliminar</button>
+                                                </form>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
