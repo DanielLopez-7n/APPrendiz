@@ -7,6 +7,8 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm, MiPerfilForm, UsuarioForm
+from aprendices.forms import AprendizForm
+from instructores.forms import InstructorForm
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -185,47 +187,53 @@ def ver_detalle_usuario(request, user_id):
 
 
 @login_required
-@user_passes_test(es_staff, login_url='usuarios:login')
-def crear_usuario_view(request):
-    """
-    Vista para crear un nuevo usuario base (Aprendiz/Instructor)
-    sin pedir contraseña (se asigna el documento por defecto).
-    """
+def crear_usuario_con_perfil(request):
+    # Verificamos quién está operando
+    es_instructor = hasattr(request.user, 'instructor')
+    es_admin = request.user.is_superuser or (request.user.is_staff and not es_instructor)
+
     if request.method == 'POST':
-        # USAMOS EL NUEVO FORMULARIO SIMPLIFICADO
-        form = UsuarioForm(request.POST) 
+        rol = request.POST.get('rol_seleccionado')
+        form_usuario = UsuarioForm(request.POST)
         
-        if form.is_valid():
-            # 1. Preparamos el usuario pero no lo guardamos aún
-            user = form.save(commit=False)
-            
-            # 2. La contraseña será el mismo número de documento (username)
-            documento = form.cleaned_data['username']
-            user.set_password(documento)
-            
-            # 3. Guardamos el User. ¡Magia! Esto dispara tu señal en models.py
-            # y crea el PerfilUsuario automáticamente en el fondo.
-            user.save()
-            
-            # 4. Ahora tomamos ese perfil recién creado y le asignamos el documento real
-            user.perfil.documento = documento
-            user.perfil.save()
-            
-            messages.success(request, f'¡Cuenta de acceso creada! La contraseña temporal es el documento: {documento}. Ahora puedes ir a vincularla en Aprendices o Instructores.')
-            return redirect('usuarios:lista_usuarios')
+        # Elegimos el formulario de perfil según el rol
+        if rol == 'aprendiz':
+            form_perfil = AprendizForm(request.POST)
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            form_perfil = InstructorForm(request.POST)
+
+        if form_usuario.is_valid() and form_perfil.is_valid():
+            # 1. Crear el Usuario base
+            usuario = form_usuario.save(commit=False)
+            documento = form_usuario.cleaned_data['username']
+            usuario.set_password(documento) # Password = Documento
+            
+            # Si se crea como instructor, le damos is_staff
+            if rol == 'instructor':
+                usuario.is_staff = True
+            
+            usuario.save()
+
+            # 2. Crear el Perfil (Aprendiz o Instructor)
+            perfil = form_perfil.save(commit=False)
+            perfil.usuario = usuario
+            perfil.save()
+
+            messages.success(request, f'¡Registro exitoso! Se creó el usuario y el perfil de {rol}.')
+            return redirect('usuarios:lista_usuarios')
     else:
-        form = UsuarioForm()
-    
+        form_usuario = UsuarioForm()
+        form_perfil_aprendiz = AprendizForm()
+        form_perfil_instructor = InstructorForm()
+
     context = {
-        'titulo': 'Crear Cuenta de Acceso (Base)',
-        'form': form,
-        'accion': 'Crear'
+        'form_usuario': form_usuario,
+        'form_aprendiz': form_perfil_aprendiz,
+        'form_instructor': form_perfil_instructor,
+        'es_admin': es_admin,
+        'es_instructor': es_instructor,
     }
-    
-    return render(request, 'usuarios/crear_usuario.html', context)
-# usuarios/views.py
+    return render(request, 'usuarios/crear_usuario_dinamico.html', context)
 
 @login_required
 @user_passes_test(es_staff, login_url='usuarios:login')
@@ -236,40 +244,44 @@ def editar_usuario_view(request, user_id):
         form_usuario = EditarUsuarioForm(request.POST, instance=usuario)
         form_perfil = EditarPerfilForm(request.POST, request.FILES, instance=usuario.perfil)
         
+        # 1. PRIMERO VALIDAMOS (Esto genera el 'cleaned_data')
         if form_usuario.is_valid() and form_perfil.is_valid():
+            
+            # 🛡️ --- INICIO DEL BLINDAJE (AHORA SÍ FUNCIONA) --- 🛡️
+            # Verificamos si es el mismo usuario y si intentó ponerse "inactivo" (False)
+            # Nota: Usamos 'is False' explícitamente para mayor seguridad
+            if usuario.id == request.user.id and form_usuario.cleaned_data.get('is_active') is False:
+                messages.error(request, '¡Alerta de seguridad! No puedes desactivar tu propia cuenta mientras estás usándola.')
+                # Te devolvemos a la misma pantalla sin guardar nada
+                return redirect('usuarios:editar_usuario', user_id=usuario.id)
+            # 🛡️ --- FIN DEL BLINDAJE --- 🛡️
+            
+            # 2. SI PASA EL BLINDAJE, GUARDAMOS
             form_usuario.save()
             form_perfil.save()
             messages.success(request, f'Usuario {usuario.get_full_name()} actualizado exitosamente.')
             
-            # CORRECCIÓN DEL REDIRECT (sin la 'r' extra)
             return redirect('usuarios:lista_usuarios') 
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
     
     else:
-        # --- LÓGICA GET (MOSTRAR DATOS) ---
+        # --- LÓGICA GET (Esta parte ya la tienes bien, déjala igual) ---
         form_usuario = EditarUsuarioForm(instance=usuario)
         
-        # 1. Variables para guardar los datos reales
         documento_real = ''
         telefono_real = ''
         
-        # 2. Buscamos en Aprendiz
         if hasattr(usuario, 'aprendiz'):
             documento_real = usuario.aprendiz.documento
             telefono_real = usuario.aprendiz.telefono
-            
-        # 3. Buscamos en Instructor
         elif hasattr(usuario, 'instructor'):
             documento_real = usuario.instructor.cedula
             telefono_real = usuario.instructor.telefono
-            
-        # 4. Si es Admin o Staff (usamos los del perfil base)
         else:
             documento_real = usuario.perfil.documento
             telefono_real = usuario.perfil.telefono
 
-        # 5. Inyectamos AMBOS datos en el formulario visual
         form_perfil = EditarPerfilForm(
             instance=usuario.perfil, 
             initial={
