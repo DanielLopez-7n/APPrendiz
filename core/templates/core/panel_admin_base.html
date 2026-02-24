@@ -452,6 +452,117 @@
         border-color: #2d8600 !important;
         color: #ffffff !important;
     }
+
+    /* 1. El contenedor del carrusel se fija al fondo de la pantalla */
+    #fondo-carrusel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -10; /* Se coloca detrás de todo el contenido */
+    }
+
+    /* 2. Hacemos que las imágenes cubran todo el espacio sin deformarse */
+    #fondo-carrusel .carousel-inner,
+    #fondo-carrusel .carousel-item {
+        height: 100%;
+    }
+
+    #fondo-carrusel .carousel-item img {
+        object-fit: cover; /* Clave para que la imagen llene la pantalla */
+        height: 100vh;
+        width: 100%;
+    }
+
+    /* 3. Capa oscura superpuesta para mejorar la lectura del texto */
+    .overlay-oscura {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* Ajusta el último número (0.6) para más o menos oscuridad (de 0 a 1) */
+        background-color: rgba(0, 0, 0, 0.6); 
+    }
+
+    /* 4. Hacemos transparentes los contenedores principales para ver el fondo */
+    #wrapper, #content-wrapper, body {
+        background-color: transparent !important;
+    }
+
+    /* 5. Efecto moderno: Las tarjetas blancas ahora son semi-transparentes */
+    .card, .topbar, .sidebar {
+         /* Un blanco al 90% de opacidad */
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(5px); /* Un pequeño efecto de desenfoque elegante */
+    }
+
+    /* 6. Mejorar la legibilidad del texto en todo el panel */
+    body, .card, .sidebar, .topbar, .nav-link, table {
+        color: #000000 !important; /* Negro puro en lugar del gris por defecto */
+        font-weight: 500; /* Hace la letra un poquito más gruesa */
+    }
+
+    /* Aseguramos que los textos pequeños o secundarios también se vean bien */
+    .text-muted, .small {
+        color: #333333 !important; /* Un gris muy oscuro, casi negro */
+        font-weight: 500;
+    }
+
+    /* 1. Títulos y textos generales en BLANCO para resaltar sobre el fondo */
+    h1, h2, h3, h4, h5, h6, label, .nav-link {
+        color: #ffffff !important;
+        font-weight: 500;
+    }
+
+    /* 2. PROTECCIÓN DE TABLAS: Mantenemos el texto oscuro para que se lea bien */
+    .table, .table *, .dataTable, .dataTable * {
+        color: #212529 !important; /* Gris oscuro estándar */
+    }
+
+    /* 3. Arreglo del "hueco" en el Topbar (Barra superior) */
+    .topbar {
+        background-color: rgba(255, 255, 255, 0.95) !important; /* Blanco casi sólido */
+        width: 100% !important; /* Fuerza a que ocupe todo el ancho */
+        margin-top: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    /* Opcional: Si el título del Topbar ahora es blanco y el fondo es blanco, no se verá. 
+       Forzamos a que el texto dentro del topbar sea oscuro */
+    .topbar h1, .topbar h2, .topbar h3, .topbar span {
+        color: #333333 !important;
+    }
+
+    /* =========================================
+       ELIMINACIÓN DEL HUECO SUPERIOR Y BORDES
+       ========================================= */
+       
+    /* 1. Quitamos cualquier margen por defecto de la página entera */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 2. Forzamos a que los contenedores principales no empujen hacia abajo */
+    #wrapper, #content-wrapper, #content {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+
+    /* 3. Pegamos el Topbar (la barra blanca) al techo al 100% */
+    .topbar {
+        margin: 0 !important;
+        padding-top: 0 !important;
+        top: 0 !important;
+        border-radius: 0 !important; /* Evita esquinas redondeadas que dejen ver el fondo */
+        width: 100% !important;
+        /* Si quieres que la barra siempre se vea aunque hagas scroll hacia abajo, 
+           descomenta la siguiente línea: */
+        /* position: sticky; z-index: 1000; */
+    }
+    
 </style>
 
     
@@ -462,6 +573,23 @@
 </head>
 <body class="dashboard-body">
     
+    <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="15000" data-bs-pause="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'core/img_bg/fondo1.png' %}" class="d-block w-100" alt="Fondo 1">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo2.png' %}" class="d-block w-100" alt="Fondo 2">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo3.png' %}" class="d-block w-100" alt="Fondo 3">
+                <div class="overlay-oscura"></div>
+            </div>
+        </div>
+    </div>
+    ```
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -599,8 +727,10 @@
                 <button class="btn btn-toggle" id="sidebar-toggle">
                     <i class="bi bi-list"></i>
                 </button>
-                <h4 class="page-title mb-0">{% block page_title %}Dashboard{% endblock %}</h4>
-            </div>
+                    <h1 class="h3 mb-0" style="color: #39A900; font-weight: bold;">
+                        {% block page_title %}Panel Principal{% endblock %}
+                    </h1>            
+                </div>
             
             <div class="topbar-right">
                 <!-- Barra de búsqueda -->
@@ -741,5 +871,6 @@
     <script src="{% static 'core/js/main.js' %}"></script>    
     <!-- JavaScript adicional de cada página -->
     {% block extra_js %}{% endblock %}
+    {% include 'core/accesibilidad.html' %}
 </body>
 </html>
