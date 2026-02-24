@@ -1,0 +1,93 @@
+<style>
+    /* Diseño del contenedor y botones (se mantiene igual) */
+    #a11y-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; }
+    #a11y-btn { background-color: #39A900; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.8rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s; }
+    #a11y-btn:hover { transform: scale(1.1); }
+    #a11y-menu { background-color: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 240px; margin-bottom: 15px; overflow: hidden; display: none; max-height: 70vh; overflow-y: auto;}
+    #a11y-menu.show { display: block; }
+    .a11y-option-btn { width: 100%; background: none; border: none; border-bottom: 1px solid #eee; padding: 12px 15px; text-align: left; color: #333; font-weight: 500; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
+    .a11y-option-btn:hover { background-color: #f8f9fa; color: #39A900; }
+    .a11y-option-btn.active { background-color: #e8f5e9; border-left: 4px solid #39A900; color: #39A900; font-weight: bold;}
+    .a11y-option-btn:last-child { border-bottom: none; color: #dc3545; }
+
+    /* --- LAS 7 CLASES DE ACCESIBILIDAD --- */
+    
+    /* 1. Texto Grande */
+    body.a11y-text-large { font-size: 125% !important; }
+    body.a11y-text-large h1, body.a11y-text-large h2, body.a11y-text-large h3, body.a11y-text-large h4, body.a11y-text-large h5, body.a11y-text-large h6 { font-size: 135% !important; }
+    
+    /* 2. Alto Contraste */
+    body.a11y-contrast, body.a11y-contrast .card, body.a11y-contrast .sidebar, body.a11y-contrast .topbar { background-color: #000000 !important; color: #FFFF00 !important; border-color: #FFFF00 !important; backdrop-filter: none !important; }
+    body.a11y-contrast * { color: #FFFF00 !important; }
+    body.a11y-contrast #fondo-carrusel { display: none !important; }
+
+    /* 3. Escala de Grises */
+    body.a11y-grayscale { filter: grayscale(100%) !important; }
+
+    /* 4. Fuente para Dislexia (Usa Comic Sans como respaldo universal comprobado para dislexia) */
+    body.a11y-dyslexia * { font-family: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif !important; letter-spacing: 0.15em !important; line-height: 1.6 !important; }
+
+    /* 5. Resaltar Enlaces */
+    body.a11y-highlight-links a, body.a11y-highlight-links button { background-color: #000 !important; color: #FFFF00 !important; outline: 3px solid #FFFF00 !important; text-decoration: underline !important; font-weight: bold !important; }
+
+    /* 6. Cursor Grande (Genera un cursor de flecha gigante nativo) */
+    body.a11y-big-cursor, body.a11y-big-cursor * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z'/%3E%3C/svg%3E"), auto !important; }
+
+    /* 7. Pausar Animaciones */
+    body.a11y-pause-animations * { animation: none !important; transition: none !important; }
+</style>
+
+<div id="a11y-container">
+    <div id="a11y-menu">
+        <div style="background-color: #39A900; color: white; padding: 12px; text-align: center; font-weight: bold;">
+            <i class="bi bi-universal-access-circle me-1"></i> Accesibilidad
+        </div>
+        <button id="btn-a11y-text-large" class="a11y-option-btn" onclick="toggleA11yClass('a11y-text-large')"><i class="bi bi-zoom-in me-2"></i> Aumentar Texto</button>
+        <button id="btn-a11y-contrast" class="a11y-option-btn" onclick="toggleA11yClass('a11y-contrast')"><i class="bi bi-circle-half me-2"></i> Alto Contraste</button>
+        <button id="btn-a11y-grayscale" class="a11y-option-btn" onclick="toggleA11yClass('a11y-droplet-half')"><i class="bi bi-droplet-half me-2"></i> Escala de Grises</button>
+        <button id="btn-a11y-dyslexia" class="a11y-option-btn" onclick="toggleA11yClass('a11y-dyslexia')"><i class="bi bi-type me-2"></i> Fuente Dislexia</button>
+        <button id="btn-a11y-highlight-links" class="a11y-option-btn" onclick="toggleA11yClass('a11y-highlight-links')"><i class="bi bi-link-45deg me-2"></i> Resaltar Enlaces</button>
+        <button id="btn-a11y-big-cursor" class="a11y-option-btn" onclick="toggleA11yClass('a11y-big-cursor')"><i class="bi bi-cursor-fill me-2"></i> Cursor Grande</button>
+        <button id="btn-a11y-pause-animations" class="a11y-option-btn" onclick="toggleA11yClass('a11y-pause-animations')"><i class="bi bi-pause-circle me-2"></i> Pausar Animaciones</button>
+        <button class="a11y-option-btn" onclick="resetA11y()"><i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer todo</button>
+    </div>
+    <button id="a11y-btn" onclick="document.getElementById('a11y-menu').classList.toggle('show')">
+        <i class="bi bi-universal-access-circle"></i>
+    </button>
+</div>
+
+<script>
+    const a11yClasses = ['a11y-text-large', 'a11y-contrast', 'a11y-grayscale', 'a11y-dyslexia', 'a11y-highlight-links', 'a11y-big-cursor', 'a11y-pause-animations'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        a11yClasses.forEach(cls => {
+            if (localStorage.getItem(cls) === 'true') {
+                document.body.classList.add(cls);
+                document.getElementById('btn-' + cls).classList.add('active'); // Pinta el botón de verde si está activo
+            }
+        });
+    });
+
+    function toggleA11yClass(className) {
+        const body = document.body;
+        const btn = document.getElementById('btn-' + className);
+        if (body.classList.contains(className)) {
+            body.classList.remove(className);
+            btn.classList.remove('active');
+            localStorage.setItem(className, 'false');
+        } else {
+            body.classList.add(className);
+            btn.classList.add('active');
+            localStorage.setItem(className, 'true');
+        }
+    }
+
+    function resetA11y() {
+        a11yClasses.forEach(cls => {
+            document.body.classList.remove(cls);
+            document.getElementById('btn-' + cls).classList.remove('active');
+            localStorage.setItem(cls, 'false');
+        });
+        document.getElementById('a11y-menu').classList.remove('show');
+    }
+</script>
