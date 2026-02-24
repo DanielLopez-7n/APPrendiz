@@ -1,4 +1,5 @@
 {% extends 'core/panel_admin_base.html' %}
+{% block page_title %}Gestión de Fichas{% endblock %}
 
 {% block content %}
 
@@ -27,8 +28,8 @@
         <div class="col-12">
             <div class="card shadow-sm border-0" style="border-top: 5px solid #39a900;"> <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                     <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-collection me-2"></i>{{ titulo }}</h5>
-                    <a href="/admin/fichas/ficha/add/" class="btn btn-success btn-sm fw-bold px-3">
-                        <i class="bi bi-plus-lg me-1"></i> Nueva Ficha
+                    <a href="{% url 'fichas:crear_ficha' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-1"></i> Nueva Ficha
                     </a>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
@@ -60,9 +61,16 @@
                                     <td class="align-middle text-center">
                                         <span class="text-secondary text-xs font-weight-bold">Activa</span>
                                     </td>
-                                    <td class="align-middle text-end pe-4">
-                                        <a href="/admin/fichas/ficha/{{ ficha.id }}/change/" class="btn btn-link text-secondary mb-0">
-                                            <i class="bi bi-pencil-fill text-xs"></i>
+                                    <td>
+                                        <a href="{% url 'fichas:editar_ficha' pk=ficha.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        
+                                        <a href="{% url 'fichas:eliminar_ficha' pk=ficha.id %}" 
+                                        class="btn btn-sm btn-outline-danger" 
+                                        title="Eliminar"
+                                        onclick="return confirm('¿Estás seguro de eliminar la ficha {{ ficha.numero }}? Se perderá el enlace con los aprendices.');">
+                                            <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
                                 </tr>

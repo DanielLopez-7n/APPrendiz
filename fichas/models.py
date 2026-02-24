@@ -1,5 +1,5 @@
 from django.db import models
-from programas.models import Programa # Importamos la relación
+from programas.models import Programa 
 
 class Ficha(models.Model):
     numero = models.CharField(max_length=50, unique=True, verbose_name="Número de Ficha")

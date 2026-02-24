@@ -1,0 +1,55 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}{{ accion }} Ficha{% endblock %}
+{% block page_title %}Gestión de Fichas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-success">
+                    <i class="bi bi-people-fill me-2"></i>{{ accion }} Ficha de Formación
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.numero.label }} *</label>
+                        {{ form.numero }}
+                        <div class="text-danger small">{{ form.numero.errors }}</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">{{ form.programa.label }} *</label>
+                        {{ form.programa }}
+                        <div class="text-danger small">{{ form.programa.errors }}</div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">{{ form.fecha_inicio.label }} *</label>
+                            {{ form.fecha_inicio }}
+                            <div class="text-danger small">{{ form.fecha_inicio.errors }}</div>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label class="form-label fw-bold">{{ form.fecha_fin.label }} *</label>
+                            {{ form.fecha_fin }}
+                            <div class="text-danger small">{{ form.fecha_fin.errors }}</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'fichas:listar_fichas' %}" class="btn btn-light me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-1"></i> Guardar Ficha
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
