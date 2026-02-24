@@ -1,0 +1,48 @@
+{% extends 'core/panel_admin_base.html' %}
+
+{% block title %}{{ accion }} Programa{% endblock %}
+{% block page_title %}Gestión de Programas{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-success">
+                    <i class="bi bi-book-half me-2"></i>{{ accion }} Programa de Formación
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.codigo.label }} *</label>
+                        {{ form.codigo }}
+                        <div class="text-danger small">{{ form.codigo.errors }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.nombre.label }} *</label>
+                        {{ form.nombre }}
+                        <div class="text-danger small">{{ form.nombre.errors }}</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">{{ form.nivel.label }} *</label>
+                        {{ form.nivel }}
+                        <div class="text-danger small">{{ form.nivel.errors }}</div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'programas:listar_programas' %}" class="btn btn-light me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-save me-1"></i> Guardar Programa
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
