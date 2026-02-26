@@ -176,3 +176,20 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# ==========================================
+# CONFIGURACIÓN DE CORREOS (PRODUCCIÓN - SMTP GMAIL)
+# ==========================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Tu correo de Gmail desde donde se enviarán los mensajes
+EMAIL_HOST_USER = 'apprendizsistemadegestiondeseg@gmail.com' 
+
+# La contraseña de 16 letras que te dio Google (NO tu contraseña normal)
+EMAIL_HOST_PASSWORD = 'cyzi yxvk iolo dojo' 
+
+# Opcional: Para que el correo diga que viene del sistema y no de tu nombre personal
+DEFAULT_FROM_EMAIL = 'APPrendiz SENA <tu_correo_del_proyecto@gmail.com>'
