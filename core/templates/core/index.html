@@ -203,11 +203,9 @@
                         </label>
                     </div>
 
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" name="remember_me" id="id_remember_me">
-                        <label class="form-check-label text-muted small" for="id_remember_me">
-                            Recordar mi sesión
-                        </label>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
+                        <label class="form-check-label text-dark" for="rememberMe">Recordar mi sesión</label>
                     </div>
 
                     <button type="submit" class="btn btn-login w-100 py-3 mb-3 shadow-sm">
@@ -215,7 +213,9 @@
                     </button>
                     
                     <div class="text-center">
-                        <a href="#" class="text-decoration-none small text-muted hover-link">¿Olvidaste tu contraseña?</a>
+                        <a href="{% url 'password_reset' %}" style="color: #878787; text-decoration: none;">
+                            ¿Olvidaste tu contraseña?
+                        </a>
                     </div>
                 </form>
             </div>
@@ -226,11 +226,9 @@
 
 {% block extra_js %}
 <script>
-    // Script opcional: si hay errores en el formulario (django messages), abrir el modal automáticamente
+
     document.addEventListener("DOMContentLoaded", function() {
-        // Si hay errores en el bloque de mensajes o en el form, podrías forzar la apertura:
-        // var myModal = new bootstrap.Modal(document.getElementById('loginModal'));
-        // myModal.show();
+
     });
 </script>
 {% endblock %}

@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User 
 from fichas.models import Ficha
 from programas.models import Programa
+from django.contrib.auth.views import LoginView
 
 
 # Importamos los modelos de nuestras Apps para las estadísticas
@@ -131,3 +132,21 @@ def busqueda_global(request):
     }
     
     return render(request, 'core/resultados_busqueda.html', context)
+
+# --- VISTA DE LOGIN PERSONALIZADA ---
+
+class CustomLoginView(LoginView):
+    template_name = 'core/index.html' 
+    
+    def form_valid(self, form):
+        # Capturamos si el usuario marcó el checkbox (devuelve 'on' si está marcado, o None si no)
+        remember_me = self.request.POST.get('remember_me')
+        
+        if not remember_me:
+            # Si NO la marcó, la sesión caduca al cerrar el navegador (0 segundos)
+            self.request.session.set_expiry(0)
+        else:
+            # Si SÍ la marcó, la sesión dura 2 semanas (1209600 segundos)
+            self.request.session.set_expiry(1209600)
+            
+        return super().form_valid(form)
