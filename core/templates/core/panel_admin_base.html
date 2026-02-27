@@ -563,7 +563,39 @@
         /* position: sticky; z-index: 1000; */
     }
     
+    <style>
+        /* 1. Todos los títulos y subtítulos dentro de las tarjetas */
+        .card-header h1, .card-body h1,
+        .card-header h2, .card-body h2,
+        .card-header h3, .card-body h3,
+        .card-header h4, .card-body h4,
+        .card-header h5, .card-body h5,
+        .card-header h6, .card-body h6,
+        h5, h6.font-weight-bold {
+            color: #333333 !important; /* Gris oscuro para títulos */
+        }
+        
+        /* 2. Etiquetas de los campos de formulario (Nombres, Correo, Documento, etc.) */
+        label, 
+        .form-label, 
+        .col-form-label, 
+        .form-group label,
+        .bmd-label-static,
+        .bmd-label-floating {
+            color: #555555 !important; /* Gris intermedio elegante */
+            font-weight: 600 !important; /* Un poco de grosor para que resalten */
+        }
+        
+        /* 3. Textos generales por si acaso */
+        .card-body p, 
+        .card-body td, 
+        .card-body th,
+        .text-muted {
+            color: #4a5568 !important;
+        }
+    
 </style>
+
 
     
 
