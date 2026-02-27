@@ -17,8 +17,8 @@
                         <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
                     </div>
                 </div>
-                <h4 class="fw-bold mb-1">{{ aprendiz.usuario.get_full_name }}</h4>
-                <p class="text-muted mb-3">{{ aprendiz.programa_formacion }}</p>
+                <h4 class="font-weight-bold mb-1 text-dark">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h4>
+                <p class="text-dark mb-3">{{ aprendiz.programa_formacion }} ({{ aprendiz.numero_ficha.numero_ficha }})</p>
                 <span class="badge {% if aprendiz.usuario.is_active %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3">
                     {% if aprendiz.usuario.is_active %}Activo{% else %}Inactivo{% endif %}
                 </span>
@@ -38,41 +38,63 @@
             <div class="card-header bg-white py-3 border-bottom">
                 <h5 class="mb-0 text-primary"><i class="bi bi-card-list me-2"></i>Información Completa</h5>
             </div>
-            <div class="card-body p-4">
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Tipo de Documento</label>
-                        <p class="fw-medium mb-0">Cédula de Ciudadanía</p>
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Número de Documento (Usuario)</label>
-                        <p class="fw-medium mb-0">{{ aprendiz.usuario.username }}</p>
-                    </div>
+            <div class="card-body p-4 p-md-5">
 
-                    <div class="col-12"><hr class="my-2"></div>
-
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Número de Ficha</label>
-                        <p class="fw-medium mb-0">{{ aprendiz.numero_ficha }}</p>
+                <h6 class="font-weight-bold text-uppercase mb-3" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Personal</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">TIPO DE DOCUMENTO</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.get_tipo_documento_display }}</p>
                     </div>
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Teléfono / Celular</label>
-                        <p class="fw-medium mb-0">{{ aprendiz.telefono|default:"No registrado" }}</p>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">NÚMERO DE IDENTIFICACIÓN</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.documento }}</p>
                     </div>
-
-                    <div class="col-12"><hr class="my-2"></div>
-
-                    <div class="col-12">
-                        <label class="text-muted small text-uppercase fw-bold">Correo Electrónico</label>
-                        <p class="fw-medium mb-0">{{ aprendiz.usuario.email }}</p>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">CONTACTO TELEFÓNICO</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.telefono }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">CORREO ELECTRÓNICO PERSONAL</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.correo_personal|default:"No registrado" }}</p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">DIRECCIÓN DE RESIDENCIA</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.direccion_residencia|default:"No registrada" }}</p>
                     </div>
                 </div>
-            </div>
-            <div class="card-footer bg-light py-3 border-0 text-end">
-                <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-secondary me-2">Volver</a>
-                <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn btn-warning">
-                    <i class="bi bi-pencil-square me-1"></i> Editar Datos
-                </a>
+
+                <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Académica SENA</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">NÚMERO DE GRUPO (FICHA)</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.numero_ficha }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">PROGRAMA DE FORMACIÓN</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.programa_formacion }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">MODALIDAD FORMACIÓN</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.modalidad_formacion }}</p>
+                    </div>
+                </div>
+
+                <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Etapa Productiva</h6>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">MODALIDAD ETAPA</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.modalidad_etapa }}</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">¿EN EL EXTERIOR?</label>
+                        <p class="text-dark mb-0 fs-6">{% if aprendiz.etapa_exterior %}Sí{% else %}No{% endif %}</p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="text-muted small mb-0 fw-bold">PAÍS</label>
+                        <p class="text-dark mb-0 fs-6">{{ aprendiz.pais_etapa }}</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
