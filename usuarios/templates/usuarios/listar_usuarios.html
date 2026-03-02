@@ -206,4 +206,18 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Buscamos todas las ventanas modales en esta página
+        const modales = document.querySelectorAll('.modal');
+        
+        // Las sacamos de sus contenedores y las pegamos directamente en el <body>
+        modales.forEach(modal => {
+            document.body.appendChild(modal);
+        });
+    });
+</script>
+
 {% endblock %}

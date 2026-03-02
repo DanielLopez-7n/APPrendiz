@@ -53,12 +53,11 @@ def login_view(request):
                     if next_url:
                         return redirect(next_url)
                     
-                    # 2. EL CAMBIO QUE PEDISTE AQUÍ 👇
                     elif user.is_staff:
                         # Si es Instructor/Admin -> Dashboard
                         return redirect('core:dashboard')
                     else:
-                        # Si es Aprendiz -> Su Perfil Nuevo 🚀
+                        # Si es Aprendiz -> Su Perfil Nuevo
                         return redirect('aprendices:perfil_aprendiz')
                         
                 else:
@@ -118,16 +117,23 @@ def logout_view(request):
     return redirect('core:index')
 
 
-# ==================== PANEL DE ADMINISTRACIÓN ====================
+# ==================== LÓGICA DE CONTROL DE ACCESO (RBAC) ====================
 
-def es_staff(user):
-    """Función auxiliar para verificar si el usuario es staff"""
-    return user.is_staff
+def es_administrador(user):
+    """
+    Verifica si el usuario tiene privilegios de administrador global.
+    Retorna True solo si es superusuario o si es staff pero NO tiene perfil de instructor.
+    """
+    if user.is_superuser:
+        return True
+    if user.is_staff and not hasattr(user, 'instructor'):
+        return True
+    return False
 
 
 
 @login_required
-@user_passes_test(es_staff, login_url='usuarios:login')
+@user_passes_test(es_administrador, login_url='usuarios:login')
 def lista_usuarios_view(request):
     """
     Vista para listar todos los usuarios
@@ -170,7 +176,7 @@ def lista_usuarios_view(request):
 
  # ---ver detalle usuario ---
 @login_required
-@user_passes_test(es_staff, login_url='usuarios:login')
+@user_passes_test(es_administrador, login_url='usuarios:login')
 def ver_detalle_usuario(request, user_id):
     """
     Vista para ver el detalle de un usuario específico
@@ -236,7 +242,7 @@ def crear_usuario_con_perfil(request):
     return render(request, 'usuarios/crear_usuario_dinamico.html', context)
 
 @login_required
-@user_passes_test(es_staff, login_url='usuarios:login')
+@user_passes_test(es_administrador, login_url='usuarios:login')
 def editar_usuario_view(request, user_id):
     usuario = get_object_or_404(User, id=user_id)
     
@@ -300,7 +306,7 @@ def editar_usuario_view(request, user_id):
     return render(request, 'usuarios/editar_usuario.html', context)
 
 @login_required
-@user_passes_test(es_staff, login_url='usuarios:login')
+@user_passes_test(es_administrador, login_url='usuarios:login')
 def eliminar_usuario_view(request, user_id):
     """
     Vista para eliminar DEFINITIVAMENTE un usuario de la base de datos
