@@ -5,172 +5,290 @@
 
 {% block extra_css %}
 <style>
+    /* ==========================================
+       ESTADÍSTICAS: EFECTO PREMIUM Y GLASSMORPHISM
+       ========================================== */
+    .stats-grid { gap: 1.2rem; }
+    
     .stats-card {
-        border-radius: 10px;
-        padding: 25px;
-        margin-bottom: 20px;
-        color: white;
-        transition: transform 0.3s;
-        position: relative; /* Para que el icono se posicione bien */
+        border-radius: 16px;
+        padding: 25px 20px;
+        margin-bottom: 10px;
+        color: #fff;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
         overflow: hidden;
-    }
-    
-    .stats-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .stats-card .icon {
-        font-size: 3rem;
-        opacity: 0.2; /* Un poco más sutil */
-        position: absolute;
-        right: 20px;
-        top: 20px;
-    }
-    
-    .stats-card h3 {
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 0;
+        min-height: 120px;
+        display: flex; flex-direction: column; justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
     }
 
-    /* GRADIENTES CON IDENTIDAD SENA */
-    
-    /* Verde SENA principal */
-    .card-usuarios {
-        background: linear-gradient(135deg, #39a900 0%, #2d8600 100%);
+    /* Efecto de elevación y brillo al pasar el mouse */
+    .stats-card:hover { 
+        transform: translateY(-8px); 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
     }
     
-    /* Naranja SENA (complementario oficial) */
-    .card-activos {
-        background: linear-gradient(135deg, #ff671f 0%, #e65100 100%);
+    /* Brillo diagonal interno */
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+        transform: skewX(-25deg);
+        transition: 0.6s;
+    }
+    .stats-card:hover::before { left: 200%; }
+
+    /* Iconos gigantes de fondo */
+    .stats-card .icon { 
+        font-size: 4.5rem; 
+        opacity: 0.15; 
+        position: absolute; 
+        right: -5px; 
+        top: 50%; 
+        transform: translateY(-50%);
+        transition: 0.3s;
+    }
+    .stats-card:hover .icon { transform: translateY(-50%) scale(1.1); opacity: 0.25; }
+    
+    /* Textos */
+    .stats-card .label { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
+    .stats-card .value { font-size: 2.5rem; font-weight: 900; margin: 0; line-height: 1.1; }
+
+    /* Gradientes SENA (Semi-translúcidos para combinar con el cristal) */
+    .card-usuarios { background: linear-gradient(135deg, rgba(57, 169, 0, 0.85) 0%, rgba(45, 134, 0, 0.95) 100%); }
+    .card-activos { background: linear-gradient(135deg, rgba(255, 103, 31, 0.85) 0%, rgba(230, 81, 0, 0.95) 100%); }
+    .card-staff { background: linear-gradient(135deg, rgba(45, 134, 0, 0.85) 0%, rgba(30, 90, 0, 0.95) 100%); }
+    .card-nuevos { background: linear-gradient(135deg, rgba(162, 207, 0, 0.85) 0%, rgba(57, 169, 0, 0.95) 100%); }
+
+    /* ==========================================
+       TARJETAS DEL DASHBOARD (Limpias y modernas)
+       ========================================== */
+    .dashboard-card {
+        border: none;
+        border-radius: 16px;
+        background-color: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        transition: 0.3s;
     }
     
-    /* Verde oscuro para contraste */
-    .card-staff {
-        background: linear-gradient(135deg, #2d8600 0%, #1e5a00 100%);
+    .dashboard-card-header {
+        background: transparent;
+        border-bottom: 2px solid rgba(57, 169, 0, 0.2);
+        padding: 20px 25px;
     }
     
-    /* Verde brillante / lima */
-    .card-nuevos {
-        background: linear-gradient(135deg, #a2cf00 0%, #39a900 100%);
+    .dashboard-card-header h5 {
+        color: var(--sena-dark-green) !important;
+        font-weight: 800;
+        margin: 0;
     }
+
+    /* Botones de acción rápida redondeados */
+    .btn-action-quick {
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    .btn-action-quick i { font-size: 1.1rem; vertical-align: text-bottom; }
+
+    /* Ajustes específicos para los botones rápidos del panel
+       - Usar paleta SENA
+       - Evitar subrayado al pasar el cursor (override global)
+       - Mantener color de texto blanco y bordes coherentes
+    */
+    .sena-btn { border-radius: 8px; color: #fff !important; text-decoration: none !important; }
+    .sena-btn.btn-primary { background: linear-gradient(135deg, var(--sena-green), var(--sena-dark-green)); border: none; }
+    .sena-btn.sena-dark { background: var(--sena-dark-green); border-color: var(--sena-dark-green); }
+    .sena-btn.sena-muted { background: #6a7280; border-color: #626b79; }
+    .btn-action-quick, .btn-action-quick:hover, .btn-action-quick:focus { text-decoration: none !important; }
+
+    /* Tabla más limpia */
+    .table-custom th { color: #555 !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; border-bottom: 2px solid #eee; }
+    .table-custom td { color: #222 !important; font-weight: 500; vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.05); }
+
+    @media (max-width: 767px){
+        .stats-card { padding: 18px 15px; min-height: 100px; }
+        .stats-card .icon { font-size: 3rem; right: 10px; }
+        .stats-card .value { font-size: 2rem; }
+    }
+
+    /* ===== OVERRIDES PARA QUITAR AZUL Y MEJORAR CONTRASTE EN ESTA PÁGINA ===== */
+    /* Forzar links dentro del dashboard a paleta SENA (verde) */
+    .content-wrapper a, .container-fluid a { color: var(--sena-green) !important; text-decoration: none !important; }
+    .content-wrapper a:hover, .container-fluid a:hover { color: var(--sena-dark-green) !important; text-decoration: underline !important; }
+
+    /* Evitar azules que vienen de bootstrap */
+    .content-wrapper .text-primary, .container-fluid .text-primary { color: var(--sena-green) !important; }
+
+    /* Botones outline primary: convertir a verde consistente */
+    .btn-outline-primary { color: var(--sena-green) !important; border-color: rgba(57,169,0,0.18) !important; background-color: #fff !important; }
+    .btn-outline-primary:hover { background-color: rgba(57,169,0,0.06) !important; color: var(--sena-dark-green) !important; }
+
+    /* Tabla: reforzar líneas y contraste para mejor lectura */
+    .table-custom thead th { background-color: rgba(0,0,0,0.03) !important; color: #333 !important; border-bottom: 2px solid rgba(0,0,0,0.08) !important; }
+    .table-custom tbody td { border-bottom: 1px solid rgba(0,0,0,0.06) !important; }
+
+    /* Botón editar (pequeño): evitar texto azul, usar verde oscuro */
+    .btn-light.text-primary { color: var(--sena-dark-green) !important; border-color: rgba(0,0,0,0.06) !important; background-color: #fff !important; }
+    .btn-light.text-primary:hover { color: #fff !important; background-color: var(--sena-dark-green) !important; border-color: var(--sena-dark-green) !important; }
+
+    /* Links dentro de la tabla (por ejemplo: 'Ficha: 2993648') */
+    .table-custom a { color: var(--sena-green) !important; }
+
+    /* Badges y pequeñas piezas */
+    .badge.bg-light.text-dark { color: #222 !important; }
+    .badge.bg-white.text-dark { color: var(--neutral-text) !important; }
+
+    /* Búsqueda topbar: integrarla visualmente */
+    .topbar .form-control { border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); }
+
+    /* Iconos informativos en headers: verdes en lugar de azul */
+    .dashboard-card-header .text-info, .dashboard-card-header i.text-info { color: var(--sena-green) !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold">
-                <i class="bi bi-speedometer2"></i> Panel de Administración
+<div class="container-fluid">
+    
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold mb-1 text-dark">
+                Panel de <span style="color: var(--sena-green);">Administración</span>
             </h1>
-            <p class="text-muted">Bienvenido, {{ request.user.get_full_name }}</p>
+            <p class="text-muted fs-5 mb-0">¡Qué bueno verte de nuevo, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>!</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0 d-none d-md-block">
+            <span class="badge bg-white text-dark border shadow-sm px-3 py-2 fs-6 rounded-pill">
+                <i class="bi bi-calendar3 text-success me-2"></i> {% now "l, j de F de Y" %}
+            </span>
         </div>
     </div>
     
-    <!-- Tarjetas de Estadísticas -->
+    <div class="row stats-grid row-cols-1 row-cols-sm-2 row-cols-md-4 gx-3 mb-4">
+        
+        <div class="col">
+            <section class="stats-card card-usuarios shadow-sm">
+                <i class="bi bi-people-fill icon"></i>
+                <div class="label">Total Usuarios</div>
+                <div class="value">{{ total_usuarios|default:"0" }}</div>
+            </section>
+        </div>
+
+        <div class="col">
+            <section class="stats-card card-activos shadow-sm">
+                <i class="bi bi-person-check-fill icon"></i>
+                <div class="label">Usuarios Activos</div>
+                <div class="value">{{ usuarios_activos|default:"0" }}</div>
+            </section>
+        </div>
+
+        <div class="col">
+            <section class="stats-card card-staff shadow-sm">
+                <i class="bi bi-shield-lock-fill icon"></i>
+                <div class="label">Administradores</div>
+                <div class="value">{{ usuarios_staff|default:"0" }}</div>
+            </section>
+        </div>
+
+        <div class="col">
+            <section class="stats-card card-nuevos shadow-sm">
+                <i class="bi bi-person-plus-fill icon"></i>
+                <div class="label">Nuevos (Mes)</div>
+                <div class="value">{{ nuevos_usuarios_mes|default:"0" }}</div>
+            </section>
+        </div>
+        
+    </div>
+    
     <div class="row">
-        <div class="col-md-3">
-            <div class="stats-card card-usuarios">
-                <i class="bi bi-people icon"></i>
-                <p class="mb-0">Total Usuarios</p>
-                <h3>{{ total_usuarios }}</h3>
-            </div>
-        </div>
         
-        <div class="col-md-3">
-            <div class="stats-card card-activos">
-                <i class="bi bi-check-circle icon"></i>
-                <p class="mb-0">Usuarios Activos</p>
-                <h3>{{ usuarios_activos }}</h3>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="stats-card card-staff">
-                <i class="bi bi-shield-check icon"></i>
-                <p class="mb-0">Administradores</p>
-                <h3>{{ usuarios_staff }}</h3>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="stats-card card-nuevos">
-                <i class="bi bi-person-plus icon"></i>
-                <p class="mb-0">Nuevos Este Mes</p>
-                <h3>{{ nuevos_usuarios_mes }}</h3>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Acciones Rápidas -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Acciones Rápidas</h5>
+        <div class="col-lg-4 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="dashboard-card-header">
+                    <h5><i class="bi bi-lightning-charge-fill me-2 text-warning"></i> Acciones Rápidas</h5>
                 </div>
-                <div class="card-body">
-                    <a href="{% url 'usuarios:crear_usuario' %}" class="btn btn-primary me-2">
-                        <i class="bi bi-person-plus"></i> Crear Usuario
+                <div class="card-body d-flex flex-column gap-3 justify-content-center p-4">
+                    
+                    <a href="{% url 'usuarios:crear_usuario' %}" class="btn btn-primary btn-action-quick sena-btn w-100 shadow-sm text-start py-2">
+                        <i class="bi bi-person-plus-fill me-2 text-white fs-5 align-middle"></i> 
+                        <span class="align-middle fw-bold">Crear Usuario</span>
                     </a>
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-outline-primary me-2">
-                        <i class="bi bi-people"></i> Ver Usuarios
+                    
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-action-quick sena-btn sena-dark w-100 shadow-sm text-start py-2">
+                        <i class="bi bi-people-fill me-2 text-white fs-5 align-middle"></i> 
+                        <span class="align-middle fw-bold">Gestionar Usuarios</span>
                     </a>
-                    <a href="{% url 'usuarios:perfil' %}" class="btn btn-outline-secondary">
-                        <i class="bi bi-person-circle"></i> Mi Perfil
+                    
+                    <a href="{% url 'usuarios:perfil' %}" class="btn btn-action-quick sena-btn sena-muted w-100 shadow-sm text-start py-2">
+                        <i class="bi bi-person-badge-fill me-2 text-white fs-5 align-middle"></i> 
+                        <span class="align-middle fw-bold">Ver Mi Perfil</span>
                     </a>
+
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Últimos Usuarios Registrados -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimos Usuarios Registrados</h5>
+        
+        <div class="col-lg-8 mb-4">
+            <div class="card dashboard-card h-100">
+                <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="bi bi-clock-history me-2 text-info"></i> Registros Recientes</h5>
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-sm btn-link text-decoration-none">Ver todos <i class="bi bi-arrow-right"></i></a>
                 </div>
-                <div class="card-body">
+                
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-custom table-hover align-middle mb-0">
+                            <thead class="bg-light bg-opacity-50">
                                 <tr>
-                                    <th>Documento</th>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Fecha de Registro</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th class="ps-4">Usuario</th>
+                                    <th>Documento / Email</th>
+                                    <th>Registro</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="pe-4 text-end">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for usuario in ultimos_usuarios %}
                                 <tr>
-                                    <td>{{ usuario.username }}</td>
-                                    <td>{{ usuario.get_full_name|default:usuario.username }}</td>
-                                    <td>{{ usuario.email }}</td>
-                                    <td>{{ usuario.date_joined|date:"d/m/Y H:i" }}</td>
-                                    <td>
-                                        {% if usuario.is_active %}
-                                            <span class="badge bg-success">Activo</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">Inactivo</span>
-                                        {% endif %}
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person-fill fs-5"></i>
+                                            </div>
+                                            <div class="fw-bold text-dark">{{ usuario.get_full_name|default:usuario.username }}</div>
+                                        </div>
                                     </td>
                                     <td>
-                                        <a href="{% url 'usuarios:editar_usuario' usuario.id %}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil"></i>
+                                        <div class="text-dark">{{ usuario.username }}</div>
+                                        <div class="small text-muted">{{ usuario.email|default:"Sin correo" }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border shadow-sm"><i class="bi bi-calendar-event me-1"></i>{{ usuario.date_joined|date:"d/m/Y" }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if usuario.is_active %}
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn btn-sm btn-light border text-primary rounded-circle shadow-sm" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;" title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
                                         </a>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
-                                        No hay usuarios registrados aún
+                                    <td colspan="5" class="text-center py-5">
+                                        <i class="bi bi-inbox fs-1 text-muted opacity-50 mb-3 d-block"></i>
+                                        <h6 class="text-muted">No hay usuarios registrados recientemente</h6>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -180,6 +298,7 @@
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

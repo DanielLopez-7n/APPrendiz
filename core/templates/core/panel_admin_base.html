@@ -5,607 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Panel Administrativo{% endblock %} - Mi Proyecto SENA</title>
         
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Chart.js para gráficos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
     
-    <!-- CSS personalizado del dashboard -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'core/css/panel_admin_base.css' %}">
-    
-    <!-- CSS adicional de cada página -->
-    {% block extra_css %}
+    {% block extra_css %}{% endblock %}
     
     <style>
-    /* 1. VARIABLES GLOBALES */
-    :root {
-        --sena-green: #39a900;
-        --sena-dark-green: #2d8600;
-        --sena-orange: #ff671f;
-        --sena-white: #ffffff;
-    }
+        :root {
+            --sena-green: #39a900;
+            --sena-dark-green: #2d8600;
+            --sena-orange: #ff671f;
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
+        }
 
-    /* 2. SIDEBAR: USAMOS EL ID #sidebar PARA MÁXIMA PRIORIDAD */
-    #sidebar.sidebar {
-        background-color: var(--sena-green) !important;
-        background-image: none !important; /* Elimina degradados previos */
-        box-shadow: 4px 0 10px rgba(0,0,0,0.1) !important;
-    }
-
-    /* 3. HEADER DEL USUARIO (Foto y Nombre) */
-    .sidebar-header {
-        background-color: var(--sena-dark-green) !important;
-        padding: 20px 15px !important;
-    }
-
-    .sidebar-header .user-name {
-        color: white !important;
-        font-weight: bold !important;
-        margin-top: 10px !important;
-    }
-
-    .sidebar-header .user-role {
-        color: rgba(255, 255, 255, 0.8) !important;
-        font-size: 0.85rem !important;
-    }
-
-    .sidebar-header .divider {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        height: 1px !important;
-        margin: 15px 0 !important;
-    }
-
-    /* 4. ELEMENTOS DE NAVEGACIÓN */
-    .sidebar-nav .nav-link {
-        color: white !important;
-        border-radius: 8px !important;
-        margin: 4px 15px !important;
-        display: flex !important;
-        align-items: center !important;
-        transition: all 0.3s ease !important;
-    }
-
-    .sidebar-nav .nav-link i {
-        color: white !important;
-        font-size: 1.2rem !important;
-        margin-right: 10px !important;
-    }
-
-    .sidebar-nav .nav-link:hover {
-        background-color: rgba(255, 255, 255, 0.15) !important;
-        transform: translateX(5px) !important;
-    }
-
-    /* Títulos de sección (ej: CONFIGURACIÓN) */
-    .sidebar-nav .nav-header, .nav-header span {
-        color: rgba(255, 255, 255, 0.5) !important;
-        font-size: 0.75rem !important;
-        font-weight: bold !important;
-        text-transform: uppercase !important;
-        padding-left: 25px !important;
-        margin-top: 20px !important;
-        display: block !important;
-    }
-
-    /* 5. TOPBAR (Barra Superior Blanca) */
-    .topbar {
-        background-color: white !important;
-        border-bottom: 3px solid var(--sena-green) !important;
-    }
-
-    .page-title {
-        color: var(--sena-green) !important;
-        font-weight: bold !important;
-    }
-
-    .btn-toggle i {
-        color: var(--sena-green) !important;
-    }
-
-    /* 6. BOTONES Y NOTIFICACIONES */
-    .badge-dot {
-        background-color: var(--sena-orange) !important;
-    }
-
-    .bg-primary {
-        background-color: var(--sena-green) !important;
-    }
-
-    /* Ajuste especial para el Logout para que sea legible */
-    .nav-link.text-danger {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        margin-top: 10px !important;
-    }
-    
-    .nav-link.text-danger i, .nav-link.text-danger span {
-        color: #ffcccc !important; /* Rojo claro sobre fondo verde */
-    }
-
-    /* =========================================
-   CORRECCIONES DE ESTILO SENA - HEADER USUARIO
-   ========================================= */
-
-    /* 1. ELIMINAR LA LÍNEA AZUL */
-    /* Apuntamos a cualquier divisor o elemento 'after' que pueda estar creando esa línea */
-    .sidebar-header .divider,
-    .sidebar-header hr,
-    .sidebar-header::after,
-    .user-role::after {
-        background-color: transparent !important;
-        height: 0 !important;
-        border: none !important;
-        display: none !important;
-        content: none !important;
-    }
-
-    /* 2. ARREGLAR EL CÍRCULO AZUL DEL AVATAR */
-    /* Buscamos el contenedor de la imagen o el placeholder del icono */
-    .sidebar-header .avatar-placeholder, 
-    .sidebar-header .user-avatar-circle,
-    .sidebar-header .img-circle {
-        /* Cambiamos el degradado azul por un degradado SENA vibrante */
-        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
-        /* Quitamos cualquier borde azul si lo hubiera */
-        border: 2px solid var(--sena-white) !important; 
-        /* Una sombra suave para darle profundidad */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
-    }
-
-    /* OPCIONAL: Asegurar que el icono dentro del círculo sea blanco */
-    .sidebar-header .avatar-placeholder i,
-    .sidebar-header .user-avatar-circle i {
-        color: #ffffff !important;
-    }
-
-    /* 3. AJUSTE FINO DEL FONDO DEL HEADER (Opcional pero recomendado) */
-    /* Hacemos que el fondo de esta sección sea un verde un poco más oscuro 
-    para que el círculo brillante del avatar resalte más */
-    .sidebar-header {
-        background-color: #2d8600 !important; /* Verde SENA oscuro */
-        border-bottom: 1px solid rgba(255,255,255,0.15) !important;
-    }
-{% endblock %}
-
-    <style>
-
-    /* 1. FUERZA BRUTA PARA EL SIDEBAR (No importa qué página sea) */
-    body.dashboard-body #sidebar.sidebar {
-        background-color: #39a900 !important; /* Verde SENA */
-        background-image: none !important;
-        box-shadow: 4px 0 10px rgba(0,0,0,0.1) !important;
-    }
-
-    /* 2. HEADER DONDE ESTÁ TU FOTO (Daniel_7) */
-    body.dashboard-body #sidebar .sidebar-header {
-        background-color: #2d8600 !important; /* Verde más oscuro */
-        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-    }
-
-    /* 3. ICONOS Y TEXTOS SIEMPRE BLANCOS */
-    #sidebar .nav-link, 
-    #sidebar .nav-link i, 
-    #sidebar .nav-link span,
-    #sidebar .user-name {
-        color: #ffffff !important;
-    }
-
-    /* 4. ELIMINAR EL AZUL CUANDO EL BOTÓN ESTÁ ACTIVO */
-    #sidebar .nav-link.active, 
-    #sidebar .nav-link:hover {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-    }
-
-    /* 5. TOPBAR (La línea verde de arriba que ya te funcionaba) */
-    .topbar {
-        border-bottom: 3px solid #39a900 !important;
-    }
-    .page-title {
-        color: #39a900 !important;
-    }
-
-    <style>
-    /* 1. ELIMINAR LA LÍNEA AZUL Y EL CÍRCULO AZUL (ESTILO NUCLEAR) */
-    
-    /* Atacamos el círculo del avatar */
-    html body.dashboard-body #sidebar .avatar-placeholder,
-    html body.dashboard-body #sidebar .user-avatar {
-        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
-        border: 2px solid #ffffff !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
-    }
-
-    /* 1. ELIMINAR LA LÍNEA AZUL Y EL CÍRCULO AZUL (ESTILO NUCLEAR) */
-    
-    /* Atacamos el círculo del avatar */
-    html body.dashboard-body #sidebar .avatar-placeholder,
-    html body.dashboard-body #sidebar .user-avatar {
-        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
-        border: 2px solid #ffffff !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
-    }
-
-    /* Eliminamos la línea azul (el div .divider) */
-    html body.dashboard-body #sidebar .divider {
-        display: none !important;
-        height: 0 !important;
-        background-color: transparent !important;
-        margin: 0 !important;
-    }
-
-    /* 2. FORZAR EL SIDEBAR VERDE EN EL DASHBOARD */
-    html body.dashboard-body #sidebar.sidebar {
-        background-color: #39a900 !important;
-        background-image: none !important;
-    }
-
-    /* 3. LIMPIEZA DEL HEADER DEL USUARIO */
-    html body.dashboard-body #sidebar .sidebar-header {
-        background-color: #2d8600 !important; /* Verde oscuro para que resalte el avatar */
-        padding-bottom: 20px !important;
-    }
-
-    /* Asegurar que el rol (Superadministrador) no tenga sombras ni líneas raras */
-    html body.dashboard-body #sidebar .user-role {
-        color: rgba(255, 255, 255, 0.8) !important;
-        border: none !important;
-        margin-bottom: 0 !important;
-    }
-
-    /* 4. ICONOS Y TEXTOS SIEMPRE BLANCOS */
-    html body.dashboard-body #sidebar .nav-link,
-    html body.dashboard-body #sidebar .nav-link i,
-    html body.dashboard-body #sidebar .nav-link span,
-    html body.dashboard-body #sidebar .user-name {
-        color: #ffffff !important;
-    }
-
-    /* Hover para que no se ponga azul al pasar el mouse */
-    html body.dashboard-body #sidebar .nav-link:hover {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* 1. CAMBIAR EL COLOR DE LOS TEXTOS PRIMARIOS (Títulos) */
-    .text-primary, 
-    .breadcrumb-item a, 
-    h2.text-primary, 
-    h5.text-primary {
-        color: #39a900 !important;
-    }
-
-    /* 2. CAMBIAR EL COLOR DEL BOTÓN "NUEVO APRENDIZ" (Y todos los primary) */
-    .btn-primary {
-        background-color: #39a900 !important;
-        border-color: #39a900 !important;
-        color: #ffffff !important;
-        font-weight: bold !important;
-    }
-
-    /* Efecto cuando pasas el mouse por el botón */
-    .btn-primary:hover {
-        background-color: #2d8600 !important;
-        border-color: #2d8600 !important;
-    }
-
-    /* 3. CAMBIAR LOS LINKS DE LOS BREADCRUMBS (La ruta arriba) */
-    .breadcrumb-item a {
-        text-decoration: none !important;
-        color: #39a900 !important;
-    }
-
-    .breadcrumb-item a:hover {
-        color: #2d8600 !important;
-        text-decoration: underline !important;
-    }
-
-    /* 4. LÍNEAS DEBAJO DE LOS TÍTULOS */
-    .border-primary {
-        border-color: #39a900 !important;
-    }
-
-    /* VARIABLES GLOBALES */
-    :root {
-        --sena-green: #39a900;
-        --sena-dark-green: #2d8600;
-        --sena-orange: #ff671f;
-    }
-
-    /* 1. INTERCEPTAR TODOS LOS BOTONES AZULES/CELESTES */
-    .btn-primary, .btn-info, .btn-outline-primary, .btn-outline-info {
-        background-color: var(--sena-green) !important;
-        border-color: var(--sena-green) !important;
-        color: #ffffff !important;
-    }
-
-    .btn-primary:hover, .btn-info:hover {
-        background-color: var(--sena-dark-green) !important;
-        border-color: var(--sena-dark-green) !important;
-    }
-
-    /* 2. TEXTOS E ICONOS QUE SIGUEN SIENDO AZULES */
-    .text-primary, .text-info, .bi-primary, .bi-info {
-        color: var(--sena-green) !important;
-    }
-
-    /* 3. BORDES Y ESTADOS DE FOCUS (PARA QUE NO SE PONGAN AZULES AL DAR CLICK) */
-    .form-control:focus, .form-select:focus {
-        border-color: var(--sena-green) !important;
-        box-shadow: 0 0 0 0.25rem rgba(57, 169, 0, 0.25) !important;
-    }
-
-    /* 4. BADGES (ETIQUETAS) */
-    .bg-primary, .bg-info {
-        background-color: var(--sena-green) !important;
-    }
-    
-    /* REFUERZO TOTAL DE COLORES SENA */
-    
-    /* 1. Forzar que bg-success sea nuestro verde SENA */
-    .bg-success {
-        background-color: #39a900 !important;
-        background-opacity: 1 !important;
-    }
-
-    /* 2. Forzar que btn-success y btn-primary sean verdes */
-    .btn-success, .btn-primary, .btn-info {
-        background-color: #39a900 !important;
-        border-color: #39a900 !important;
-        color: white !important;
-    }
-
-    .btn-success:hover, .btn-primary:hover, .btn-info:hover {
-        background-color: #2d8600 !important;
-        border-color: #2d8600 !important;
-    }
-
-    /* 3. Cambiar el color de los iconos informativos y textos azules */
-    .text-success, .text-primary, .text-info, .bi-info-circle, .bi-person-plus {
-        color: #39a900 !important;
-    }
-
-    /* 4. Arreglar el Breadcrumb (Navegación de arriba) */
-    .breadcrumb-item a {
-        color: #39a900 !important;
-        text-decoration: none !important;
-    }
-
-    .breadcrumb-item.active {
-        color: #666 !important;
-    }
-
-    /* RECONFIGURACIÓN DE RAÍZ - ESTILO SENA */
-    :root {
-        --sena-green: #39a900;
-        --sena-dark-green: #2d8600;
-        --sena-orange: #ff671f;
+        /* 1. VISIBILIDAD DEL CARRUSEL Y FONDOS TRANSPARENTES */
+        html, body { margin: 0; padding: 0; overflow-x: hidden; background-color: transparent !important; }
         
-        /* Esto obliga a Bootstrap a creer que el azul ahora es verde */
-        --bs-primary: #39a900 !important;
-        --bs-primary-rgb: 57, 169, 0 !important;
-        --bs-success: #39a900 !important;
-    }
+        #fondo-carrusel { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; pointer-events: none; }
+        #fondo-carrusel .carousel-item img { object-fit: cover; height: 100vh; width: 100%; }
+        .overlay-oscura { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); }
 
-    /* FORZAR SIDEBAR (NUCLEAR) */
-    body.dashboard-body #sidebar.sidebar {
-        background-color: var(--sena-green) !important;
-        background-image: none !important;
-    }
+        /* ==========================================
+           2. ERRADICACIÓN GLOBAL DEL COLOR AZUL BOOTSTRAP
+           ========================================== */
+        a { color: var(--sena-green); text-decoration: none; }
+        a:hover { color: var(--sena-dark-green); }
+        
+        .text-primary { color: var(--sena-green) !important; }
+        .bg-primary { background-color: var(--sena-green) !important; color: white !important; }
+        
+        .btn-primary { background-color: var(--sena-green) !important; border-color: var(--sena-green) !important; color: white !important; }
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active { background-color: var(--sena-dark-green) !important; border-color: var(--sena-dark-green) !important; color: white !important; box-shadow: 0 0 0 0.25rem rgba(57, 169, 0, 0.25) !important;}
+        
+        .btn-outline-primary { color: var(--sena-green) !important; border-color: var(--sena-green) !important; }
+        .btn-outline-primary:hover, .btn-outline-primary:active { background-color: var(--sena-green) !important; color: white !important; }
 
-    /* ELIMINAR CÍRCULO AZUL Y LÍNEA BAJO "SUPERADMINISTRADOR" */
-    #sidebar .avatar-placeholder, #sidebar .user-avatar {
-        background: linear-gradient(135deg, #46d200 0%, #39a900 100%) !important;
-        border: 2px solid white !important;
-    }
+        /* Paginación, checkboxes y focus de formularios */
+        .page-link { color: var(--sena-green) !important; }
+        .page-item.active .page-link { background-color: var(--sena-green) !important; border-color: var(--sena-green) !important; color: white !important; }
+        .form-control:focus, .form-select:focus { border-color: var(--sena-green) !important; box-shadow: 0 0 0 0.25rem rgba(57, 169, 0, 0.25) !important; }
+        .form-check-input:checked { background-color: var(--sena-green) !important; border-color: var(--sena-green) !important; }
+        
+        /* 3. SIDEBAR (Menú Lateral) */
+        #sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh;
+            background-color: rgba(57, 169, 0, 0.95) !important;
+            backdrop-filter: blur(10px); z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow-y: auto; overflow-x: hidden; box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+        }
 
-    #sidebar .divider {
-        display: none !important; /* Adiós a la línea azul */
-    }
+        #sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+        #sidebar.collapsed .user-name, #sidebar.collapsed .user-role, #sidebar.collapsed .nav-header span, #sidebar.collapsed .nav-link span { display: none !important; }
+        #sidebar.collapsed .sidebar-header { padding: 15px 5px !important; }
+        #sidebar.collapsed .user-avatar { width: 40px !important; height: 40px !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px 0 !important; }
+        #sidebar.collapsed .nav-link i { margin: 0 !important; font-size: 1.4rem; }
 
-    /* BOTONES Y TEXTOS */
-    .btn-primary, .bg-primary {
-        background-color: var(--sena-green) !important;
-        border-color: var(--sena-green) !important;
-        color: white !important;
-    }
+        .sidebar-header { padding: 25px 15px; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: center; transition: 0.3s; }
+        .user-avatar { background: linear-gradient(135deg, #46d200 0%, #39a900 100%); border: 3px solid #fff; margin: 0 auto; transition: 0.3s; }
+        
+        /* Enlaces del Sidebar */
+        #sidebar .nav-link {
+            color: rgba(255,255,255,0.85) !important; border-radius: 8px; margin: 4px 10px;
+            display: flex; align-items: center; white-space: nowrap; transition: all 0.3s ease;
+        }
+        #sidebar .nav-link i { color: rgba(255,255,255,0.85) !important; margin-right: 12px; font-size: 1.2rem; transition: 0.3s; }
+        
+        #sidebar .nav-link:hover, #sidebar .nav-link.activo {
+            background-color: #ffffff !important; transform: scale(1.02); box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        #sidebar .nav-link:hover span, #sidebar .nav-link.activo span { color: #111111 !important; font-weight: 700; }
+        #sidebar .nav-link:hover i, #sidebar .nav-link.activo i { color: var(--sena-dark-green) !important; }
+        
+        #sidebar .nav-link.activo { position: relative; }
+        #sidebar .nav-link.activo::before {
+            content: ''; position: absolute; left: -10px; top: 10%; height: 80%; width: 5px;
+            background-color: var(--sena-orange); border-radius: 0 4px 4px 0;
+        }
 
-    .btn-outline-primary {
-        color: var(--sena-green) !important;
-        border-color: var(--sena-green) !important;
-    }
+        /* 4. BOTÓN DE LOGOUT (Corrección de color rojo) */
+        #sidebar .nav-link.logout-btn { background-color: rgba(226, 216, 217, 0.1) !important; margin-top: 15px; }
+        #sidebar .nav-link.logout-btn i, #sidebar .nav-link.logout-btn span { color: #8e8282 !important; }
+        #sidebar .nav-link.logout-btn:hover { background-color: #e3d7d8 !important; transform: scale(1.02); }
+        #sidebar .nav-link.logout-btn:hover span, #sidebar .nav-link.logout-btn:hover i { color: #ffffff !important; }
 
-    .btn-outline-primary:hover {
-        background-color: var(--sena-green) !important;
-        color: white !important;
-    }
+        .nav-header { padding: 15px 10px 5px 20px; white-space: nowrap; }
+        .nav-header span { color: rgba(255,255,255,0.6); font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
 
-    .text-primary {
-        color: var(--sena-green) !important;
-    }
+        /* 5. CONTENIDO PRINCIPAL Y CRISTAL */
+        #main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; position: relative; z-index: 10; }
+        #main-content.collapsed { margin-left: var(--sidebar-collapsed-width); }
 
-    /* FORZAR VISIBILIDAD EN BOTONES DE ACCIONES RÁPIDAS */
-    
-    /* Botón "Crear Usuario" (btn-primary) */
-    .btn-primary, .bg-primary {
-        background-color: #39a900 !important;
-        border-color: #39a900 !important;
-        color: #ffffff !important; /* Forzamos texto blanco */
-    }
+        .topbar { background-color: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(15px); border-bottom: 2px solid rgba(57, 169, 0, 0.5); position: sticky; top: 0; z-index: 900; }
 
-    /* Botón "Ver Usuarios" (btn-outline-primary) */
-    .btn-outline-primary {
-        /* Si quieres que sea VERDE con texto BLANCO desde el inicio: */
-        background-color: #39a900 !important;
-        color: #ffffff !important; 
-        border-color: #39a900 !important;
-    }
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.92) !important;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 15px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); flex-grow: 1;
+        }
 
-    /* Aseguramos que los ICONOS dentro de los botones también sean blancos */
-    .btn-primary i, .btn-outline-primary i {
-        color: #ffffff !important;
-    }
+        /* Textos oscuros */
+        .card { background-color: rgba(255, 255, 255, 0.98) !important; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        body, .card, table, .table *, p, span, div { color: #1a1d20; font-weight: 500; }
+        h1, h2, h3, h4, h5, h6, .page-title { color: #111 !important; font-weight: 800; }
+        label, .form-label { color: #333 !important; font-weight: 700 !important; }
+        .text-muted, .small { color: #666 !important; font-weight: 600; }
 
-    /* Efecto al pasar el mouse para ambos */
-    .btn-primary:hover, .btn-outline-primary:hover {
-        background-color: #2d8600 !important;
-        border-color: #2d8600 !important;
-        color: #ffffff !important;
-    }
+        .btn-toggle { cursor: pointer; transition: 0.2s; }
+        .btn-toggle:hover { transform: scale(1.1); color: var(--sena-dark-green); }
 
-    /* 1. El contenedor del carrusel se fija al fondo de la pantalla */
-    #fondo-carrusel {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -10; /* Se coloca detrás de todo el contenido */
-    }
+        @media (max-width: 768px) {
+            #sidebar { left: calc(-1 * var(--sidebar-width)); }
+            #sidebar.mobile-open { left: 0; }
+            #main-content { margin-left: 0 !important; }
+            .content-wrapper { margin: 10px; border-radius: 10px; }
+        }
 
-    /* 2. Hacemos que las imágenes cubran todo el espacio sin deformarse */
-    #fondo-carrusel .carousel-inner,
-    #fondo-carrusel .carousel-item {
-        height: 100%;
-    }
+        /* 1. ANIQUILAR EL AZUL Y VERDE POR DEFECTO DE BOOTSTRAP 5 */
+        :root, [data-bs-theme="light"] {
+            --bs-primary: #39a900 !important;
+            --bs-primary-rgb: 57, 169, 0 !important;
+            --bs-success: #39a900 !important;
+            --bs-success-rgb: 57, 169, 0 !important;
+            --bs-info: #39a900 !important;
+            --bs-link-color: #39a900 !important;
+            --bs-link-hover-color: #2d8600 !important;
+            --bs-body-bg: transparent !important;
+        }
 
-    #fondo-carrusel .carousel-item img {
-        object-fit: cover; /* Clave para que la imagen llene la pantalla */
-        height: 100vh;
-        width: 100%;
-    }
+        /* 2. DESTRUIR EL FONDO BLANCO (Para liberar el carrusel) */
+        html, body, .dashboard-body, #main-content, #wrapper, #content-wrapper {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
 
-    /* 3. Capa oscura superpuesta para mejorar la lectura del texto */
-    .overlay-oscura {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        /* Ajusta el último número (0.6) para más o menos oscuridad (de 0 a 1) */
-        background-color: rgba(0, 0, 0, 0.6); 
-    }
-
-    /* 4. Hacemos transparentes los contenedores principales para ver el fondo */
-    #wrapper, #content-wrapper, body {
-        background-color: transparent !important;
-    }
-
-    /* 5. Efecto moderno: Las tarjetas blancas ahora son semi-transparentes */
-    .card, .topbar, .sidebar {
-         /* Un blanco al 90% de opacidad */
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(5px); /* Un pequeño efecto de desenfoque elegante */
-    }
-
-    /* 6. Mejorar la legibilidad del texto en todo el panel */
-    body, .card, .sidebar, .topbar, .nav-link, table {
-        color: #000000 !important; /* Negro puro en lugar del gris por defecto */
-        font-weight: 500; /* Hace la letra un poquito más gruesa */
-    }
-
-    /* Aseguramos que los textos pequeños o secundarios también se vean bien */
-    .text-muted, .small {
-        color: #333333 !important; /* Un gris muy oscuro, casi negro */
-        font-weight: 500;
-    }
-
-    /* 1. Títulos y textos generales en BLANCO para resaltar sobre el fondo */
-    h1, h2, h3, h4, h5, h6, label, .nav-link {
-        color: #ffffff !important;
-        font-weight: 500;
-    }
-
-    /* 2. PROTECCIÓN DE TABLAS: Mantenemos el texto oscuro para que se lea bien */
-    .table, .table *, .dataTable, .dataTable * {
-        color: #212529 !important; /* Gris oscuro estándar */
-    }
-
-    /* 3. Arreglo del "hueco" en el Topbar (Barra superior) */
-    .topbar {
-        background-color: rgba(255, 255, 255, 0.95) !important; /* Blanco casi sólido */
-        width: 100% !important; /* Fuerza a que ocupe todo el ancho */
-        margin-top: 0 !important;
-        border-radius: 0 !important;
-    }
-
-    /* Opcional: Si el título del Topbar ahora es blanco y el fondo es blanco, no se verá. 
-       Forzamos a que el texto dentro del topbar sea oscuro */
-    .topbar h1, .topbar h2, .topbar h3, .topbar span {
-        color: #333333 !important;
-    }
-
-    /* =========================================
-       ELIMINACIÓN DEL HUECO SUPERIOR Y BORDES
-       ========================================= */
-       
-    /* 1. Quitamos cualquier margen por defecto de la página entera */
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* 2. Forzamos a que los contenedores principales no empujen hacia abajo */
-    #wrapper, #content-wrapper, #content {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-    }
-
-    /* 3. Pegamos el Topbar (la barra blanca) al techo al 100% */
-    .topbar {
-        margin: 0 !important;
-        padding-top: 0 !important;
-        top: 0 !important;
-        border-radius: 0 !important; /* Evita esquinas redondeadas que dejen ver el fondo */
-        width: 100% !important;
-        /* Si quieres que la barra siempre se vea aunque hagas scroll hacia abajo, 
-           descomenta la siguiente línea: */
-        /* position: sticky; z-index: 1000; */
-    }
-    
-    <style>
-        /* 1. Todos los títulos y subtítulos dentro de las tarjetas */
-        .card-header h1, .card-body h1,
-        .card-header h2, .card-body h2,
-        .card-header h3, .card-body h3,
-        .card-header h4, .card-body h4,
-        .card-header h5, .card-body h5,
-        .card-header h6, .card-body h6,
-        h5, h6.font-weight-bold {
-            color: #333333 !important; /* Gris oscuro para títulos */
+        /* 3. CORREGIR FORMULARIOS Y ENLACES (Adiós azul) */
+        a, .text-primary, .text-success, .text-info, .btn-link {
+            color: #39a900 !important;
+            text-decoration: none !important;
+        }
+        a:hover, .btn-link:hover {
+            color: #2d8600 !important;
         }
         
-        /* 2. Etiquetas de los campos de formulario (Nombres, Correo, Documento, etc.) */
-        label, 
-        .form-label, 
-        .col-form-label, 
-        .form-group label,
-        .bmd-label-static,
-        .bmd-label-floating {
-            color: #555555 !important; /* Gris intermedio elegante */
-            font-weight: 600 !important; /* Un poco de grosor para que resalten */
+        /* Los títulos de los campos del formulario en gris oscuro, no azul */
+        .form-label, .col-form-label, legend, label {
+            color: #333333 !important; 
+            font-weight: 700 !important;
+        }
+
+        /* 4. UNIFICAR TODOS LOS BOTONES AL VERDE SENA */
+        .btn-success, .btn-primary, .btn-info {
+            background-color: #39a900 !important;
+            border-color: #39a900 !important;
+            color: #ffffff !important;
+        }
+        .btn-success:hover, .btn-primary:hover, .btn-info:hover {
+            background-color: #2d8600 !important;
+            border-color: #2d8600 !important;
+        }
+
+        /* ==========================================
+                    COLORES DEL MENÚ LATERAL
+           ========================================== */
+        
+        /* 1. ESTADO NORMAL: Letras e iconos en blanco puro */
+        #sidebar .nav-link, 
+        #sidebar .nav-link span, 
+        #sidebar .nav-link i,
+        .sidebar-nav .nav-link {
+            color: #ffffff !important;
+            transition: all 0.3s ease !important;
+        }
+
+        /* 2. ESTADO HOVER / ACTIVO: Fondo blanco */
+        #sidebar .nav-link:hover, 
+        #sidebar .nav-link.activo {
+            background-color: #ffffff !important;
+            transform: translateX(5px) !important; /* Pequeño salto a la derecha */
+        }
+
+        /* 3. EL CONTRASTE: Letras negras al pasar el ratón o estar activo */
+        #sidebar .nav-link:hover span, 
+        #sidebar .nav-link.activo span,
+        /* Cubrimos también por si el texto no está dentro de un <span> */
+        #sidebar .nav-link:hover,
+        #sidebar .nav-link.activo {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+
+        /* 4. EL DETALLE FINO: El icono se vuelve verde oscuro al pasar el ratón */
+        #sidebar .nav-link:hover i, 
+        #sidebar .nav-link.activo i {
+            color: #2d8600 !important; 
+        }
+
+        /* 5. EL BOTÓN DE CERRAR SESIÓN (Excepción a la regla) */
+        #sidebar .nav-link.logout-btn {
+            background-color: rgba(220, 53, 69, 0.15) !important;
+            color: #ffcccc !important;
+        }
+        #sidebar .nav-link.logout-btn span,
+        #sidebar .nav-link.logout-btn i {
+            color: #ffcccc !important;
+        }
+        #sidebar .nav-link.logout-btn:hover {
+            background-color: #dc3545 !important; /* Rojo intenso */
+        }
+        #sidebar .nav-link.logout-btn:hover span,
+        #sidebar .nav-link.logout-btn:hover i {
+            color: #ffffff !important; /* Letras blancas para el rojo */
+        }
+
+        /* ==========================================
+           GARANTIZAR TEXTO BLANCO EN EL MENÚ LATERAL
+           ========================================== */
+        #sidebar .nav-link, 
+        #sidebar .nav-link span, 
+        #sidebar .nav-link i,
+        #sidebar .nav-header span {
+            color: #ffffff !important;
+        }
+
+        /* Solo se pinta de negro cuando el fondo se vuelve blanco (Hover/Activo) */
+        #sidebar .nav-link:hover span, 
+        #sidebar .nav-link.activo span {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+        #sidebar .nav-link:hover i, 
+        #sidebar .nav-link.activo i {
+            color: var(--sena-dark-green) !important;
         }
         
-        /* 3. Textos generales por si acaso */
-        .card-body p, 
-        .card-body td, 
-        .card-body th,
-        .text-muted {
-            color: #4a5568 !important;
-        }
-    
-</style>
-
-
-    
+    </style>
 
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 </head>
-<body class="dashboard-body">
+<body>
     
-    <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="15000" data-bs-pause="false">
+    <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="12000" data-bs-pause="false">
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <img src="{% static 'core/img_bg/fondo1.png' %}" class="d-block w-100" alt="Fondo 1">
@@ -621,288 +267,223 @@
             </div>
         </div>
     </div>
-    ```
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    
+    <div id="sidebar">
         <div class="sidebar-header">
-            <!-- Avatar del usuario -->
-            <div class="user-avatar">
+            <div class="user-avatar d-flex justify-content-center align-items-center rounded-circle" style="width: 70px; height: 70px; overflow: hidden;">
                 {% if user.perfil.foto_perfil %}
-                    <img src="{{ user.perfil.foto_perfil.url }}" alt="{{ user.get_full_name }}" class="avatar-img">
+                    <img src="{{ user.perfil.foto_perfil.url }}" alt="{{ user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
                 {% else %}
-                    <div class="avatar-placeholder">
-                        <i class="bi bi-person-circle"></i>
-                    </div>
+                    <i class="bi bi-person text-white fs-1"></i>
                 {% endif %}
             </div>
             
-            <!-- Nombre del usuario -->
-            <h6 class="user-name">{{ user.get_full_name|default:user.username }}</h6>
-            <p class="user-role text-muted">
-                {% if user.is_superuser %}
-                    Superadministrador
-                {% elif user.is_staff %}
-                    Administrador
-                {% else %}
-                    Usuario
-                {% endif %}
-            </p>
-            <div class="divider"></div>
+            <div class="mt-2 text-container text-center">
+                <h6 class="user-name mb-0 text-truncate" style="color: #ffffff !important; font-weight: 700;">
+                    {{ user.get_full_name|default:user.username }}
+                </h6>
+                <p class="user-role mt-1" style="color: #ffffff !important; font-weight: 500;">
+                    {% if user.is_superuser %} Superadministrador
+                    {% elif user.is_staff %} Instructor
+                    {% else %} Aprendiz {% endif %}
+                </p>
+            </div>
         </div>
         
-        <!-- Menú de navegación -->
-        <nav class="sidebar-nav">
-            <ul class="nav flex-column">
+        <nav class="sidebar-nav mt-2 pb-4">
+            <ul class="nav flex-column" id="menu-lateral">
 
                 <li class="nav-item">
-                    <a href="{% url 'usuarios:perfil' %}" class="nav-link">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Mi Perfil</span>
+                    <a href="{% url 'usuarios:perfil' %}" class="nav-link px-3">
+                        <i class="bi bi-person-circle"></i> <span>Mi Perfil</span>
                     </a>
                 </li>
                 
                 <li class="nav-item">
-                    <a href="{% url 'core:dashboard' %}" class="nav-link">
-                        <i class="bi bi-speedometer2"></i>
-                        <span>Dashboard</span>
+                    <a href="{% url 'core:dashboard' %}" class="nav-link px-3">
+                        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
                     </a>
                 </li>
                 
-                {% if user.is_superuser %}
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link text-white">
-                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <span class="nav-link-text ms-1">Usuarios</span>
+                <li class="nav-item">
+                    <a class="nav-link px-3" href="{% url 'bitacoras:listar_bitacoras' %}">
+                        <i class="bi bi-journal-text"></i> <span>Bitácoras</span>
                     </a>
-                {% endif %}
+                </li>
 
-                
-                <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link text-white">
+                <li class="nav-item">
+                    <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link px-3">
                         <i class="bi bi-mortarboard-fill"></i> <span>Aprendices</span>
-                </a>
-                
-
-                <a href="{% url 'instructores:listar_instructores' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                        <i class="bi bi-person-video3"></i> </div>
-                    <span class="nav-link-text ms-1">Instructores</span>
-                </a>
-
-                <a href="{% url 'empresas:listar_empresas' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-buildings"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Empresas</span>
-                </a>
-
-                <a href="{% url 'bitacoras:listar_bitacoras' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-journal-check"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Bitácoras</span>
-                </a>
-
-                <a href="{% url 'programas:listar_programas' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-book"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Programas</span>
-                </a>
-                
-
-                <a href="{% url 'fichas:listar_fichas' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-collection"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Fichas</span>
-                </a>
-
-                <a href="{% url 'actividades:listar_actividades' %}" class="nav-link text-white">
-                    <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-card-checklist"></i>
-                    </div>
-                    <span class="nav-link-text ms-1">Actividades</span>
-                </a>
-                
-
-
-                
-                <!-- Configuración -->
-                <li class="nav-header">
-                    <span>CONFIGURACIÓN</span>
+                    </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{% url 'actividades:listar_actividades' %}" class="nav-link px-3">
+                        <i class="bi bi-card-checklist"></i> <span>Actividades</span>
+                    </a>
+                </li>
+
+                {% if request.user.is_superuser %}
+                    <li class="nav-header"><span>ADMINISTRACIÓN</span></li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link px-3">
+                            <i class="bi bi-people-fill"></i> <span>Usuarios</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'instructores:listar_instructores' %}" class="nav-link px-3">
+                            <i class="bi bi-person-badge"></i> <span>Instructores</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a href="{% url 'fichas:listar_fichas' %}" class="nav-link px-3">
+                            <i class="bi bi-diagram-3"></i> <span>Fichas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'programas:listar_programas' %}" class="nav-link px-3">
+                            <i class="bi bi-book"></i> <span>Programas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'empresas:listar_empresas' %}" class="nav-link px-3">
+                            <i class="bi bi-buildings"></i> <span>Empresas</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                <li class="nav-header mt-3"><span>SISTEMA</span></li>
                 
                 <li class="nav-item">
-                    <a href="{% url 'core:index' %}" class="nav-link">
-                        <i class="bi bi-house-door"></i>
-                        <span>Ir al Sitio</span>
+                    <a href="{% url 'core:index' %}" class="nav-link px-3">
+                        <i class="bi bi-house-door"></i> <span>Ir al Sitio</span>
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a href="{% url 'usuarios:logout' %}" class="nav-link text-danger" onclick="return confirm('¿Seguro que deseas cerrar sesión?')">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Cerrar Sesión</span>
+                <li class="nav-item mt-3">
+                    <a href="{% url 'usuarios:logout' %}" class="nav-link logout-btn px-3 text-center" onclick="return confirm('¿Seguro que deseas cerrar sesión?')">
+                        <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
                     </a>
                 </li>
             </ul>
         </nav>
     </div>
     
-    <!-- Main Content -->
-    <div class="main-content" id="main-content">
+    <div id="main-content">
         
-        <!-- Top Bar -->
-        <div class="topbar">
-            <div class="topbar-left">
-                <button class="btn btn-toggle" id="sidebar-toggle">
+        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 shadow-sm">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-toggle border-0 bg-transparent fs-3 p-0 me-3" style="color: var(--sena-green);" id="sidebar-toggle">
                     <i class="bi bi-list"></i>
                 </button>
-                    <h1 class="h3 mb-0" style="color: #39A900; font-weight: bold;">
-                        {% block page_title %}Panel Principal{% endblock %}
-                    </h1>            
-                </div>
+                <h1 class="h4 mb-0 page-title" style="color: var(--sena-green) !important;">
+                    {% block page_title %}Panel Principal{% endblock %}
+                </h1>            
+            </div>
             
-            <div class="topbar-right">
-                <!-- Barra de búsqueda -->
-                <form class="search-box" method="GET" action="{% url 'core:busqueda' %}">
-                    <i class="bi bi-search"></i>
-                    <input type="text" name="q" class="form-control" placeholder="Buscar..." value="{{ request.GET.q|default:'' }}">
+            <div class="d-flex align-items-center">
+                <form class="search-box me-4 position-relative d-none d-md-block" method="GET" action="{% url 'core:busqueda' %}">
+                    <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                    <input type="text" name="q" class="form-control rounded-pill ps-5 bg-light border-0 shadow-sm" placeholder="Buscar globalmente..." value="{{ request.GET.q|default:'' }}" style="width: 250px;">
                 </form>
-                
-                <!-- Notificaciones -->
+
                 <div class="dropdown">
-                    <button class="btn btn-icon" data-bs-toggle="dropdown">
-                        <i class="bi bi-bell"></i>
-                        <span class="badge-dot"></span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end notification-dropdown">
-                        <div class="dropdown-header">
-                            <h6>Notificaciones</h6>
-                            <span class="badge bg-primary">3 nuevas</span>
-                        </div>
-                        <div class="dropdown-body">
-                            <a href="#" class="notification-item">
-                                <div class="notification-icon bg-primary">
-                                    <i class="bi bi-person-plus"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <p class="notification-title">Nuevo usuario registrado</p>
-                                    <span class="notification-time">Hace 5 minutos</span>
-                                </div>
-                            </a>
-                            <a href="#" class="notification-item">
-                                <div class="notification-icon bg-success">
-                                    <i class="bi bi-check-circle"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <p class="notification-title">Tarea completada</p>
-                                    <span class="notification-time">Hace 1 hora</span>
-                                </div>
-                            </a>
-                            <a href="#" class="notification-item">
-                                <div class="notification-icon bg-warning">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <p class="notification-title">Actualización disponible</p>
-                                    <span class="notification-time">Hace 3 horas</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="dropdown-footer">
-                            <a href="#">Ver todas las notificaciones</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Usuario -->
-                <div class="dropdown">
-                    <button class="btn btn-user" data-bs-toggle="dropdown">
+                    <button class="btn border-0 d-flex align-items-center bg-transparent" data-bs-toggle="dropdown">
                         {% if user.perfil.foto_perfil %}
-                            <img src="{{ user.perfil.foto_perfil.url }}" alt="{{ user.get_full_name }}" class="user-avatar-sm">
+                            <img src="{{ user.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle border border-2" style="border-color: var(--sena-green) !important; width: 40px; height: 40px; object-fit: cover;">
                         {% else %}
-                            <i class="bi bi-person-circle fs-4"></i>
+                            <i class="bi bi-person-circle fs-2" style="color: var(--sena-green);"></i>
                         {% endif %}
-                        <span class="d-none d-md-inline ms-2">{{ user.first_name }}</span>
-                        <i class="bi bi-chevron-down ms-1"></i>
+                        <span class="d-none d-md-inline ms-2 fw-bold text-dark">{{ user.first_name }}</span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end">
+                    <div class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3">
                         <div class="dropdown-header">
-                            <strong>{{ user.get_full_name }}</strong>
-                            <p class="text-muted mb-0">{{ user.email }}</p>
+                            <strong class="text-dark">{{ user.get_full_name }}</strong>
+                            <p class="text-muted small mb-0">{{ user.email }}</p>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'usuarios:perfil' %}">
-                            <i class="bi bi-person"></i> Mi Perfil
+                        <a class="dropdown-item py-2 fw-semibold" href="{% url 'usuarios:perfil' %}">
+                            <i class="bi bi-person me-2" style="color: var(--sena-green);"></i> Mi Perfil
                         </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-gear"></i> Configuración
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="{% url 'usuarios:logout' %}">
-                            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                        <a class="dropdown-item text-danger py-2 fw-semibold" href="{% url 'usuarios:logout' %}">
+                            <i class="bi bi-box-arrow-right me-2"></i> Salir
                         </a>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Mensajes de Django -->
         {% if messages %}
-            <div class="messages-container">
+            <div class="container-fluid mt-3 px-4">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}x-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-                        {{ message }}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert" style="border-left: 6px solid {% if message.tags == 'success' %}var(--sena-green){% elif message.tags == 'error' %}#dc3545{% else %}#ffc107{% endif %} !important;">
+                        <span class="fw-bold">{{ message }}</span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
         
-        <!-- Breadcrumb (opcional) -->
-        {% block breadcrumb %}
-        <nav aria-label="breadcrumb" class="breadcrumb-nav">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
-                {% block breadcrumb_items %}
-                {% endblock %}
-            </ol>
-        </nav>
-        {% endblock %}
-        
-        <!-- Contenido Principal -->
-        <div class="content-wrapper">
+        <div class="content-wrapper p-4 p-md-5">
             {% block content %}
-            <!-- El contenido específico de cada página va aquí -->
             {% endblock %}
         </div>
         
-        <!-- Footer del Dashboard -->
-        <footer class="dashboard-footer">
-            <div class="footer-content">
-                <p class="mb-0">&copy; {% now "Y" %} Mi Proyecto SENA. Todos los derechos reservados.</p>
-                <div class="footer-links">
-                    <a href="#">Ayuda</a>
-                    <a href="#">Soporte</a>
-                    <a href="#">Términos</a>
-                </div>
-            </div>
-        </footer>
     </div>
     
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- JavaScript del dashboard -->
-    <script src="{% static 'core/js/main.js' %}"></script>    
-    <!-- JavaScript adicional de cada página -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // 1. LÓGICA DEL BOTÓN HAMBURGUESA
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+
+            toggleBtn.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.toggle('mobile-open');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('collapsed');
+                }
+            });
+
+            // 2. DETECCIÓN DE MÓDULO ACTIVO
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('#menu-lateral .nav-link');
+            
+            navLinks.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (linkHref && linkHref !== '#' && !link.classList.contains('logout-btn')) {
+                    if (currentPath.includes(linkHref) && linkHref !== '/') {
+                        link.classList.add('activo');
+                    } else if (currentPath === linkHref) {
+                        link.classList.add('activo');
+                    }
+                }
+            });
+
+            // 3. RETENCIÓN DEL SCROLL DEL MENÚ LATERAL
+            // Guarda la posición del scroll cada vez que se mueve el menú
+            sidebar.addEventListener('scroll', function() {
+                sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
+            });
+            // Restaura la posición del scroll al cargar la página
+            const savedScroll = sessionStorage.getItem('sidebarScroll');
+            if (savedScroll) {
+                sidebar.scrollTop = savedScroll;
+            }
+        });
+    </script>
+    
     {% block extra_js %}{% endblock %}
-    {% include 'core/accesibilidad.html' %}
 </body>
 </html>
