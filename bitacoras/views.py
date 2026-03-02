@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from django.db.models import Q
+from django.core.paginator import Paginator
+from xhtml2pdf import pisa
 
 
 # Importamos Modelos y Formularios
@@ -13,24 +15,50 @@ from .forms import CrearBitacoraForm, ActividadFormSet
 # --- VISTA: LISTAR BITÁCORAS ---
 @login_required
 def listar_bitacoras(request):
-    bitacoras = Bitacora.objects.all()
     query = request.GET.get('q', '')
+    
+    # --- 1. LÓGICA DE AISLAMIENTO DE DATOS POR ROL ---
+    if request.user.is_superuser:
+        # Administrador global: Acceso total al histórico
+        bitacoras_base = Bitacora.objects.all()
+        
+    elif hasattr(request.user, 'instructor'):
+        # Instructor: Acceso restringido estrictamente a las bitácoras donde fue asignado
+        bitacoras_base = Bitacora.objects.filter(instructor_seguimiento=request.user.instructor)
+        
+    elif hasattr(request.user, 'aprendiz'):
+        # Aprendiz: Acceso exclusivo a sus propios registros
+        bitacoras_base = Bitacora.objects.filter(aprendiz=request.user.aprendiz)
+        
+    else:
+        # Fallback de seguridad por si un usuario no tiene perfil asignado
+        bitacoras_base = Bitacora.objects.none()
 
+    # Ordenamiento por defecto
+    bitacoras_list = bitacoras_base.order_by('-fecha_entrega')
+    
+    # --- 2. LÓGICA DE BÚSQUEDA ---
     if query:
-        bitacoras = bitacoras.filter(
-            # Viajamos: Bitácora -> Aprendiz -> Usuario -> Nombre
+        bitacoras_list = bitacoras_list.filter(
             Q(aprendiz__usuario__first_name__icontains=query) |
             Q(aprendiz__usuario__last_name__icontains=query) |
             Q(aprendiz__documento__icontains=query) |
-            Q(titulo__icontains=query) # Si tus bitácoras tienen un título o número
+            Q(ficha__numero_ficha__icontains=query)
         )
-
+    
+    # --- 3. PAGINACIÓN ---
+    paginator = Paginator(bitacoras_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'bitacoras': bitacoras,
+        'page_obj': page_obj,
         'query': query,
+        # Se envían banderas booleanas al template para renderizado condicional si es necesario
+        'es_aprendiz': hasattr(request.user, 'aprendiz'),
+        'es_instructor': hasattr(request.user, 'instructor'),
     }
     return render(request, 'bitacoras/listar_bitacoras.html', context)
-
 
 # --- VISTA: CREAR BITÁCORA (CORREGIDA PARA V5) ---
 @login_required
@@ -188,24 +216,47 @@ def revisar_bitacora(request, pk):
 # --- VISTA: EXPORTAR PDF ---
 @login_required
 def exportar_pdf(request, pk):
+    """
+    Vista encargada de compilar el template HTML y convertirlo 
+    a un archivo binario PDF para su descarga directa.
+    """
     bitacora = get_object_or_404(Bitacora, pk=pk)
     
-    es_dueno = hasattr(request.user, 'aprendiz') and bitacora.aprendiz == request.user.aprendiz
-    es_instructor = request.user.is_staff
+    # Se recomienda crear un template simplificado 'revisar_bitacora_pdf.html' 
+    # sin barras de navegación ni botones, exclusivo para el renderizado del PDF.
+    template = get_template('bitacoras/revisar_bitacora.html')
+    context = {'bitacora': bitacora}
+    html = template.render(context)
     
-    if not es_dueno and not es_instructor:
-        messages.error(request, "No tienes permiso para descargar esta bitácora.")
-        return redirect('core:home')
-
-    return HttpResponse("Función de PDF pendiente de actualizar al nuevo formato V5.")
+    response = HttpResponse(content_type='application/pdf')
+    # attachment; fuerza la descarga del archivo en lugar de abrirlo en el navegador
+    response['Content-Disposition'] = f'attachment; filename="Formato_Bitacora_{bitacora.numero_bitacora}_{bitacora.aprendiz.usuario.last_name}.pdf"'
+    
+    # Creación del PDF
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    
+    if pisa_status.err:
+        return HttpResponse('Error interno al generar el documento PDF.', status=500)
+    
+    return response
 
 
 # --- VISTA: REVISAR BITÁCORA (CORREGIDA PARA V5) ---
 def revisar_bitacora(request, id):
-    # Buscamos la bitácora por su ID de forma segura
     bitacora = get_object_or_404(Bitacora, id=id)
     
-    context = {
-        'bitacora': bitacora
-    }
+    # Si el instructor le dio a "Guardar Calificación" en el modal
+    if request.method == 'POST':
+        nuevo_estado = request.POST.get('estado')
+        observaciones = request.POST.get('observaciones_instructor')
+        
+        # Actualizamos y guardamos
+        bitacora.estado = nuevo_estado
+        bitacora.observaciones_instructor = observaciones
+        bitacora.save()
+        
+        messages.success(request, f'La Bitácora #{bitacora.numero_bitacora} fue calificada exitosamente.')
+        return redirect('bitacoras:revisar_bitacora', id=bitacora.id)
+    
+    context = {'bitacora': bitacora}
     return render(request, 'bitacoras/revisar_bitacora.html', context)

@@ -4,17 +4,66 @@
 
 {% block content %}
 <style>
-    :root{--brand:#39A900}
-    .brand{color:var(--brand)}
-    .section-title{color:var(--brand);border-bottom:2px solid var(--brand);padding-bottom:6px;margin-bottom:1rem}
-    .label-strong{font-weight:600}
-    @media print{
-        .sidebar,.topbar,.btn,#a11y-container,footer{display:none !important}
-        #content-wrapper,.card{width:100% !important;margin:0 !important;padding:0 !important;box-shadow:none !important;border:none !important}
-        .badge{border:1px solid #000;color:#000 !important;background:transparent !important}
-        body{font-size:12px;color:#000}
-        table{page-break-inside:auto}
-        tr{page-break-inside:avoid;page-break-after:auto}
+    /* Estilos base para la pantalla (ya los teníamos) */
+    .btn-calificar { background-color: #39A900; color: white; }
+    .titulo-modulo { color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px; }
+
+    /* ESTILOS EXCLUSIVOS PARA CUANDO SE IMPRIME EL DOCUMENTO */
+    @media print {
+        /* 1. Configuración de la hoja (Tamaño Carta y márgenes limpios) */
+        @page {
+            size: letter;
+            margin: 1.5cm;
+        }
+
+        /* 2. OCULTAR TODO LO QUE NO SEA DOCUMENTO (¡Aquí matamos el carrusel!) */
+        .sidebar, .topbar, .btn, footer, .modal, .navbar, #a11y-container,
+        .carousel, .slide, .carousel-inner, .carousel-indicators, .carousel-control-prev, .carousel-control-next,
+        .overlay, .bg-image, .background-image { 
+            display: none !important; 
+        }
+
+        /* 3. LIMPIAR FONDOS (Asegurar que sea una hoja blanca impecable) */
+        body, html, #page-top, #wrapper, #content-wrapper, #content, .container-fluid, .card { 
+            background-color: #ffffff !important; 
+            background-image: none !important; /* Mata cualquier imagen de fondo */
+            width: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            box-shadow: none !important; 
+            border: none !important; 
+        }
+        #content-wrapper, .container-fluid, .card { 
+            width: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            box-shadow: none !important; 
+            border: none !important; 
+        }
+
+        /* 4. Forzar que los colores (como el verde SENA) sí se impriman */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* 5. Asegurar que los textos sean negros en papel */
+        p, span, td, th, label, strong {
+            color: #000 !important;
+            font-size: 11pt !important;
+        }
+
+        /* 6. Evitar que las tablas y firmas se corten entre dos páginas */
+        table { page-break-inside: auto; border-collapse: collapse !important; width: 100% !important; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
+        .firmas-section { page-break-inside: avoid; }
+
+        /* 7. Darle más espacio (respiro) a las secciones */
+        .mb-4 { margin-bottom: 2rem !important; }
+        .row { display: flex !important; flex-wrap: wrap !important; }
+        
+        /* 8. Mantener las dos columnas en papel (a veces el navegador las colapsa a una sola) */
+        .col-md-6 { width: 50% !important; float: left !important; }
     }
 </style>
 
@@ -27,9 +76,9 @@
 
         <div class="d-flex align-items-center">
             <button onclick="window.print()" class="btn btn-outline-info shadow-sm me-2">
-                <i class="bi bi-printer-fill me-1"></i> Imprimir / PDF
+                <i class="bi bi-printer-fill me-1"></i> Descargar / PDF
             </button>
-            <button class="btn btn-success text-white shadow-sm">
+            <button type="button" class="btn text-white shadow-sm" style="background-color: #39A900;" data-bs-toggle="modal" data-bs-target="#modalCalificar">
                 <i class="bi bi-check-circle-fill me-1"></i> Calificar
             </button>
         </div>
@@ -118,20 +167,54 @@
             </div>
 
             <!-- Firmas -->
-            <div class="row mt-5 text-center">
-                <div class="col-md-6">
-                    <hr class="w-75 mx-auto">
-                    <p class="mt-2 mb-0 fw-bold text-uppercase">Firma del Aprendiz</p>
+            <div class="row mt-5 pt-5 text-center firmas-section">
+                <div class="col-6">
+                    <hr class="w-75 mx-auto border-dark">
+                    <p class="mt-2 mb-0 font-weight-bold text-dark text-uppercase">Firma del Aprendiz</p>
+                    <p class="small text-muted text-dark">{{ bitacora.aprendiz }}</p>
                 </div>
-                <div class="col-md-6">
-                    <hr class="w-75 mx-auto">
-                    <p class="mt-2 mb-0 fw-bold text-uppercase">Firma del Instructor</p>
+                <div class="col-6">
+                    <hr class="w-75 mx-auto border-dark">
+                    <p class="mt-2 mb-0 font-weight-bold text-dark text-uppercase">Firma del Instructor</p>
+                    <p class="small text-muted text-dark">{{ bitacora.instructor_seguimiento|default:"_____________________" }}</p>
                 </div>
             </div>
 
         </div>
     </div>
 
+</div>
+
+<div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-header" style="background-color: #39A900; color: white;">
+                    <h5 class="modal-title text-white"><i class="bi bi-pencil-square me-2"></i>Calificar Bitácora #{{ bitacora.numero_bitacora }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">Estado de Evaluación</label>
+                        <select name="estado" class="form-select border-dark" required>
+                            <option value="">Seleccione el estado final...</option>
+                            <option value="Evaluada" {% if bitacora.estado == 'Evaluada' %}selected{% endif %}>Aprobar (Evaluada)</option>
+                            <option value="Rechazada" {% if bitacora.estado == 'Rechazada' %}selected{% endif %}>Rechazar (Con correcciones)</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-dark">Observaciones para el Aprendiz</label>
+                        <textarea name="observaciones_instructor" class="form-control border-dark" rows="5" placeholder="Escriba aquí sus comentarios, felicitaciones o correcciones...">{{ bitacora.observaciones_instructor|default:"" }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn text-white" style="background-color: #39A900;">Guardar Calificación</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

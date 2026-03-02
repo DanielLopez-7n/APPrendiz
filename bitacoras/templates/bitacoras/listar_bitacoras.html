@@ -42,7 +42,7 @@
     <div class="card shadow border-0">
         <div class="card-body p-0">
             
-            {% if bitacoras %}
+            {% if page_obj %}
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
@@ -61,7 +61,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for bit in bitacoras %}
+                            {% for bit in page_obj %}
                             <tr>
                                 <td class="ps-4 fw-bold text-primary">
                                     # {{ bit.numero_bitacora }}
@@ -143,6 +143,25 @@
                     {% endif %}
                 </div>
             {% endif %}
+            </div> <div class="mt-4 mb-2 d-flex justify-content-center">
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination pagination-sm shadow-sm">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item"><a class="page-link text-primary" href="?page=1&q={{ request.GET.q }}">&laquo; Primera</a></li>
+                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}">Anterior</a></li>
+                            {% endif %}
+
+                            <li class="page-item disabled">
+                                <span class="page-link bg-light text-muted fw-bold">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}">Siguiente</a></li>
+                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}">Última &raquo;</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
         </div>
     </div>
 </div>
