@@ -3,10 +3,11 @@ from django.forms import inlineformset_factory
 from .models import Bitacora, ActividadBitacora
 from instructores.models import Instructor
 from fichas.models import Ficha
+from empresas.models import Empresa  # Importación del modelo relacionado
 
-# --- 1. EL FORMULARIO PRINCIPAL (ENCABEZADO) ---
+# --- 1. FORMULARIO PRINCIPAL (ENCABEZADO DE BITÁCORA) ---
 class CrearBitacoraForm(forms.ModelForm):
-    # Campo especial para seleccionar la Ficha (Lista Desplegable)
+    # Campo relacional para la selección de la Ficha de Caracterización
     ficha = forms.ModelChoiceField(
         queryset=Ficha.objects.all(),
         widget=forms.Select(attrs={'class': 'form-select'}),
@@ -14,25 +15,31 @@ class CrearBitacoraForm(forms.ModelForm):
         empty_label="-- Seleccione su Ficha --"
     )
 
+    # Campo relacional para la selección del Ente Co-formador
+    empresa = forms.ModelChoiceField(
+        queryset=Empresa.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label="Ente Co-formador (Empresa)",
+        empty_label="-- Seleccione la Empresa --"
+    )
+
     class Meta:
         model = Bitacora
-        # Excluimos los campos que se llenan solos o que van en el formset
+        # Exclusión de campos autogenerados o gestionados mediante formsets anidados
         exclude = [
             'aprendiz', 
-            'numero_bitacora',  # Se calcula solo
+            'numero_bitacora',
             'estado', 
             'fecha_entrega', 
             'observaciones_instructor',
-            # IMPORTANTE: Quitamos 'descripcion_actividades' y 'evidencia' de aquí
-            # porque ahora las manejaremos en las filas dinámicas (abajo)
         ]
         
         widgets = {
-            # FECHAS
+            # Campos de tipo Fecha
             'fecha_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'fecha_fin': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             
-            # SELECTORES (Listas desplegables)
+            # Campos de selección estándar
             'instructor_seguimiento': forms.Select(attrs={'class': 'form-select'}),
             'modalidad': forms.Select(attrs={'class': 'form-select'}),
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
@@ -40,10 +47,7 @@ class CrearBitacoraForm(forms.ModelForm):
             'nivel_riesgo': forms.Select(attrs={'class': 'form-select'}),
             'uso_epp': forms.Select(attrs={'class': 'form-select'}),
             
-            # CAMPOS DE TEXTO (EMPRESA)
-            'razon_social_empresa': forms.TextInput(attrs={'class': 'form-control'}),
-            'nit_empresa': forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion_empresa': forms.TextInput(attrs={'class': 'form-control'}),
+            # Campos de texto (Datos de contacto del jefe inmediato)
             'nombre_jefe': forms.TextInput(attrs={'class': 'form-control'}),
             'cargo_jefe': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono_jefe': forms.TextInput(attrs={'class': 'form-control'}),
@@ -51,19 +55,16 @@ class CrearBitacoraForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # 1. SACAMOS (pop) las variables personalizadas del diccionario kwargs
-        # Si no hacemos esto, al llamar a super(), Django dará error porque no las reconoce.
-        self.user = kwargs.pop('user', None)      # Sacamos 'user' si viene
-        self.aprendiz = kwargs.pop('aprendiz', None) # Sacamos 'aprendiz' si viene
+        # Extracción de argumentos personalizados previos a la inicialización de la clase padre
+        self.user = kwargs.pop('user', None)
+        self.aprendiz = kwargs.pop('aprendiz', None)
         
-        # 2. Ahora que kwargs está "limpio", llamamos al constructor de Django
         super().__init__(*args, **kwargs)
         
-        # 3. Configuraciones visuales y lógica
+        # Configuraciones visuales adicionales
         self.fields['instructor_seguimiento'].label = "Instructor de Seguimiento"
         
-        # LÓGICA DE AUTOCOMPLETADO
-        # Usamos self.user o self.aprendiz dependiendo de qué nos mandó la vista
+        # Lógica de autocompletado basada en el histórico del usuario
         usuario_a_consultar = self.user if self.user else (self.aprendiz.usuario if self.aprendiz else None)
 
         if usuario_a_consultar and hasattr(usuario_a_consultar, 'aprendiz'):
@@ -71,10 +72,8 @@ class CrearBitacoraForm(forms.ModelForm):
             ultima_bitacora = Bitacora.objects.filter(aprendiz=aprendiz_obj).last()
             
             if ultima_bitacora:
-                # Pre-llenamos los datos si existen
-                self.fields['razon_social_empresa'].initial = ultima_bitacora.razon_social_empresa
-                self.fields['nit_empresa'].initial = ultima_bitacora.nit_empresa
-                self.fields['direccion_empresa'].initial = ultima_bitacora.direccion_empresa
+                # Carga de valores iniciales correspondientes al último registro válido
+                self.fields['empresa'].initial = ultima_bitacora.empresa
                 self.fields['nombre_jefe'].initial = ultima_bitacora.nombre_jefe
                 self.fields['cargo_jefe'].initial = ultima_bitacora.cargo_jefe
                 self.fields['telefono_jefe'].initial = ultima_bitacora.telefono_jefe
@@ -83,7 +82,7 @@ class CrearBitacoraForm(forms.ModelForm):
                 self.fields['instructor_seguimiento'].initial = ultima_bitacora.instructor_seguimiento
 
 
-# --- 2. EL FORMULARIO PARA LAS FILAS (ACTIVIDADES) ---
+# --- 2. FORMULARIO PARA REGISTROS HIJOS (ACTIVIDADES) ---
 class ActividadForm(forms.ModelForm):
     class Meta:
         model = ActividadBitacora
@@ -101,12 +100,12 @@ class ActividadForm(forms.ModelForm):
             }),
         }
 
-# --- 3. EL FORMSET (LA FÁBRICA DE FILAS) ---
-# Esto crea la magia de "Agregar más filas"
+# --- 3. CONFIGURACIÓN DEL INLINE FORMSET ---
+# Instanciación de la fábrica de formularios dinámicos para el modelo ActividadBitacora
 ActividadFormSet = inlineformset_factory(
-    Bitacora,               # Modelo Padre
-    ActividadBitacora,      # Modelo Hijo
-    form=ActividadForm,     # El formulario de la fila
-    extra=1,                # Muestra 1 fila vacía al principio
-    can_delete=True         # Permite borrar filas
+    Bitacora,
+    ActividadBitacora,
+    form=ActividadForm,
+    extra=1,
+    can_delete=True
 )

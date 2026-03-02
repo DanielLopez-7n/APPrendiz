@@ -115,8 +115,8 @@
                                             Ver Detalle <i class="bi bi-arrow-right ms-1"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'bitacoras:ver_bitacora' bit.id %}" class="btn btn-sm btn-outline-dark rounded-pill" title="Revisar">
-                                            Revisar <i class="bi bi-pencil-square ms-1"></i>
+                                        <a href="{% url 'bitacoras:revisar_bitacora' bit.id %}" class="btn btn-sm btn-outline-info rounded-pill" title="Revisar">
+                                            Revisar <i class="bi bi-eye ms-1"></i>
                                         </a>
                                     {% endif %}
                                 </td>

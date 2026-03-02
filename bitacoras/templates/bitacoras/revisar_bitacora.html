@@ -1,108 +1,137 @@
-{% extends template_to_extend %}
-{% load static %}
+{% extends 'core/panel_admin_base.html' %}
 
-{% block title %}Revisión Instructor - SENA{% endblock %}
+{% block page_title %}Revisión de Bitácora #{{ bitacora.numero_bitacora }}{% endblock %}
 
 {% block content %}
 <style>
-    .bg-sena { background-color: #39a900; color: white; }
-    .text-sena { color: #39a900; }
-    .card-sena { border-top: 4px solid #39a900; }
+    :root{--brand:#39A900}
+    .brand{color:var(--brand)}
+    .section-title{color:var(--brand);border-bottom:2px solid var(--brand);padding-bottom:6px;margin-bottom:1rem}
+    .label-strong{font-weight:600}
+    @media print{
+        .sidebar,.topbar,.btn,#a11y-container,footer{display:none !important}
+        #content-wrapper,.card{width:100% !important;margin:0 !important;padding:0 !important;box-shadow:none !important;border:none !important}
+        .badge{border:1px solid #000;color:#000 !important;background:transparent !important}
+        body{font-size:12px;color:#000}
+        table{page-break-inside:auto}
+        tr{page-break-inside:avoid;page-break-after:auto}
+    }
 </style>
 
-<div class="container py-5">
-    
+<div class="container-fluid">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i>Volver al Listado
+        <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left me-1"></i> Volver al listado
         </a>
-        <h2 class="fw-bold text-sena">Evaluación de Bitácora</h2>
-    </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm mb-4 card-sena">
-                <div class="card-header bg-light fw-bold">
-                    <i class="bi bi-person-badge me-2"></i>Datos del Aprendiz
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <small class="text-muted">Aprendiz:</small>
-                            <h5 class="fw-bold">{{ bitacora.aprendiz.usuario.get_full_name }}</h5>
-                        </div>
-                        <div class="col-md-6">
-                            <small class="text-muted">Ficha:</small>
-                            <h5 class="fw-bold">{{ bitacora.ficha }}</h5>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-sena text-white fw-bold">
-                    <i class="bi bi-list-check me-2"></i>Actividades Registradas
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Descripción</th>
-                                    <th>Evidencia</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for act in bitacora.actividades.all %}
-                                <tr>
-                                    <td style="width: 120px;">{{ act.fecha_ejecucion|date:"d/m/Y" }}</td>
-                                    <td>{{ act.descripcion }}</td>
-                                    <td>{{ act.evidencia|default:"--" }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="3" class="text-center text-muted">Sin actividades</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow border-0" style="border-top: 4px solid #ff671f;"> <div class="card-header bg-white fw-bold text-center py-3">
-                    <i class="bi bi-check-circle-fill me-2 text-warning"></i>Zona de Evaluación
-                </div>
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Estado Actual:</label>
-                            <input type="text" class="form-control text-center fw-bold" value="{{ bitacora.estado }}" disabled>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Observaciones del Instructor:</label>
-                            <textarea name="observaciones_instructor" class="form-control" rows="5" placeholder="Escriba aquí las correcciones o comentarios para el aprendiz...">{{ bitacora.observaciones_instructor|default:"" }}</textarea>
-                        </div>
-
-                        <hr>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" name="estado" value="Evaluada" class="btn btn-success fw-bold">
-                                <i class="bi bi-check-lg me-2"></i>APROBAR (EVALUADA)
-                            </button>
-                            
-                            <button type="submit" name="estado" value="Rechazada" class="btn btn-danger fw-bold">
-                                <i class="bi bi-x-lg me-2"></i>RECHAZAR (DEVOLVER)
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="d-flex align-items-center">
+            <button onclick="window.print()" class="btn btn-outline-info shadow-sm me-2">
+                <i class="bi bi-printer-fill me-1"></i> Imprimir / PDF
+            </button>
+            <button class="btn btn-success text-white shadow-sm">
+                <i class="bi bi-check-circle-fill me-1"></i> Calificar
+            </button>
         </div>
     </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+            <h5 class="m-0 brand">Formato de Seguimiento - Bitácora N° {{ bitacora.numero_bitacora }}</h5>
+            <span class="badge {% if bitacora.estado == 'Evaluada' %}bg-success{% elif bitacora.estado == 'Rechazada' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                {{ bitacora.estado }}
+            </span>
+        </div>
+
+        <div class="card-body p-4">
+
+            <!-- 1. Generalidades -->
+            <h6 class="font-weight-bold text-uppercase mb-3" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">1. Generalidades</h6>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p class="mb-1"><span class="label-strong">Aprendiz:</span> {{ bitacora.aprendiz.usuario.first_name }} {{ bitacora.aprendiz.usuario.last_name }}</p>
+                    <p class="mb-1"><span class="label-strong">Documento:</span> {{ bitacora.aprendiz.get_tipo_documento_display }} {{ bitacora.aprendiz.documento }}</p>
+                    <p class="mb-1"><span class="label-strong">Ficha:</span> {{ bitacora.aprendiz.numero_ficha }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><span class="label-strong">Período Reportado:</span> {{ bitacora.fecha_inicio|date:"d/m/Y" }} - {{ bitacora.fecha_fin|date:"d/m/Y" }}</p>
+                    <p class="mb-1"><span class="label-strong">Fecha de Entrega:</span> {{ bitacora.fecha_entrega|date:"d/m/Y h:i A" }}</p>
+                    <p class="mb-1"><span class="label-strong">Estado:</span> <span class="badge bg-secondary">{{ bitacora.estado }}</span></p>
+                </div>
+            </div>
+
+            <!-- 2. Ente Co-Formador y SST -->
+            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">2. Ente Co-Formador y SST</h6>
+            <div class="row mb-4 bg-light border rounded p-3">
+                <div class="col-md-6">
+                    <p class="mb-1"><span class="label-strong">Empresa:</span> {{ bitacora.razon_social_empresa }} (NIT: {{ bitacora.nit_empresa }})</p>
+                    <p class="mb-1"><span class="label-strong">Dirección:</span> {{ bitacora.direccion_empresa|default:"N/A" }}</p>
+                    <p class="mb-1"><span class="label-strong">Jefe Inmediato:</span> {{ bitacora.nombre_jefe }} ({{ bitacora.cargo_jefe }})</p>
+                    <p class="mb-1"><span class="label-strong">Contacto:</span> {{ bitacora.telefono_jefe }} | {{ bitacora.email_jefe }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><span class="label-strong">Modalidad:</span> {{ bitacora.modalidad }} ({{ bitacora.pais_etapa }})</p>
+                    <p class="mb-1"><span class="label-strong">Afiliación ARL:</span> {{ bitacora.get_afiliado_arl_display }} &nbsp; <span class="label-strong">Riesgo:</span> {{ bitacora.get_nivel_riesgo_display }}</p>
+                    <p class="mb-1"><span class="label-strong">Uso de EPP:</span> {{ bitacora.get_uso_epp_display }}</p>
+                </div>
+            </div>
+
+            <!-- 3. Actividades Ejecutadas -->
+            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">3. Actividades Ejecutadas</h6>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th style="width:15%">Fecha</th>
+                            <th style="width:65%">Descripción de la Actividad</th>
+                            <th style="width:20%">Evidencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for actividad in bitacora.actividades.all %}
+                        <tr>
+                            <td class="text-center">{{ actividad.fecha_ejecucion|date:"d/m/Y" }}</td>
+                            <td>{{ actividad.descripcion|linebreaksbr }}</td>
+                            <td class="text-center">
+                                {% if actividad.evidencia %}
+                                    <a href="{{ actividad.evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-paperclip"></i> Ver
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">Sin adjunto</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">El aprendiz no registró actividades.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 4. Observaciones del Instructor -->
+            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">4. Observaciones del Instructor</h6>
+            <div class="mb-4 p-3 border rounded bg-white" style="min-height:100px;">
+                {{ bitacora.observaciones_instructor|default:"Sin observaciones registradas."|linebreaks }}
+            </div>
+
+            <!-- Firmas -->
+            <div class="row mt-5 text-center">
+                <div class="col-md-6">
+                    <hr class="w-75 mx-auto">
+                    <p class="mt-2 mb-0 fw-bold text-uppercase">Firma del Aprendiz</p>
+                </div>
+                <div class="col-md-6">
+                    <hr class="w-75 mx-auto">
+                    <p class="mt-2 mb-0 fw-bold text-uppercase">Firma del Instructor</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}

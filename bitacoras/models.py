@@ -3,7 +3,8 @@ from django.db.models import Max
 # Importamos los modelos de tus otras apps
 from aprendices.models import Aprendiz
 from instructores.models import Instructor
-from fichas.models import Ficha 
+from fichas.models import Ficha
+from empresas.models import Empresa
 
 class Bitacora(models.Model):
     # --- LISTAS DESPLEGABLES (CHOICES) DEL FORMATO V5 ---
@@ -60,10 +61,12 @@ class Bitacora(models.Model):
     tipo_documento = models.CharField(max_length=2, choices=TIPO_DOC_CHOICES, default='CC')
 
     # --- MÓDULO 2: DATOS DEL ENTE CO-FORMADOR (EMPRESA) ---
-    razon_social_empresa = models.CharField(max_length=200, verbose_name="Nombre de la Empresa")
-    nit_empresa = models.CharField(max_length=20, verbose_name="NIT")
-    direccion_empresa = models.CharField(max_length=200, blank=True, null=True, verbose_name="Dirección")
-    
+    empresa = models.ForeignKey(
+        'empresas.Empresa', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        verbose_name="Empresa (Ente Co-formador)"
+    )
     nombre_jefe = models.CharField(max_length=150, verbose_name="Nombre Jefe Inmediato")
     cargo_jefe = models.CharField(max_length=100, verbose_name="Cargo")
     telefono_jefe = models.CharField(max_length=20, verbose_name="Teléfono")

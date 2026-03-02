@@ -198,3 +198,14 @@ def exportar_pdf(request, pk):
         return redirect('core:home')
 
     return HttpResponse("Función de PDF pendiente de actualizar al nuevo formato V5.")
+
+
+# --- VISTA: REVISAR BITÁCORA (CORREGIDA PARA V5) ---
+def revisar_bitacora(request, id):
+    # Buscamos la bitácora por su ID de forma segura
+    bitacora = get_object_or_404(Bitacora, id=id)
+    
+    context = {
+        'bitacora': bitacora
+    }
+    return render(request, 'bitacoras/revisar_bitacora.html', context)
