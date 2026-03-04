@@ -205,6 +205,37 @@
         </div>
         
     </div>
+
+        <!-- Gráficos y tabla -->
+    <div class="row mb-4">
+        
+        <div class="col-lg-5 mb-4 mb-lg-0">
+            <div class="card dashboard-card h-100">
+                <div class="dashboard-card-header">
+                    <h5><i class="bi bi-pie-chart-fill me-2" style="color: var(--sena-orange);"></i> Estado de Bitácoras</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center p-4">
+                    <div style="position: relative; height:280px; width:100%">
+                        <canvas id="chartBitacoras"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card dashboard-card h-100">
+                <div class="dashboard-card-header">
+                    <h5><i class="bi bi-bar-chart-line-fill me-2 text-success"></i> Distribución de Usuarios</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div style="position: relative; height:280px; width:100%">
+                        <canvas id="chartUsuarios"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
     
     <div class="row">
         
@@ -301,4 +332,95 @@
         
     </div>
 </div>
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. Obtener los datos desde Django de forma segura
+        const labelsBitacoras = JSON.parse('{{ labels_bitacoras|safe|default:"[]" }}');
+        const dataBitacoras = JSON.parse('{{ data_bitacoras|safe|default:"[]" }}');
+        
+        const labelsUsuarios = JSON.parse('{{ labels_usuarios|safe|default:"[]" }}');
+        const dataUsuarios = JSON.parse('{{ data_usuarios|safe|default:"[]" }}');
+
+        // Paleta de colores SENA
+        const colorSenaGreen = '#39a900';
+        const colorSenaDark = '#2d8600';
+        const colorSenaOrange = '#ff671f';
+        const colorGray = '#4a5568';
+        const colorLightGreen = '#a2cf00';
+
+        // ==========================================
+        // GRÁFICO 1: DONA (Estado de Bitácoras)
+        // ==========================================
+        const ctxBitacoras = document.getElementById('chartBitacoras').getContext('2d');
+        
+        // Si no hay datos, mostramos un gráfico vacío gris
+        const chartDataBitacoras = dataBitacoras.length > 0 ? dataBitacoras : [1];
+        const chartLabelsBitacoras = labelsBitacoras.length > 0 ? labelsBitacoras : ['Sin datos'];
+        const bgColorsBitacoras = dataBitacoras.length > 0 ? [colorSenaGreen, colorSenaOrange, colorGray] : ['#e2e8f0'];
+
+        new Chart(ctxBitacoras, {
+            type: 'doughnut',
+            data: {
+                labels: chartLabelsBitacoras,
+                datasets: [{
+                    data: chartDataBitacoras,
+                    backgroundColor: bgColorsBitacoras,
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { family: 'Arial', weight: 'bold' }, color: '#333' } }
+                },
+                cutout: '70%' // Hace que la dona sea más delgada y elegante
+            }
+        });
+
+        // ==========================================
+        // GRÁFICO 2: BARRAS (Distribución de Usuarios)
+        // ==========================================
+        const ctxUsuarios = document.getElementById('chartUsuarios').getContext('2d');
+        
+        new Chart(ctxUsuarios, {
+            type: 'bar',
+            data: {
+                labels: labelsUsuarios,
+                datasets: [{
+                    label: 'Cantidad Registrada',
+                    data: dataUsuarios,
+                    backgroundColor: [colorSenaDark, colorLightGreen, colorSenaOrange],
+                    borderRadius: 8, // Bordes redondeados en las barras
+                    barThickness: 40 // Grosor de la barra
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } // Ocultamos la leyenda superior para que se vea más limpio
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] },
+                        ticks: { stepSize: 1, color: '#666', font: { weight: 'bold' } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#333', font: { weight: 'bold' } }
+                    }
+                }
+            }
+        });
+        
+    });
+</script>
+{% endblock %}
+
 {% endblock %}

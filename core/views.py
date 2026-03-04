@@ -6,6 +6,10 @@ from django.contrib.auth.models import User
 from fichas.models import Ficha
 from programas.models import Programa
 from django.contrib.auth.views import LoginView
+from bitacoras.models import Bitacora
+from django.db.models import Count
+import json
+from django.utils import timezone
 
 
 # Importamos los modelos de nuestras Apps para las estadísticas
@@ -33,35 +37,76 @@ def dashboard(request):
     Vista principal del panel de administración (Dashboard).
     Reúne estadísticas de todas las apps.
     """
-    # 1. Estadísticas de APPRENDIZ
+    # ==========================================
+    # 1. ESTADÍSTICAS GENERALES (Las que ya tenías)
+    # ==========================================
     total_aprendices = Aprendiz.objects.count()
     total_empresas = Empresa.objects.count()
-    
-    # --- CORRECCIÓN 1: Usamos el campo 'estado' para saber cuáles faltan ---
-    # Antes buscabas 'instructor_seguimiento=False', ahora es por estado:
     bitacoras_pendientes = Bitacora.objects.filter(estado='Pendiente').count()
-    
-    # --- CORRECCIÓN 2: Usamos 'fecha_entrega' para ordenar ---
-    # 'fecha_creacion' ya no existe en el modelo V5
     ultimas_bitacoras = Bitacora.objects.all().order_by('-fecha_entrega')[:5]
 
-    # 2. Estadísticas de Usuarios
-    total_usuarios = User.objects.count()
-    usuarios_activos = User.objects.filter(is_active=True).count()
     total_fichas = Ficha.objects.count()
     total_programas = Programa.objects.count()
 
+    # ==========================================
+    # 2. ESTADÍSTICAS DE USUARIOS (Para las tarjetas y la tabla)
+    # ==========================================
+    total_usuarios = User.objects.count()
+    usuarios_activos = User.objects.filter(is_active=True).count()
+    usuarios_staff = User.objects.filter(is_staff=True).count()
+    
+    # Usuarios nuevos registrados este mes
+    hoy = timezone.now()
+    nuevos_usuarios_mes = User.objects.filter(date_joined__year=hoy.year, date_joined__month=hoy.month).count()
+    
+    # Últimos 5 usuarios registrados (Para tu tabla de Registros Recientes)
+    ultimos_usuarios = User.objects.all().order_by('-date_joined')[:5]
+
+    # ==========================================
+    # 3. DATOS PARA LOS GRÁFICOS (CHART.JS)
+    # ==========================================
+    
+    # Gráfico 1: Estado de las Bitácoras (Dona)
+    bitacoras_estado = Bitacora.objects.values('estado').annotate(total=Count('id'))
+    labels_bitacoras = [item['estado'] for item in bitacoras_estado]
+    data_bitacoras = [item['total'] for item in bitacoras_estado]
+    
+    # Gráfico 2: Distribución de Usuarios (Barras)
+    total_admin = User.objects.filter(is_superuser=True).count()
+    total_instructores = User.objects.filter(is_staff=True, is_superuser=False).count()
+    total_solo_aprendices = User.objects.filter(is_staff=False, is_superuser=False).count()
+    
+    labels_usuarios = ['Administradores', 'Instructores', 'Aprendices']
+    data_usuarios = [total_admin, total_instructores, total_solo_aprendices]
+
+    # ==========================================
+    # 4. EMPAQUETAR Y ENVIAR AL TEMPLATE
+    # ==========================================
     context = {
         'titulo': 'Panel de Control',
+        
+        # Datos extraídos (los tuyos originales)
         'total_aprendices': total_aprendices,
         'total_empresas': total_empresas,
         'bitacoras_pendientes': bitacoras_pendientes,
         'ultimas_bitacoras': ultimas_bitacoras,
-        'total_usuarios': total_usuarios,
-        'usuarios_activos': usuarios_activos,
         'total_fichas': total_fichas,
         'total_programas': total_programas,
+        
+        # Datos vitales para el HTML del Dashboard actual
+        'total_usuarios': total_usuarios,
+        'usuarios_activos': usuarios_activos,
+        'usuarios_staff': usuarios_staff,
+        'nuevos_usuarios_mes': nuevos_usuarios_mes,
+        'ultimos_usuarios': ultimos_usuarios,
+        
+        # Listas de Python convertidas a formato JSON para JavaScript
+        'labels_bitacoras': json.dumps(labels_bitacoras),
+        'data_bitacoras': json.dumps(data_bitacoras),
+        'labels_usuarios': json.dumps(labels_usuarios),
+        'data_usuarios': json.dumps(data_usuarios),
     }
+    
     return render(request, 'core/dashboard.html', context)
 
 # --- VISTAS UTILITARIAS ---
@@ -81,37 +126,39 @@ def PanelAdmin_base(request):
 
 @login_required
 def busqueda_global(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()
     
     # Inicializamos listas vacías
     aprendices = []
     instructores = []
     empresas = []
-    usuarios = [] # <--- Lista nueva
+    usuarios = [] 
 
     if query:
         # 1. Búsqueda Aprendices
         aprendices = Aprendiz.objects.filter(
             Q(usuario__first_name__icontains=query) | 
             Q(usuario__last_name__icontains=query) |
-            Q(programa_formacion__icontains=query) |
-            Q(numero_ficha__icontains=query)
+            Q(documento__icontains=query)
+            # Descomentaremos estas cuando sepamos el nombre exacto de los campos en Ficha y Programa
+            # | Q(programa_formacion__nombre__icontains=query) 
+            # | Q(numero_ficha__numero_ficha__icontains=query) 
         ).distinct()
 
         # 2. Búsqueda Instructores
         instructores = Instructor.objects.filter(
             Q(usuario__first_name__icontains=query) | 
-            Q(usuario__last_name__icontains=query) |           
+            Q(usuario__last_name__icontains=query) |          
             Q(profesion__icontains=query)
         ).distinct()
 
-        # 3. Búsqueda Empresas
+        # 3. Búsqueda Empresas (¡Corregido a 'nombre'!)
         empresas = Empresa.objects.filter(
             Q(nombre__icontains=query) | 
             Q(nit__icontains=query)
-        )
+        ).distinct()
         
-        # 4. Búsqueda Usuarios (General) - NUEVO BLOQUE
+        # 4. Búsqueda Usuarios (General)
         usuarios = User.objects.filter(
             Q(username__icontains=query) |
             Q(first_name__icontains=query) |
@@ -128,7 +175,8 @@ def busqueda_global(request):
         'instructores': instructores,
         'empresas': empresas,
         'usuarios': usuarios,  
-        'total_resultados': total
+        'total_resultados': total,
+        'titulo': 'Resultados de Búsqueda'
     }
     
     return render(request, 'core/resultados_busqueda.html', context)
