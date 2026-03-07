@@ -243,6 +243,23 @@
             color: var(--sena-dark-green) !important;
         }
         
+        /* ==========================================
+           1. CORRECCIÓN DEL ESPACIO EN BLANCO (MENÚ)
+           ========================================== */
+        /* Oculta el menú por completo hacia la izquierda */
+        #sidebar.collapsed {
+            left: calc(-1 * var(--sidebar-width)) !important;
+            width: 0 !important;
+        }
+        
+        /* Expande el contenido principal para ocupar todo el vacío */
+        #main-content.collapsed {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        
+
     </style>
 
     {% load bootstrap5 %}
@@ -317,11 +334,7 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a href="{% url 'actividades:listar_actividades' %}" class="nav-link px-3">
-                        <i class="bi bi-card-checklist"></i> <span>Actividades</span>
-                    </a>
-                </li>
+                <!-- Enlace 'Actividades' eliminado (app removida) -->
 
                 {% if request.user.is_superuser %}
                     <li class="nav-header"><span>ADMINISTRACIÓN</span></li>
@@ -365,11 +378,22 @@
                     </a>
                 </li>
                 
-                <li class="nav-item mt-3">
-                    <a href="{% url 'usuarios:logout' %}" class="nav-link logout-btn px-3 text-center" onclick="return confirm('¿Seguro que deseas cerrar sesión?')">
-                        <i class="bi bi-box-arrow-right"></i> <span>Cerrar Sesión</span>
-                    </a>
-                </li>
+                <div class="mt-auto p-3">
+                    <form action="{% url 'usuarios:logout' %}" method="post" id="formLogoutSidebar" class="m-0">
+                        {% csrf_token %} <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center py-2" 
+                                onclick="confirmarCierreSesion()">
+                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+
+<script>
+    function confirmarCierreSesion() {
+        if (confirm("¿Seguro que deseas cerrar sesión?")) {
+            document.getElementById('formLogoutSidebar').submit();
+        }
+    }
+</script>
             </ul>
         </nav>
     </div>
@@ -408,7 +432,7 @@
                         </div>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item py-2 fw-semibold" href="{% url 'usuarios:perfil' %}">
-                            <i class="bi bi-person me-2" style="color: var(--sena-green);"></i> Mi Perfil
+                            <i class="bi bi-person me-2" style="color: var(--sena-green);"></i> Mi información personal
                         </a>
                         <a class="dropdown-item text-danger py-2 fw-semibold" href="{% url 'usuarios:logout' %}">
                             <i class="bi bi-box-arrow-right me-2"></i> Salir
