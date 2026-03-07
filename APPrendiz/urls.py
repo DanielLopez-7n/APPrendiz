@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings               
 from django.conf.urls.static import static
 from core.views import CustomLoginView
+from django.conf.urls import handler404
+from django.shortcuts import render
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,7 +32,6 @@ urlpatterns = [
     path('bitacoras/', include('bitacoras.urls')),
     path('programas/', include('programas.urls')),
     path('fichas/', include('fichas.urls')),
-    path('actividades/', include('actividades.urls')),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
@@ -38,3 +39,10 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    # Importamos la función render para la vista personalizada de 404
+
+def custom_404(request, exception):
+    return render(request, 'core/404.html', status=404)
+
+handler404 = custom_404
