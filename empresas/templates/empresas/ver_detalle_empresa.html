@@ -1,0 +1,137 @@
+{% extends 'core/panel_admin_base.html' %}
+{% load static %}
+
+{% block title %}Detalle Empresa | {{ empresa.nombre_empresa }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border-radius: 30px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 30px;
+    }
+    .info-card {
+        border: none;
+        border-radius: 20px;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        height: 100%;
+    }
+    .data-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #adb5bd;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .data-value {
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 20px;
+    }
+    .status-pill {
+        background: rgba(255,255,255,0.2);
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    
+    <div class="mb-4">
+        <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-light rounded-pill px-4 fw-bold border">
+            <i class="bi bi-arrow-left me-2"></i>Volver al listado
+        </a>
+    </div>
+
+    <div class="detail-header shadow-lg">
+        <div class="row align-items-center">
+            <div class="col-md-2 text-center text-md-start mb-3 mb-md-0">
+                <div class="bg-white text-primary rounded-4 d-inline-flex align-items-center justify-content-center shadow" style="width: 100px; height: 100px;">
+                    <i class="bi bi-building-fill" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+            <div class="col-md-7 text-center text-md-start">
+                <span class="status-pill mb-2 d-inline-block">Empresa Vinculada</span>
+                <h1 class="fw-bold mb-1">{{ empresa.nombre_empresa }}</h1>
+                <p class="mb-0 opacity-75 fs-5">NIT: {{ empresa.nit }} | Sector: {{ empresa.sector_economico }}</p>
+            </div>
+            <div class="col-md-3 text-center text-md-end">
+                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 border-0 shadow-sm">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Datos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="info-card p-4">
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Datos Legales</h5>
+                
+                <span class="data-label">Razón Social</span>
+                <p class="data-value fs-5">{{ empresa.nombre_empresa }}</p>
+
+                <span class="data-label">NIT</span>
+                <p class="data-value">{{ empresa.nit }}</p>
+
+                <span class="data-label">Representante Legal</span>
+                <p class="data-value">{{ empresa.representante_legal|default:"No registrado" }}</p>
+
+                <span class="data-label">Ciudad / Ubicación</span>
+                <p class="data-value">{{ empresa.ciudad }} - {{ empresa.direccion }}</p>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="info-card p-4">
+                        <h5 class="fw-bold mb-4 border-bottom pb-2">Información de Contacto</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-envelope-at fs-4 text-primary me-3"></i>
+                            <div>
+                                <span class="data-label">Correo Electrónico</span>
+                                <div class="fw-bold">{{ empresa.correo_electronico }}</div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-telephone fs-4 text-primary me-3"></i>
+                            <div>
+                                <span class="data-label">Teléfono de Contacto</span>
+                                <div class="fw-bold">{{ empresa.telefono }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="info-card p-4 text-center d-flex flex-column justify-content-center">
+                        <span class="data-label">Aprendices Vinculados</span>
+                        <h2 class="display-4 fw-bold text-primary mb-0">0</h2>
+                        <p class="text-muted small">Actualmente en etapa productiva</p>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="info-card p-4">
+                        <h5 class="fw-bold mb-3">Descripción / Notas</h5>
+                        <p class="text-muted">
+                            Esta empresa se encuentra registrada bajo el sector de <strong>{{ empresa.sector_economico }}</strong>. 
+                            Participa activamente en la vinculación de aprendices para fortalecer el desarrollo regional.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

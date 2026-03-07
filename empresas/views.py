@@ -82,4 +82,8 @@ def eliminar_empresa(request, pk):
         empresa.delete()
         messages.success(request, 'Empresa eliminada del sistema.')
         return redirect('empresas:listar_empresas')
-    
+
+def ver_detalle_empresa(request, id):
+    # Buscamos la empresa por su ID o lanzamos un error 404 si no existe
+    empresa = get_object_or_404(Empresa, id=id)
+    return render(request, 'empresas/ver_detalle_empresa.html', {'empresa': empresa})

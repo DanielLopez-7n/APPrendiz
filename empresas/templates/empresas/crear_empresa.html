@@ -1,75 +1,179 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block title %}{{ titulo }}{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar{% else %}Registrar{% endif %} Aprendiz | APPrendiz{% endblock %}
 
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'empresas:listar_empresas' %}">Empresas</a></li>
-    <li class="breadcrumb-item active">{{ titulo }}</li>
+{% block extra_css %}
+<style>
+    .form-container-studio { max-width: 900px; margin: 0 auto; }
+    .card-form {
+        border: none;
+        border-radius: 30px;
+        background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        padding: 40px;
+    }
+    .input-group-studio {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 5px 15px;
+        border: 1px solid #eee;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .input-group-studio:focus-within {
+        border-color: #39A900;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
+    }
+    .input-group-studio i { color: #adb5bd; margin-right: 15px; font-size: 1.1rem; }
+    
+    .input-group-studio input, .input-group-studio select {
+        border: none !important;
+        background: transparent !important;
+        width: 100%;
+        padding: 10px 0;
+        outline: none !important;
+        box-shadow: none !important;
+        color: #2d3436;
+        font-weight: 500;
+    }
+    .label-studio {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #636e72;
+        margin-left: 5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .btn-save-studio {
+        background: #39A900;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .btn-save-studio:hover {
+        background: #2d8600;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2);
+    }
+    
+    /* Separador visual elegante */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, rgba(57,169,0,0.1), rgba(57,169,0,0.5), rgba(57,169,0,0.1));
+        margin: 30px 0;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-building-check me-2"></i>{{ titulo }}</h5>
+<div class="container py-5">
+    <div class="form-container-studio">
+        
+        <div class="text-center mb-5">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 80px; height: 80px;">
+                {% if form.instance.pk %}
+                    <i class="bi bi-person-lines-fill fs-1"></i>
+                {% else %}
+                    <i class="bi bi-person-plus-fill fs-1"></i>
+                {% endif %}
             </div>
-            <div class="card-body p-4">
+            <h2 class="fw-bold text-dark">
+                {% if form.instance.pk %}Actualizar Datos del{% else %}Matricular Nuevo{% endif %} Aprendiz
+            </h2>
+            <p class="text-muted">Asegúrate de vincular correctamente la ficha y el programa de formación.</p>
+        </div>
+
+        <div class="card-form">
+            <form method="POST">
+                {% csrf_token %}
                 
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    <h6 class="text-primary fw-bold mb-3">Datos de la Organización</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">NIT *</label>
-                            {{ form.nit }}
-                            {% if form.nit.errors %}
-                                <div class="text-danger small">{{ form.nit.errors.0 }}</div>
-                            {% endif %}
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">1. Información Personal</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">Nombres</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person"></i>
+                            {{ form.nombres }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Apellidos</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person"></i>
+                            {{ form.apellidos }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Documento de Identidad</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-card-heading"></i>
+                            {{ form.documento }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Razón Social (Nombre) *</label>
-                            {{ form.nombre }}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Dirección Física</label>
-                            {{ form.direccion }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Teléfono General</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Teléfono / Celular</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-phone"></i>
                             {{ form.telefono }}
                         </div>
                     </div>
-
-                    <hr class="text-muted">
-
-                    <h6 class="text-primary fw-bold mb-3">Contacto / Jefe Inmediato</h6>
-                    <div class="alert alert-light border small">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Esta persona será quien firme las bitácoras y evalúe al aprendiz.
-                    </div>
-                    
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre del Jefe Inmediato *</label>
-                            {{ form.encargado }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Correo Electrónico (Jefe)</label>
-                            {{ form.email_encargado }}
+                    <div class="col-md-12">
+                        <label class="label-studio">Correo Electrónico Institucional</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-envelope-at"></i>
+                            {{ form.email }}
                         </div>
                     </div>
+                </div>
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-4">
-                            <i class="bi bi-save me-2"></i>Guardar Empresa
+                <div class="section-divider"></div>
+
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">2. Información Académica y Etapa Productiva</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">Ficha de Formación</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-hash"></i>
+                            {{ form.ficha }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Programa de Formación</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-journal-bookmark"></i>
+                            {{ form.programa_formacion }}
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="label-studio">Empresa Patrocinadora (Opcional)</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-building"></i>
+                            {{ form.empresa }} </div>
+                    </div>
+                </div>
+
+                <div class="row align-items-center mt-4">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-pill w-100 fw-bold border py-3 text-muted">
+                            <i class="bi bi-x-lg me-2"></i>Cancelar
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn-save-studio shadow-sm">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            {% if form.instance.pk %}Guardar Cambios{% else %}Matricular Aprendiz{% endif %}
                         </button>
                     </div>
-                </form>
+                </div>
 
-            </div>
+            </form>
         </div>
     </div>
 </div>
