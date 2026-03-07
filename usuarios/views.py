@@ -9,6 +9,8 @@ from django.db.models import Q
 from .forms import LoginForm, RegistroForm, EditarUsuarioForm, EditarPerfilForm, MiPerfilForm, UsuarioForm
 from aprendices.forms import AprendizForm
 from instructores.forms import InstructorForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -18,8 +20,6 @@ def login_view(request):
     """
     Vista para el inicio de sesión de usuarios
     """
-    # 1. MEJORA AL PRINCIPIO:
-    # Si el usuario ya está autenticado, redirigir según su ROL
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect('core:dashboard')
@@ -131,7 +131,6 @@ def es_administrador(user):
     return False
 
 
-
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
 def lista_usuarios_view(request):
@@ -174,7 +173,8 @@ def lista_usuarios_view(request):
     }
     return render(request, 'usuarios/listar_usuarios.html', context)
 
- # ---ver detalle usuario ---
+
+# ---ver detalle usuario ---
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
 def ver_detalle_usuario(request, user_id):
@@ -188,8 +188,6 @@ def ver_detalle_usuario(request, user_id):
         'usuario': usuario
     }
     return render(request, 'usuarios/ver_detalle.html', context)
-
-# --------------------------------------------------
 
 
 @login_required
@@ -241,6 +239,7 @@ def crear_usuario_con_perfil(request):
     }
     return render(request, 'usuarios/crear_usuario_dinamico.html', context)
 
+
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
 def editar_usuario_view(request, user_id):
@@ -253,12 +252,10 @@ def editar_usuario_view(request, user_id):
         # 1. PRIMERO VALIDAMOS (Esto genera el 'cleaned_data')
         if form_usuario.is_valid() and form_perfil.is_valid():
             
-            # 🛡️ --- INICIO DEL BLINDAJE (AHORA SÍ FUNCIONA) --- 🛡️
+            # 🛡️ --- INICIO DEL BLINDAJE --- 🛡️
             # Verificamos si es el mismo usuario y si intentó ponerse "inactivo" (False)
-            # Nota: Usamos 'is False' explícitamente para mayor seguridad
             if usuario.id == request.user.id and form_usuario.cleaned_data.get('is_active') is False:
                 messages.error(request, '¡Alerta de seguridad! No puedes desactivar tu propia cuenta mientras estás usándola.')
-                # Te devolvemos a la misma pantalla sin guardar nada
                 return redirect('usuarios:editar_usuario', user_id=usuario.id)
             # 🛡️ --- FIN DEL BLINDAJE --- 🛡️
             
@@ -272,7 +269,6 @@ def editar_usuario_view(request, user_id):
             messages.error(request, 'Por favor corrige los errores en el formulario.')
     
     else:
-        # --- LÓGICA GET (Esta parte ya la tienes bien, déjala igual) ---
         form_usuario = EditarUsuarioForm(instance=usuario)
         
         documento_real = ''
@@ -304,6 +300,7 @@ def editar_usuario_view(request, user_id):
         'accion': 'Actualizar'
     }
     return render(request, 'usuarios/editar_usuario.html', context)
+
 
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
@@ -357,11 +354,12 @@ def perfil_view(request):
         form_perfil = EditarPerfilForm(instance=usuario.perfil)
     
     context = {
-        'titulo': 'Mi Perfil',
+        'titulo': 'Mi información personal',
         'form_usuario': form_usuario,
         'form_perfil': form_perfil,
     }
     return render(request, 'usuarios/perfil.html', context)
+
 
 @login_required
 def editar_mi_perfil(request):
@@ -383,3 +381,34 @@ def editar_mi_perfil(request):
         'form': form
     })
     
+    
+# --- VISTA DE CAMBIO DE CONTRASEÑA ---
+
+@login_required
+def cambiar_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user) # Mantiene la sesión viva
+            messages.success(request, '¡Excelente! Tu contraseña ha sido actualizada y tu cuenta ahora es segura.')
+            
+            # REDIRECCIÓN INTELIGENTE
+            if user.is_staff or user.is_superuser:
+                return redirect('core:dashboard') # Instructores y Admins
+            else:
+                return redirect('aprendices:perfil_aprendiz') # Aprendices <-- ¡AQUÍ ESTÁ LA CORRECCIÓN!
+        else:
+            messages.error(request, 'Hubo un error. Por favor, revisa las validaciones del formulario.')
+    else:
+        form = PasswordChangeForm(request.user)
+
+    # PLANTILLA BASE DINÁMICA
+    plantilla_base = 'core/panel_admin_base.html' if request.user.is_staff else 'core/base_simple.html'
+
+    context = {
+        'form': form,
+        'titulo': 'Cambiar Contraseña',
+        'plantilla_base': plantilla_base
+    }
+    return render(request, 'usuarios/cambiar_password.html', context)

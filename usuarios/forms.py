@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from .models import PerfilUsuario
+from aprendices.models import Aprendiz
 
 class LoginForm(AuthenticationForm):
     """
@@ -189,8 +190,8 @@ class UsuarioForm(forms.ModelForm):
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@misena.edu.co'}),
-            # Al username le ponemos etiqueta de Documento para que se entienda mejor
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Número de Documento'}),
+            # Al username le ponemos placeholder más descriptivo
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Documento, nombre...'}),
         }
         
         labels = {
@@ -262,4 +263,65 @@ class MiPerfilForm(forms.ModelForm):
             if commit:
                 self.perfil_instance.save()
         return user
-    
+
+
+# ===================================================================
+# FORMULARIO PARA SINCRONIZACIÓN DE PERFIL DEL APRENDIZ COMPLETO
+# ===================================================================
+class AprendizPerfilForm(forms.ModelForm):
+    # 1. Campos del modelo User
+    first_name = forms.CharField(max_length=150, required=True, label="Nombres *", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=150, required=True, label="Apellidos *", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(required=True, label="Correo Institucional *", widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = Aprendiz
+        # Aquí ponemos TODOS los campos que tienes en tu formulario de creación
+        # (OJO: Asegúrate de que estos nombres coincidan con los de tu models.py)
+        fields = [
+            'tipo_documento', 
+            'documento', 
+            'telefono', 
+            'correo_personal', 
+            'direccion_residencia', 
+            'numero_ficha',
+            'modalidad_formacion', 
+            'modalidad_etapa', 
+            'etapa_exterior', 
+            'pais_etapa'
+        ]
+        
+        widgets = {
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
+            'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}), # El documento no debería poder cambiarlo él mismo
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_personal': forms.EmailInput(attrs={'class': 'form-control'}),
+            'direccion_residencia': forms.TextInput(attrs={'class': 'form-control'}),
+            'ficha': forms.Select(attrs={'class': 'form-select'}),
+            'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
+            'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),
+            'etapa_exterior': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'pais_etapa': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(AprendizPerfilForm, self).__init__(*args, **kwargs)
+        
+        if user:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+
+    def save(self, commit=True):
+        aprendiz = super(AprendizPerfilForm, self).save(commit=False)
+        user = aprendiz.usuario
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
+        
+        if commit:
+            user.save()
+            aprendiz.save()
+            
+        return aprendiz

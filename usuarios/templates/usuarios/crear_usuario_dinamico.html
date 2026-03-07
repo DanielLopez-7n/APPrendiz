@@ -1,28 +1,115 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block title %}Registrar Usuario Completo{% endblock %}
+{% block title %}Registrar Usuario Completo | APPrendiz{% endblock %}
 {% block page_title %}Gestión de Accesos{% endblock %}
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-12 col-lg-10">
-        <div class="card shadow-sm border-0">
-            
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 text-primary">
-                    <i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo Usuario del Sistema
-                </h5>
-            </div>
+{% block extra_css %}
+<style>
+    .form-container-studio { max-width: 900px; margin: 0 auto; }
+    .card-form {
+        border: none;
+        border-radius: 30px;
+        background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        padding: 40px;
+    }
+    
+    /* Input Group Premium */
+    .input-group-studio {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 5px 15px;
+        border: 1px solid #eee;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .input-group-studio:focus-within {
+        border-color: #39A900;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
+    }
+    .input-group-studio i { color: #adb5bd; margin-right: 15px; font-size: 1.1rem; }
+    
+    /* Reseteo de estilos nativos de Django/Bootstrap */
+    .input-group-studio input, .input-group-studio select, .input-group-studio textarea {
+        flex-grow: 1;
+        border: none !important;
+        background: transparent !important;
+        width: 100%;
+        padding: 10px 0;
+        outline: none !important;
+        box-shadow: none !important;
+        color: #2d3436;
+        font-weight: 500;
+    }
+    
+    .label-studio {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #636e72;
+        margin-left: 5px;
+        margin-bottom: 8px;
+        display: block;
+    }
 
-            <div class="card-body p-4">
-                <form method="POST" action="" id="formDinamico">
-                    {% csrf_token %}
-                    
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1 border-bottom pb-2">1. Datos de Identidad y Acceso</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-12 mb-2">
-                            <label class="form-label fw-bold text-primary">¿Qué tipo de usuario deseas registrar? *</label>
-                            <select name="rol_seleccionado" id="id_rol" class="form-select form-select-lg border-primary" required>
+    /* Botón Guardar Dinámico */
+    .btn-save-studio {
+        background: #39A900;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .btn-save-studio:hover:not(:disabled) {
+        background: #2d8600;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2);
+    }
+    .btn-save-studio:disabled {
+        background: #e9ecef;
+        color: #adb5bd;
+        cursor: not-allowed;
+    }
+    
+    /* Separador Elegante */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, rgba(0,0,0,0.02), rgba(0,0,0,0.08), rgba(0,0,0,0.02));
+        margin: 30px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="form-container-studio">
+        
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 70px; height: 70px;">
+                <i class="bi bi-person-plus-fill fs-2"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Registrar Nuevo Usuario</h2>
+            <p class="text-muted">Selecciona el rol para desplegar los campos correspondientes.</p>
+        </div>
+
+        <div class="card-form">
+            <form method="POST" action="" id="formDinamico">
+                {% csrf_token %}
+                
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-8">
+                        <label class="label-studio text-center w-100 text-primary fs-6 mb-3">¿Qué tipo de usuario deseas registrar? *</label>
+                        <div class="input-group-studio" style="border: 2px solid rgba(13, 110, 253, 0.2); padding: 5px 20px;">
+                            <i class="bi bi-diagram-3-fill text-primary"></i>
+                            <select name="rol_seleccionado" id="id_rol" required class="fs-6 py-2">
                                 <option value="">--- Seleccione el Rol ---</option>
                                 <option value="aprendiz">Aprendiz SENA</option>
                                 {% if es_admin %}
@@ -30,60 +117,102 @@
                                 {% endif %}
                             </select>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ form_usuario.first_name.label }} *</label>
+                <div class="section-divider"></div>
+
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">1. Datos de Identidad y Acceso</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">{{ form_usuario.first_name.label }} *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person"></i>
                             {{ form_usuario.first_name }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ form_usuario.last_name.label }} *</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">{{ form_usuario.last_name.label }} *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person"></i>
                             {{ form_usuario.last_name }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ form_usuario.username.label }} *</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Nombre de Usuario *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person-badge"></i>
                             {{ form_usuario.username }}
-                            <div class="form-text text-muted small">Este será el usuario y contraseña inicial.</div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ form_usuario.email.label }} *</label>
+                        <div class="form-text text-muted small mt-1" style="margin-top:-15px; margin-bottom: 20px; margin-left: 15px;">
+                            Usuario y contraseña inicial: la contraseña será igual al nombre de usuario. Por seguridad, cambie la contraseña al iniciar sesión por primera vez.
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">{{ form_usuario.email.label }} *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-envelope-at"></i>
                             {{ form_usuario.email }}
                         </div>
                     </div>
+                </div>
 
-                    <div id="seccion_aprendiz" style="display: none;" class="mt-4">
-                        <h6 class="text-uppercase text-success mb-3 fs-7 ls-1 border-bottom pb-2">2. Perfil del Aprendiz (Ficha y Etapa)</h6>
-                        <div class="row g-3">
-                            {% for field in form_aprendiz %}
-                            <div class="col-md-4 mb-2">
-                                <label class="form-label fw-bold">{{ field.label }}</label>
-                                {{ field }}
-                                <div class="text-danger small">{{ field.errors }}</div>
-                            </div>
-                            {% endfor %}
-                        </div>
+                <div id="seccion_aprendiz" style="display: none;">
+                    <div class="section-divider"></div>
+                    <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">2. Perfil del Aprendiz (Ficha y Etapa)</h6>
+                    <div class="row">
+                        {% for field in form_aprendiz %}
+                            {% if field.name != 'programa_formacion' %}
+                                <div class="col-md-6">
+                                    <label class="label-studio">
+                                        {% if field.name == 'numero_ficha' %}Número de ficha{% else %}{{ field.label }}{% endif %}
+                                    </label>
+                                    <div class="input-group-studio">
+                                        <i class="bi bi-mortarboard"></i>
+                                        {{ field }}
+                                    </div>
+                                    {% if field.errors %}
+                                        <div class="text-danger small" style="margin-top:-15px; margin-bottom: 15px; margin-left: 15px;">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
+                </div>
 
-                    <div id="seccion_instructor" style="display: none;" class="mt-4">
-                        <h6 class="text-uppercase text-warning text-dark mb-3 fs-7 ls-1 border-bottom pb-2">2. Perfil del Instructor (Contractual)</h6>
-                        <div class="row g-3">
-                            {% for field in form_instructor %}
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label fw-bold">{{ field.label }}</label>
+                <div id="seccion_instructor" style="display: none;">
+                    <div class="section-divider"></div>
+                    <h6 class="fw-bold text-warning text-uppercase small mb-3" style="letter-spacing: 1px;">2. Perfil del Instructor (Contractual)</h6>
+                    <div class="row">
+                        {% for field in form_instructor %}
+                        <div class="col-md-6">
+                            <label class="label-studio">{{ field.label }}</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-briefcase"></i>
                                 {{ field }}
-                                <div class="text-danger small">{{ field.errors }}</div>
                             </div>
-                            {% endfor %}
+                            {% if field.errors %}
+                            <div class="text-danger small" style="margin-top:-15px; margin-bottom: 15px; margin-left: 15px;">{{ field.errors }}</div>
+                            {% endif %}
                         </div>
+                        {% endfor %}
                     </div>
+                </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
-                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary px-5" id="btnGuardar" disabled>
-                            <i class="bi bi-save me-1"></i> Guardar Registro Completo
+                <div class="row align-items-center mt-4">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light rounded-pill w-100 fw-bold border py-3 text-muted">
+                            <i class="bi bi-x-lg me-2"></i>Cancelar
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn-save-studio shadow-sm py-3" id="btnGuardar" disabled>
+                            <i class="bi bi-check-circle-fill me-2"></i>Guardar Registro Completo
                         </button>
                     </div>
-                </form> 
-            </div>
+                </div>
+                
+            </form> 
         </div>
     </div>
 </div>

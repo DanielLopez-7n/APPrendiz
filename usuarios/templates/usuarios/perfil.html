@@ -1,123 +1,106 @@
 {% extends 'core/panel_admin_base.html' %}
 
-{% block title %}Mi Perfil | Panel Admin{% endblock %}
-
-{% block page_title %}Mi Perfil{% endblock %}
-
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item active">Mi Perfil</li>
-{% endblock %}
+{% block page_title %}Mi información personal{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    
-    <div class="col-md-4 mb-4">
-        <div class="card shadow border-0 text-center h-100">
-            <div class="card-body p-5">
-                <div class="mb-4 position-relative d-inline-block">
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center p-4">
+                <div class="d-flex justify-content-center align-items-center mb-3">
                     {% if user.perfil.foto_perfil %}
-                        <img src="{{ user.perfil.foto_perfil.url }}" class="rounded-circle img-thumbnail shadow-sm" style="width: 150px; height: 150px; object-fit: cover;">
+                        <img src="{{ user.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle border border-3" style="width: 150px; height: 150px; object-fit: cover; border-color: var(--sena-green) !important;">
                     {% else %}
-                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 150px; height: 150px;">
-                            <i class="bi bi-person text-secondary display-1"></i>
+                        <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 150px; height: 150px; background-color: #f8f9fa; border: 3px solid var(--sena-green);">
+                            <i class="bi bi-person text-secondary" style="font-size: 5rem;"></i>
                         </div>
                     {% endif %}
                 </div>
-
-                <h4 class="fw-bold mb-1 text-dark">{{ user.get_full_name }}</h4>
-                <p class="text-muted mb-3">{{ user.email }}</p>
-
-                <div class="mb-4">
-                    {% if user.is_superuser %}
-                        <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">Administrador</span>
-                    {% elif user.instructor %}
-                        <span class="badge bg-warning bg-opacity-10 text-dark px-3 py-2 rounded-pill">Instructor</span>
-                    {% elif user.aprendiz %}
-                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">Aprendiz</span>
-                    {% else %}
-                        <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">Usuario</span>
-                    {% endif %}
-                </div>
+                
+                <h4 class="fw-bold mb-1" style="color: var(--sena-dark-green);">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted mb-3">
+                    {% if user.is_superuser %}Superadministrador
+                    {% elif user.is_staff %}Instructor
+                    {% else %}Aprendiz{% endif %}
+                </p>
+                
+                <a href="{% url 'aprendices:editar_perfil_aprendiz' %}" class="btn btn-outline-success w-100 fw-bold rounded-pill">
+                    <i class="bi bi-pencil-square me-1"></i> Editar Información
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-8 mb-4">
-        <div class="card shadow border-0 h-100">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-primary"><i class="bi bi-person-lines-fill me-2"></i>Información Detallada</h5>
-                <a href="{% url 'usuarios:editar_mi_perfil' %}" class="btn btn-sm btn-outline-primary rounded-pill">
-                    <i class="bi bi-pencil-square me-1"></i>Editar Datos
-                </a>
+    <div class="col-lg-8">
+        
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-transparent border-bottom p-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-person-lines-fill me-2" style="color: var(--sena-green);"></i> Información Detallada</h5>
             </div>
             <div class="card-body p-4">
-                
                 <div class="row g-4">
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Usuario</label>
-                        <p class="fs-5 fw-medium mb-0">{{ user.username }}</p>
-                    </div>
-
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Miembro Desde</label>
-                        <p class="fs-5 fw-medium mb-0">{{ user.date_joined|date:"d de F, Y" }}</p>
-                    </div>
-
-                    <div class="col-12"><hr class="text-muted opacity-25"></div>
-
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Documento de Identidad</label>
-                        <p class="fs-5 fw-medium mb-0">
-                            {% if user.aprendiz %}
-                                {{ user.aprendiz.documento|default:"No registrado" }}
-                            {% elif user.instructor %}
-                                {{ user.instructor.cedula|default:"No registrado" }}
-                            {% else %}
-                                {{ user.perfil.documento|default:"No registrado" }}
-                            {% endif %}
-                        </p>
-                    </div>
-
-                    <div class="col-sm-6">
-                        <label class="text-muted small text-uppercase fw-bold">Teléfono / Celular</label>
-                        <p class="fs-5 fw-medium mb-0">
-                            {% if user.aprendiz %}
-                                {{ user.aprendiz.telefono|default:"No registrado" }}
-                            {% elif user.instructor %}
-                                {{ user.instructor.telefono|default:"No registrado" }}
-                            {% else %}
-                                {{ user.perfil.telefono|default:"No registrado" }}
-                            {% endif %}
-                        </p>
-                    </div>
-
-                    {% if user.aprendiz %}
-                        <div class="col-12"><hr class="text-muted opacity-25"></div>
-                        <div class="col-12">
-                            <label class="text-muted small text-uppercase fw-bold">Programa de Formación</label>
-                            <p class="fs-5 fw-medium mb-0">{{ user.aprendiz.programa_formacion }}</p>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Nombres Completos</label>
+                            <p class="fw-semibold mb-0">{{ user.first_name }} {{ user.last_name }}</p>
                         </div>
-                        <div class="col-sm-6">
-                            <label class="text-muted small text-uppercase fw-bold">Ficha</label>
-                            <p class="fs-5 fw-medium mb-0">{{ user.aprendiz.numero_ficha }}</p>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Documento de Identidad</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.tipo_documento }} {{ aprendiz.documento }}</p>
                         </div>
-                    {% endif %}
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Correo Institucional</label>
+                            <p class="fw-semibold mb-0">{{ user.email|default:"---" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Correo Personal</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.correo_personal|default:"---" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Teléfono de Contacto</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.telefono|default:"---" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Dirección de Residencia</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.direccion_residencia|default:"---" }}</p>
+                        </div>
+                        
+                        <div class="col-12"><hr class="my-2"></div>
+                        
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Modalidad de Formación</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.modalidad_formacion|default:"---" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small fw-bold">Modalidad Etapa Productiva</label>
+                            <p class="fw-semibold mb-0">{{ aprendiz.modalidad_etapa|default:"---" }}</p>
+                        </div>
+                        {% if aprendiz.etapa_exterior %}
+                        <div class="col-md-12">
+                            <label class="text-muted small fw-bold">Etapa en el Exterior</label>
+                            <p class="fw-semibold mb-0 text-success"><i class="bi bi-airplane-fill me-1"></i> Sí, en {{ aprendiz.pais_etapa }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
 
-                    {% if user.instructor %}
-                        <div class="col-12"><hr class="text-muted opacity-25"></div>
-                        <div class="col-sm-6">
-                            <label class="text-muted small text-uppercase fw-bold">Profesión</label>
-                            <p class="fs-5 fw-medium mb-0">{{ user.instructor.profesion }}</p>
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="text-muted small text-uppercase fw-bold">Vinculación</label>
-                            <p class="fs-5 fw-medium mb-0">{{ user.instructor.tipo_contrato|default:"No especificado" }}</p>
-                        </div>
-                    {% endif %}
-
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom p-3">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shield-lock-fill me-2 text-warning"></i> Seguridad de la Cuenta</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h6 class="fw-bold mb-1">Contraseña de Acceso</h6>
+                        <p class="text-muted small mb-0">Es recomendable cambiar tu contraseña periódicamente para mantener tu cuenta segura.</p>
+                    </div>
+                    <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-warning fw-bold shadow-sm rounded-pill px-4">
+                        <i class="bi bi-key-fill me-1"></i> Cambiar Contraseña
+                    </a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}

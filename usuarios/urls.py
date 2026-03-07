@@ -1,15 +1,15 @@
 # usuarios/urls.py
 
 from django.urls import path
+from django.contrib.auth.views import LogoutView
+from core.views import CustomLoginView
 from . import views
-
 app_name = 'usuarios'
 
 urlpatterns = [
     # Autenticación
-    path('login/', views.login_view, name='login'),
-    path('registro/', views.registro_view, name='registro'),
-    path('logout/', views.logout_view, name='logout'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='core:index'), name='logout'),
     
     # Perfil de usuario
     path('perfil/', views.perfil_view, name='perfil'),
@@ -22,4 +22,5 @@ urlpatterns = [
     path('detalle/<int:user_id>/', views.ver_detalle_usuario, name='ver_detalle_usuario'),
     path('perfil/', views.perfil_view, name='ver_perfil'),
     path('perfil/editar/', views.editar_mi_perfil, name='editar_mi_perfil'),
+    path('cambiar-password/', views.cambiar_password, name='cambiar_password'),
 ]
