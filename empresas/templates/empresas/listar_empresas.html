@@ -1,99 +1,166 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block page_title %}Gestión de Empresas{% endblock %}
+{% block title %}Gestión de Empresas | APPrendiz{% endblock %}
 
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item active">Empresas</li>
+{% block extra_css %}
+<style>
+    /* Estilos Studio para Tablas */
+    .table-studio thead th {
+        background-color: #f8f9fa !important;
+        color: #636e72 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 20px 15px;
+        border: none;
+    }
+    .table-studio tbody tr { transition: all 0.2s ease; border-bottom: 1px solid #f8f9fa; }
+    .table-studio tbody tr:hover { background-color: rgba(13, 110, 253, 0.02) !important; }
+    .table-studio tbody td { padding: 16px 15px; vertical-align: middle; color: #2d3436; font-size: 0.88rem; }
+
+    /* Avatar para Empresas (Azul Corporativo) */
+    .avatar-enterprise {
+        width: 45px; height: 45px; border-radius: 14px;
+        background-color: rgba(13, 110, 253, 0.1); color: #0d6efd;
+        display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+
+    /* Input de búsqueda Premium */
+    .search-card { border: none; border-radius: 20px; background: #fff; shadow: 0 10px 30px rgba(0,0,0,0.02); }
+    .form-control-studio { border-radius: 12px; border: 1px solid #eee; padding: 10px 15px; background: #fcfcfc; }
+    
+    .btn-action-studio {
+        width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 10px; transition: 0.2s; background: #f8f9fa; color: #555; border: 1px solid #eee;
+    }
+    .btn-action-studio:hover { background: #0d6efd; color: white; border-color: #0d6efd; }
+</style>
 {% endblock %}
 
 {% block content %}
-<form method="GET" action="" class="mb-4">
-    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
-        
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
-                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Escribe aquí para buscar..." value="{{ request.GET.q }}">
-            </div>
-        </div>
+<div class="container-fluid py-4">
 
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-light me-2">Limpiar</a>
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-search me-1"></i> Buscar
-            </button>
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h6 class="text-primary fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Relaciones Corporativas</h6>
+            <h1 class="display-6 fw-bold text-dark mb-0">Empresas Aliadas</h1>
         </div>
-        
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'empresas:crear_empresa' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                <i class="bi bi-building-add me-2"></i>Registrar Empresa
+            </a>
+        </div>
     </div>
-</form>
 
-<div class="card shadow border-0">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-buildings me-2"></i>Listado de Empresas</h5>
-        <a href="{% url 'empresas:crear_empresa' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Nueva Empresa
-        </a>
+    <div class="card search-card mb-4 shadow-sm">
+        <div class="card-body p-4">
+            <form method="GET" action="" class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control form-control-studio border-0" 
+                               placeholder="Buscar por NIT o Razón Social..." value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="sector" class="form-select form-control-studio">
+                        <option value="">Todos los sectores</option>
+                        <option value="Servicios" {% if request.GET.sector == 'Servicios' %}selected{% endif %}>Servicios</option>
+                        <option value="Industrial" {% if request.GET.sector == 'Industrial' %}selected{% endif %}>Industrial</option>
+                        <option value="Tecnología" {% if request.GET.sector == 'Tecnología' %}selected{% endif %}>Tecnología</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold">Filtrar</button>
+                    <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-light border rounded-pill px-3"><i class="bi bi-arrow-clockwise"></i></a>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <div class="card-body">
-        {% if empresas %}
+
+    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-studio mb-0 align-middle">
+                <thead>
                     <tr>
-                        <th>Empresa / NIT</th>
-                        <th>Contacto (Jefe)</th>
-                        <th>Teléfono</th>
-                        <th>Dirección</th>
-                        <th class="text-end">Acciones</th>
+                        <th class="ps-4">Razón Social</th>
+                        <th>NIT</th>
+                        <th>Ubicación / Sector</th>
+                        <th>Contacto</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for empresa in empresas %}
                     <tr>
-                        <td>
+                        <td class="ps-4">
                             <div class="d-flex align-items-center">
-                                <div class="bg-primary bg-opacity-10 rounded p-2 me-3">
-                                    <i class="bi bi-building text-primary"></i>
+                                <div class="avatar-enterprise me-3">
+                                    <i class="bi bi-building-fill"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold">{{ empresa.nombre }}</div>
-                                    <div class="small text-muted">NIT: {{ empresa.nit }}</div>
+                                    <div class="fw-bold text-dark mb-0">{{ empresa.nombre_empresa }}</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">Representante: {{ empresa.representante_legal }}</div>
                                 </div>
                             </div>
                         </td>
+                        <td><span class="badge bg-light text-dark border px-2 py-1">{{ empresa.nit }}</span></td>
                         <td>
-                            <div class="fw-medium">{{ empresa.encargado }}</div>
-                            <div class="small text-muted">{{ empresa.email_encargado|default:"Sin correo" }}</div>
+                            <div class="fw-semibold text-dark">{{ empresa.ciudad }}</div>
+                            <div class="text-muted small">{{ empresa.sector_economico }}</div>
                         </td>
-                        <td>{{ empresa.telefono|default:"N/A" }}</td>
-                        <td class="small text-muted">{{ empresa.direccion|truncatechars:30 }}</td>
-                        <td class="text-end">
-                            <div class="btn-group">
-                                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <form action="{% url 'empresas:eliminar_empresa' empresa.id %}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar esta empresa?');">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                        <td>
+                            <div class="small text-dark fw-bold"><i class="bi bi-envelope-at me-1"></i>{{ empresa.correo_electronico }}</div>
+                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ empresa.telefono }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'empresas:ver_detalle_empresa' empresa.id %}" class="btn-action-studio text-primary" title="Detalle"><i class="bi bi-eye"></i></a>
+                                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn-action-studio text-info" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <button type="button" class="btn-action-studio text-danger" data-bs-toggle="modal" data-bs-target="#delModal{{ empresa.id }}"><i class="bi bi-trash"></i></button>
+                            </div>
+
+                            <div class="modal fade" id="delModal{{ empresa.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+                                        <div class="modal-body p-5 text-center">
+                                            <i class="bi bi-exclamation-triangle text-danger display-4 opacity-50 mb-3"></i>
+                                            <h4 class="fw-bold">¿Eliminar registro?</h4>
+                                            <p class="text-muted">¿Estás seguro de eliminar a <strong>{{ empresa.nombre_empresa }}</strong> de la base de datos?</p>
+                                            <div class="d-flex gap-2 justify-content-center mt-4">
+                                                <button class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{% url 'empresas:eliminar_empresa' empresa.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Sí, eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No hay empresas registradas con esos filtros.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-            <div class="alert alert-info text-center py-4">
-                <i class="bi bi-building-add display-4 d-block mb-3"></i>
-                <h5>No hay empresas registradas</h5>
-                <p class="text-muted">Comienza registrando las empresas donde los aprendices harán sus prácticas.</p>
-                <a href="{% url 'empresas:crear_empresa' %}" class="btn btn-primary mt-2">Registrar Primera Empresa</a>
-            </div>
-        {% endif %}
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modales = document.querySelectorAll('.modal');
+        
+        modales.forEach(modal => {
+            document.body.appendChild(modal);
+        });
+    });
+</script>
+
 {% endblock %}

@@ -1,146 +1,226 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block page_title %}Gestión de Instructores{% endblock %}
+{% block title %}Listado de Instructores | APPrendiz{% endblock %}
 
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item active">Instructores</li>
+{% block extra_css %}
+<style>
+    /* 1. Header de la Tabla: Solución al error de visibilidad */
+    .table-studio thead th {
+        background-color: #f8f9fa !important;
+        color: #636e72 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 20px 15px;
+        border: none;
+    }
+
+    /* 2. Filas Estilo Studio */
+    .table-studio tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    .table-studio tbody tr:hover {
+        background-color: rgba(57, 169, 0, 0.02) !important;
+    }
+    .table-studio tbody td {
+        padding: 16px 15px;
+        vertical-align: middle;
+        color: #2d3436;
+        font-size: 0.88rem;
+    }
+
+    /* 3. Avatar Studio con color distintivo (Naranja SENA para Instructores) */
+    .avatar-studio {
+        width: 40px; height: 40px;
+        border-radius: 12px;
+        background-color: rgba(255, 103, 31, 0.1);
+        color: #FF671F;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800;
+    }
+
+    /* 4. Badges de Tipo de Contrato */
+    .badge-contract {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* 5. Botones de Acción Minimalistas */
+    .btn-action-studio {
+        width: 36px; height: 36px;
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        border-radius: 10px;
+        transition: 0.2s;
+        background: #f8f9fa;
+        color: #555;
+        border: 1px solid #eee;
+    }
+    .btn-action-studio:hover {
+        background: var(--sena-green);
+        color: white;
+        border-color: var(--sena-green);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 
-<form method="GET" action="" class="mb-4">
-    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
-        
-        <div class="col-md-5">
-            <div class="input-group">
-                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
-                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Buscar por cédula, nombre, profesión..." value="{{ request.GET.q }}">
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 20px;">
+    <div class="card-body p-4">
+        <form method="GET" action="{% url 'instructores:listar_instructores' %}" class="row g-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                        <i class="bi bi-search text-success"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control bg-light border-0 py-2" 
+                           placeholder="Buscar por cédula, nombre o profesión..." 
+                           value="{{ request.GET.q }}"
+                           style="border-radius: 0 12px 12px 0;">
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-3">
-            <select name="tipo_contrato" class="form-select text-muted">
-                <option value="">Todos los contratos</option>
-                <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
-                <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
-            </select>
-        </div>
+            <div class="col-md-3">
+                <select name="tipo_contrato" class="form-select bg-light border-0 py-2" style="border-radius: 12px;">
+                    <option value="">Todos los contratos</option>
+                    <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
+                    <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
+                </select>
+            </div>
 
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light me-2">Limpiar</a>
-            <button type="submit" class="btn btn-success px-4">
-                <i class="bi bi-funnel-fill me-1"></i> Filtrar
-            </button>
-        </div>
-        
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm" style="background-color: #39A900; border: none;">
+                    Filtrar
+                </button>
+                <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light border rounded-pill fw-bold px-3" title="Limpiar búsqueda">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </a>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
-<div class="card shadow border-0">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-people me-2"></i>Listado de Instructores</h5>
-        
-    </div>
+<div class="container-fluid py-4">
     
-    <div class="card-body">
-        {% if instructores %}
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Administración</h6>
+            <h1 class="display-6 fw-bold text-dark mb-0">Gestión de Instructores</h1>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+            <table class="table table-studio mb-0 align-middle">
+                <thead>
                     <tr>
-                        <th>Nombre Completo</th>
-                        <th>Profesión</th>
-                        <th>Celular</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th class="text-end">Acciones</th>
+                        <th class="ps-4">Nombre Completo</th>
+                        <th>Profesión / Especialidad</th>
+                        <th>Contacto</th>
+                        <th>Contrato</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for instructor in instructores %}
                     <tr>
-                        <td>
+                        <td class="ps-4">
                             <div class="d-flex align-items-center">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                    <i class="bi bi-person text-secondary"></i>
+                                <div class="avatar-studio me-3">
+                                    {{ instructor.usuario.first_name|first|upper }}
                                 </div>
                                 <div>
-                                    <div class="fw-bold">{{ instructor.usuario.get_full_name }}</div>
-                                    <div class="small text-muted">{{ instructor.usuario.email }}</div>
+                                    <div class="fw-bold text-dark mb-0">{{ instructor.usuario.get_full_name }}</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">{{ instructor.usuario.email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>{{ instructor.profesion }}</td>
-                        <td>{{ instructor.telefono|default:"N/A" }}</td>
+                        <td>
+                            <div class="fw-semibold text-dark">{{ instructor.profesion }}</div>
+                            <div class="text-muted small">Instructor Técnico</div>
+                        </td>
+                        <td>
+                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ instructor.telefono|default:"N/A" }}</div>
+                        </td>
                         <td>
                             {% if instructor.tipo_contrato == 'PLANTA' %}
-                                <span class="badge bg-success bg-opacity-10 text-success">Planta</span>
+                                <span class="badge-contract bg-success bg-opacity-10 text-success">PLANTA</span>
                             {% else %}
-                                <span class="badge bg-info bg-opacity-10 text-info">Contratista</span>
+                                <span class="badge-contract bg-info bg-opacity-10 text-info">CONTRATISTA</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td class="text-center">
                             {% if instructor.usuario.is_active %}
-                                <span class="badge bg-success">Activo</span>
+                                <span class="badge bg-success rounded-pill" style="font-size: 0.65rem; padding: 5px 10px;">Activo</span>
                             {% else %}
-                                <span class="badge bg-danger">Inactivo</span>
+                                <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem; padding: 5px 10px;">Inactivo</span>
                             {% endif %}
                         </td>
-                        <td class="text-end">
-                            <div class="btn-group">
-                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn btn-sm btn-outline-info" title="Ver hoja de vida">
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn-action-studio" title="Hoja de Vida">
                                     <i class="bi bi-eye"></i>
                                 </a>
-
-                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
+                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn-action-studio text-info" title="Editar">
+                                    <i class="bi bi-pencil"></i>
                                 </a>
-
-                                <button type="button" class="btn btn-sm btn-light text-danger" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}" title="Eliminar">
+                                <button type="button" class="btn-action-studio text-danger" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}">
                                     <i class="bi bi-trash"></i>
                                 </button>
+                            </div>
 
-                                <div class="modal fade text-start" id="eliminarInstructorModal{{ instructor.pk }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow">
-                                            
-                                            <div class="modal-header bg-danger text-white">
-                                                <h5 class="modal-title">
-                                                    <i class="bi bi-exclamation-octagon-fill me-2"></i>Eliminar Definitivamente
-                                                </h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal fade" id="eliminarInstructorModal{{ instructor.pk }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+                                        <div class="modal-body p-5 text-center">
+                                            <div class="mb-4">
+                                                <i class="bi bi-exclamation-octagon text-danger display-1 opacity-25"></i>
                                             </div>
+                                            <h4 class="fw-bold mb-3 text-dark">Eliminar Instructor</h4>
+                                            <p class="text-muted mb-4">¿Estás seguro de que deseas eliminar a <br><strong>{{ instructor.usuario.get_full_name }}</strong>?</p>
                                             
-                                            <div class="modal-body text-center p-4">
-                                                <p class="mb-1 text-dark">¿Estás seguro de que deseas <strong>ELIMINAR</strong> a este instructor?</p>
-                                                <h5 class="text-danger fw-bold my-3">{{ instructor.usuario.get_full_name }}</h5>
-                                                <p class="text-muted small mb-0">Esta acción borrará el perfil de instructor y su cuenta de acceso de forma permanente.</p>
-                                            </div>
-                                            
-                                            <div class="modal-footer bg-light justify-content-center">
-                                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                                                
-                                                <form action="{% url 'instructores:eliminar_instructor' instructor.pk %}" method="POST" class="d-inline">
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{% url 'instructores:eliminar_instructor' instructor.pk %}" method="POST">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger px-4">Sí, Eliminar</button>
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Sí, Eliminar</button>
                                                 </form>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-person-x display-4 text-muted opacity-25 mb-3 d-block"></i>
+                            <p class="text-muted">No hay instructores registrados.</p>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-            <div class="alert alert-warning text-center">
-                <i class="bi bi-exclamation-triangle me-2"></i>No hay instructores registrados aún.
-            </div>
-        {% endif %}
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modales = document.querySelectorAll('.modal');
+        
+        modales.forEach(modal => {
+            document.body.appendChild(modal);
+        });
+    });
+</script>
 {% endblock %}
