@@ -3,10 +3,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import AprendizForm
 from .models import Aprendiz
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from bitacoras.models import Bitacora
 from django.db.models import Q
+from .models import Aprendiz
+from usuarios.forms import AprendizPerfilForm
 
 # Vista para Listar todos los Aprendices
 @login_required
@@ -93,7 +94,7 @@ def perfil_aprendiz(request):
     # 1. Seguridad: Verificamos si el usuario logueado es realmente un Aprendiz
     # Si entra un Admin o Instructor aquí, lo mandamos al home para evitar errores
     if not hasattr(request.user, 'aprendiz'):
-        return redirect('core:home') 
+        return redirect('core:dashboard')  
 
     # 2. Obtenemos el perfil del aprendiz
     aprendiz = request.user.aprendiz
@@ -104,8 +105,39 @@ def perfil_aprendiz(request):
     # - Ordenamos descendente (-) para que la bitácora 2 salga antes que la 1
     mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero_bitacora')
     
+    alerta_password = request.user.check_password(request.user.username)
     context = {
         'aprendiz': aprendiz,
-        'bitacoras': mis_bitacoras # Pasamos la lista a la plantilla
+        'bitacoras': mis_bitacoras, # Pasamos la lista a la plantilla
+        'alerta_password': alerta_password
     }
     return render(request, 'aprendices/perfil_aprendiz.html', context)
+
+
+# --- VISTA PARA EDITAR PERFIL ---
+
+@login_required
+def editar_perfil_aprendiz(request):
+    # Buscamos el registro de aprendiz que pertenece a este usuario
+    try:
+        aprendiz = Aprendiz.objects.get(usuario=request.user)
+    except Aprendiz.DoesNotExist:
+        messages.error(request, "No se encontró un perfil de aprendiz asociado.")
+        return redirect('core:dashboard')
+
+    if request.method == 'POST':
+        # Le pasamos la información actual (instance) y el usuario para que sincronice ambos
+        form = AprendizPerfilForm(request.POST, instance=aprendiz, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡Tu información se ha actualizado y sincronizado correctamente!')
+            return redirect('aprendices:perfil_aprendiz')
+        else:
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    else:
+        form = AprendizPerfilForm(instance=aprendiz, user=request.user)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'aprendices/editar_perfil.html', context)

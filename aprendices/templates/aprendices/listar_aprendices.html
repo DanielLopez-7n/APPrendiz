@@ -1,62 +1,150 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block title %}Listado de Aprendices{% endblock %}
+{% block title %}Listado de Aprendices | APPrendiz{% endblock %}
 {% block page_title %}Gestión de Aprendices{% endblock %}
 
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item active">Listado General</li>
+{% block extra_css %}
+<style>
+    /* 1. Corrección del Header: Letras visibles y fondo limpio */
+    .table-studio thead th {
+        background-color: #f8f9fa !important;
+        color: #636e72 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 20px 15px;
+        border: none;
+    }
+
+    /* 2. Filas con efecto de "Aire" */
+    .table-studio tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .table-studio tbody tr:hover {
+        background-color: rgba(57, 169, 0, 0.02) !important;
+    }
+
+    .table-studio tbody td {
+        padding: 16px 15px;
+        vertical-align: middle;
+        color: #2d3436;
+        font-size: 0.88rem;
+    }
+
+    /* 3. Avatares Studio */
+    .avatar-studio {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background-color: rgba(57, 169, 0, 0.1);
+        color: #39A900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+    }
+
+    /* 4. Filtros Estilizados */
+    .filter-box {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
+    }
+
+    .form-control-studio {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        padding: 10px 15px;
+    }
+
+    /* 5. Botones de Acción */
+    .btn-action-studio {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        transition: 0.2s;
+        background: #f8f9fa;
+        color: #555;
+        border: 1px solid #eee;
+    }
+    .btn-action-studio:hover {
+        background: #39A900;
+        color: white;
+        border-color: #39A900;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<form method="GET" action="" class="mb-4">
-    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
-        
-        <div class="col-md-5">
-            <div class="input-group">
-                <span class="input-group-text bg-light text-muted border-end-0">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text" name="q" class="form-control border-start-0 ps-0" 
-                       placeholder="Buscar por documento, nombre, ficha..." 
-                       value="{{ request.GET.q }}">
+    <!-- CABECERA UNIFORME (igual que listar_usuarios.html) -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Administración</h6>
+            <h1 class="display-6 fw-bold text-dark mb-0">Gestión de Aprendices</h1>
+        </div>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border ms-2">
+                <i class="bi bi-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- FILTROS -->
+    <form method="GET" action="" class="mb-4">
+        <div class="row g-3 align-items-center filter-box p-3 mx-0">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-0 pe-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control form-control-studio border-0" 
+                           placeholder="Buscar por documento, nombre, ficha..." 
+                           value="{{ request.GET.q }}">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="modalidad" class="form-select form-control-studio">
+                    <option value="">Todas las modalidades</option>
+                    <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
+                    <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-pill px-3 fw-bold border">Limpiar</a>
+                <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm ms-2" style="background-color: #39A900; border: none;">
+                    Filtrar
+                </button>
             </div>
         </div>
+    </form>
 
-        <div class="col-md-3">
-            <select name="modalidad" class="form-select text-muted">
-                <option value="">Todas las modalidades</option>
-                <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
-                <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
-            </select>
-        </div>
-
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-2">Limpiar</a>
-            <button type="submit" class="btn btn-success px-4">
-                <i class="bi bi-funnel-fill me-1"></i> Filtrar
-            </button>
+    <!-- TABLA -->
+    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
+        <div class="card-header bg-white py-4 px-4 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-mortarboard-fill me-2 text-success"></i>Aprendices Registrados</h5>
         </div>
         
-    </div>
-</form>
-
-<div class="card shadow-sm border-0">
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 text-primary"><i class="bi bi-people-fill me-2"></i>Aprendices Registrados</h5>
-        
-        
-    </div>
-    <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
+            <table class="table table-studio mb-0 align-middle">
+                <thead>
                     <tr>
                         <th class="ps-4">Aprendiz</th>
                         <th>Ficha</th>
-                        <th>Programa</th>
-                        <th>Celular</th>
-                        <th class="text-end pe-4">Acciones</th>
+                        <th>Programa de Formación</th>
+                        <th>Contacto</th>
+                        <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,52 +152,50 @@
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-circle me-2 bg-light text-primary d-flex align-items-center justify-content-center rounded-circle" style="width: 40px; height: 40px;">
-                                    <span class="fw-bold">{{ aprendiz.usuario.first_name|slice:":1" }}</span>
+                                <div class="avatar-studio me-3">
+                                    {{ aprendiz.usuario.first_name|slice:":1"|upper }}
                                 </div>
                                 <div>
-                                    <h6 class="mb-0">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h6>
-                                    <small class="text-muted">{{ aprendiz.usuario.email }}</small>
+                                    <div class="fw-bold text-dark mb-0">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</div>
+                                    <div class="text-muted small" style="font-size: 0.75rem;">{{ aprendiz.usuario.email }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td><span class="badge bg-secondary">{{ aprendiz.numero_ficha }}</span></td>
-                        <td>{{ aprendiz.programa_formacion }}</td>
-                        <td>{{ aprendiz.telefono }}</td>
-                        <td class="text-end pe-4">
-                            <div class="btn-group">
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success px-3 rounded-pill fw-bold">
+                                {{ aprendiz.numero_ficha }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="text-dark fw-medium">{{ aprendiz.programa_formacion }}</div>
+                        </td>
+                        <td>
+                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ aprendiz.telefono }}</div>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn-action-studio" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </a>
 
-                                <!-- Button Ver detalles -->
-                                <button type="button" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
-                                    <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn btn-sm btn-outline-info" title="Ver detalles">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </button>
+                                <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn-action-studio text-info" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
 
-                                <!-- Button Editar aprendiz -->
-                                <button type="button" class="btn btn-sm btn-outline-primary" title="Editar">
-                                    <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn btn-sm btn-outline-primary" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </button>
-
-                                <!-- Button Eliminar aprendiz -->
-                                <button type="button" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                                    <a href="{% url 'aprendices:eliminar_aprendiz' aprendiz.id %}" 
-                                        class="btn btn-sm btn-outline-danger" 
-                                        title="Eliminar"
-                                        onclick="return confirm('¿Estás seguro de eliminar a este aprendiz?');">
-                                            <i class="bi bi-trash"></i>
-                                    </a>
-                                </button>
+                                <a href="{% url 'aprendices:eliminar_aprendiz' aprendiz.id %}" 
+                                   class="btn-action-studio text-danger" 
+                                   title="Eliminar"
+                                   onclick="return confirm('¿Estás seguro de eliminar a este aprendiz?');">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                            No hay aprendices registrados todavía.
+                        <td colspan="5" class="text-center py-5">
+                            <i class="bi bi-clipboard-x display-4 text-muted opacity-25 mb-3 d-block"></i>
+                            <p class="text-muted">No se encontraron aprendices registrados.</p>
                         </td>
                     </tr>
                     {% endfor %}

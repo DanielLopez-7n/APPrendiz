@@ -1,115 +1,224 @@
 {% extends 'core/panel_admin_base.html' %}
+{% load static %}
 
-{% block title %}{% if editar %}Editar{% else %}Registrar{% endif %} Aprendiz{% endblock %}
-{% block page_title %}Gestión de Aprendices{% endblock %}
+{% block title %}Editar Perfil del Aprendiz | APPrendiz{% endblock %}
 
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a></li>
-    <li class="breadcrumb-item active">{% if editar %}Edición de Datos{% else %}Nuevo Registro{% endif %}</li>
+{% block extra_css %}
+<style>
+    .form-container-studio { max-width: 850px; margin: 0 auto; }
+    .card-form {
+        border: none;
+        border-radius: 30px;
+        background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        padding: 40px;
+    }
+    
+    /* Estilos de Inputs */
+    .input-group-studio {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 5px 15px;
+        border: 1px solid #eee;
+        transition: 0.3s;
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .input-group-studio:focus-within {
+        border-color: #39A900;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
+    }
+    .input-group-studio i { color: #adb5bd; margin-right: 15px; font-size: 1.1rem; }
+    
+    /* FIX: flex-grow asegura que puedas hacer clic en toda el área */
+    .input-group-studio input, .input-group-studio select, .input-group-studio textarea {
+        flex-grow: 1; 
+        border: none !important;
+        background: transparent !important;
+        width: 100%;
+        padding: 10px 0;
+        outline: none !important;
+        box-shadow: none !important;
+        color: #2d3436;
+        font-weight: 500;
+    }
+    
+    .label-studio {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #636e72;
+        margin-left: 5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    /* Botón Guardar */
+    .btn-save-studio {
+        background: #39A900;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .btn-save-studio:hover {
+        background: #2d8600;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2);
+    }
+
+    /* Tarjeta de Cuenta de Acceso (Solo lectura) */
+    .account-card-readonly {
+        background: rgba(57, 169, 0, 0.05);
+        border: 1px solid rgba(57, 169, 0, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .account-avatar {
+        width: 50px; height: 50px;
+        background: white;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        color: #39A900; font-weight: bold; font-size: 1.2rem;
+        margin-right: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(to right, rgba(0,0,0,0.02), rgba(0,0,0,0.08), rgba(0,0,0,0.02));
+        margin: 30px 0;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8"> 
-        <div class="card shadow-sm border-0">
+<div class="container py-4">
+    <div class="form-container-studio">
+        
+        <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle mb-3" style="width: 70px; height: 70px;">
+                <i class="bi bi-person-lines-fill fs-2"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Editar Perfil del Aprendiz</h2>
+            <p class="text-muted">Actualiza la información personal y académica del estudiante.</p>
+        </div>
+
+        <div class="card-form">
             
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 text-success">
-                    <i class="bi bi-pencil-square me-2"></i>Editar Perfil del Aprendiz
-                </h5>
+            <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">Cuenta de Acceso</h6>
+            <div class="account-card-readonly">
+                <div class="account-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">{{ form.instance.usuario.get_full_name }}</h5>
+                    <div class="text-muted small">
+                        <i class="bi bi-envelope me-1"></i> {{ form.instance.usuario.email }}
+                    </div>
+                </div>
             </div>
 
-            <div class="card-body p-4">
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Cuenta de Acceso</h6>
-
-                    <div class="bg-light border rounded p-3 mb-4 d-flex align-items-center shadow-sm">
-                        <i class="bi bi-person-circle fs-3 text-secondary me-3"></i>
-                        <div>
-                            <div class="fw-bold fs-5 text-dark">{{ form.instance.usuario.get_full_name }}</div>
-                            <div class="text-muted small">
-                                {{ form.instance.usuario.email }} | Usuario: {{ form.instance.usuario.username }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4">
-
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Personal</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.tipo_documento.label }} *</label>
+            <form method="POST">
+                {% csrf_token %}
+                
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">1. Información Personal</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">Tipo documento *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person-vcard"></i>
                             {{ form.tipo_documento }}
-                            <div class="text-danger small">{{ form.tipo_documento.errors }}</div>
-                        </div>
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.documento.label }} *</label>
-                            {{ form.documento }}
-                            <div class="text-danger small">{{ form.documento.errors }}</div>
-                        </div>
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.telefono.label }} *</label>
-                            {{ form.telefono }}
-                            <div class="text-danger small">{{ form.telefono.errors }}</div>
-                        </div>
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.correo_personal.label }}</label>
-                            {{ form.correo_personal }}
-                            <div class="text-danger small">{{ form.correo_personal.errors }}</div>
-                        </div>
-                        <div class="col-md-12"> 
-                            <label class="form-label fw-bold">{{ form.direccion_residencia.label }}</label>
-                            {{ form.direccion_residencia }}
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Número de identificación *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-hash"></i>
+                            {{ form.documento }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Contacto telefónico *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-telephone"></i>
+                            {{ form.telefono }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Correo electrónico personal</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-envelope-at"></i>
+                            {{ form.correo_personal }}
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="label-studio">Dirección de residencia</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ form.direccion_residencia }} </div>
+                    </div>
+                </div>
 
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Información Académica SENA</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.numero_ficha.label }} *</label>
-                            {{ form.numero_ficha }}
-                        </div>
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.programa_formacion.label }} *</label>
-                            {{ form.programa_formacion }}
-                        </div>
-                        <div class="col-md-12"> 
-                            <label class="form-label fw-bold">{{ form.modalidad_formacion.label }} *</label>
+                <div class="section-divider"></div>
+
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">2. Información Académica SENA</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">Número de grupo (Ficha) *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-people"></i>
+                            {{ form.numero_ficha }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Modalidad formación *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-laptop"></i>
                             {{ form.modalidad_formacion }}
                         </div>
                     </div>
+                </div>
 
-                    <h6 class="text-uppercase text-muted mb-3 fs-7 ls-1">Etapa Productiva</h6>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.modalidad_etapa.label }} *</label>
-                            {{ form.modalidad_etapa }}
-                        </div>
-                        <div class="col-md-6"> 
-                            <label class="form-label fw-bold">{{ form.pais_etapa.label }} *</label>
+                <div class="section-divider"></div>
+
+                <h6 class="fw-bold text-success text-uppercase small mb-3" style="letter-spacing: 1px;">3. Etapa Productiva</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="label-studio">Modalidad etapa productiva *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-briefcase"></i>
+                            {{ form.modalidad_etapa }} </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">País donde realiza la etapa *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-globe-americas"></i>
                             {{ form.pais_etapa }}
                         </div>
-                        <div class="col-md-12 mt-3"> 
-                            <div class="form-check form-switch">
-                                {{ form.etapa_exterior }}
-                                <label class="form-check-label fw-bold" for="{{ form.etapa_exterior.id_for_label }}">
-                                    {{ form.etapa_exterior.label }}
-                                </label>
-                            </div>
-                        </div>
                     </div>
+                </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-5">
-                            Actualizar Datos
+                <div class="row align-items-center mt-4">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-pill w-100 fw-bold border py-3 text-muted">
+                            <i class="bi bi-x-lg me-2"></i>Cancelar
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn-save-studio shadow-sm">
+                            <i class="bi bi-check-circle-fill me-2"></i>Guardar Cambios
                         </button>
                     </div>
+                </div>
 
-                </form> 
-            </div>
+            </form>
         </div>
     </div>
 </div>

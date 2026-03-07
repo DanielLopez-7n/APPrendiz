@@ -1,0 +1,335 @@
+{% extends 'core/base_simple.html' %}
+{% load static %}
+
+{% block navbar_title %}Mi Perfil SENA{% endblock %}
+
+{% block content %}
+<style>
+    /* Fondo para resaltar las tarjetas blancas */
+    body { background-color: #f4f7f6 !important; }
+
+    /* ==========================================
+       TARJETAS PREMIUM (El "Marco")
+       ========================================== */
+    .card-studio {
+        border: none;
+        border-radius: 25px;
+        background: #fff;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+
+    /* --- COLUMNA IZQUIERDA: TARJETA DE PERFIL (Fija) --- */
+    .profile-cover-small {
+        height: 140px;
+        background: linear-gradient(135deg, #39A900 0%, #2D8600 100%);
+        position: relative;
+    }
+    .profile-cover-small::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none"/></svg>');
+        background-size: 100px; opacity: 0.5;
+    }
+
+    .avatar-upload-wrapper {
+        text-align: center;
+        margin-top: -75px;
+        position: relative;
+        z-index: 10;
+        padding-bottom: 25px;
+    }
+    
+    /* El candado de tamaño de la foto */
+    .avatar-circle {
+        width: 150px !important; 
+        height: 150px !important;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 6px solid #fff;
+        box-shadow: 0 10px 25px rgba(57, 169, 0, 0.15);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        margin: 0 auto;
+    }
+    .avatar-circle img { width: 100% !important; height: 100% !important; object-fit: cover !important; }
+    .avatar-circle .placeholder-icon { font-size: 6rem; color: #e0e0e0; margin-top: 15px; }
+
+    /* Botón flotante de cámara (Innovación visual) */
+    .camera-btn-wrapper {
+        position: absolute; bottom: 5px; right: 50%; margin-right: -70px;
+        background: #39A900; color: white; width: 45px; height: 45px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        cursor: pointer; transition: 0.2s; overflow: hidden;
+    }
+    .camera-btn-wrapper:hover { transform: scale(1.1); background: #2d8600; }
+    .camera-btn-wrapper input[type="file"] {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0; cursor: pointer;
+    }
+
+    /* --- COLUMNA DERECHA: FORMULARIO PREMIUM --- */
+    .section-title {
+        color: #1a1a1a; font-weight: 800; font-size: 1.1rem;
+        margin-bottom: 25px; margin-top: 15px; display: flex; align-items: center;
+    }
+    .section-title i { color: #39A900; margin-right: 12px; font-size: 1.4rem; }
+    .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #f0f0f0; margin-left: 15px; }
+
+    .label-studio {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1.2px; color: #6c757d; margin-left: 5px; margin-bottom: 8px; display: block;
+    }
+    
+    /* Nuestra famosa caja de input con la barra verde */
+    .input-group-studio {
+        background-color: #f8f9fa; border-radius: 12px; padding: 5px 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900;
+        transition: 0.3s all ease-in-out; display: flex; align-items: center; margin-bottom: 20px;
+    }
+    .input-group-studio:focus-within { border-color: #39A900; background-color: #fff; box-shadow: 0 0 0 5px rgba(57, 169, 0, 0.1); }
+    .input-group-studio i.icon-left { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
+    .input-group-studio input, .input-group-studio select {
+        flex-grow: 1; border: none !important; background: transparent !important; width: 100%;
+        padding: 12px 0; outline: none !important; box-shadow: none !important; color: #1a1a1a; font-weight: 700;
+    }
+
+    /* Checkbox de Etapa Exterior */
+    .form-check-studio {
+        background-color: #f8f9fa; border-radius: 12px; padding: 15px 20px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900;
+        display: flex; align-items: center; margin-bottom: 20px;
+    }
+    .form-check-studio .form-check-input { width: 45px; height: 25px; margin-right: 15px; cursor: pointer; }
+
+    /* Botón Guardar */
+    .btn-save-studio {
+        background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px;
+        font-weight: 800; transition: 0.3s; font-size: 1rem; width: 100%;
+    }
+    .btn-save-studio:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(57, 169, 0, 0.3); }
+
+    /* Barra de navegación superior del mini-dashboard */
+    .mini-dash-nav {
+        background: #fff; padding: 15px 0; box-shadow: 0 2px 15px rgba(0,0,0,0.03); margin-bottom: 40px;
+    }
+</style>
+
+<div class="mini-dash-nav">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                <i class="bi bi-person-lines-fill fs-4"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-0">Mi Espacio SENA</h4>
+        </div>
+        <a href="{% url 'aprendices:perfil_aprendiz' %}" class="btn btn-light rounded-pill px-4 fw-bold border text-muted shadow-sm">
+            <i class="bi bi-house-door-fill me-2"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    
+    <form method="POST" enctype="multipart/form-data" novalidate id="perfilForm">
+        {% csrf_token %}
+        
+        <div class="row g-4 justify-content-center">
+            
+            <div class="col-lg-4 col-md-5">
+                <div class="card-studio sticky-top" style="top: 20px;">
+                    <div class="profile-cover-small"></div>
+                    
+                    <div class="avatar-upload-wrapper px-3">
+                        <div class="position-relative d-inline-block">
+                            <div class="avatar-circle">
+                                {% if user.aprendiz.foto %}
+                                    <img id="avatarImage" src="{{ user.aprendiz.foto.url }}" alt="Mi Foto">
+                                {% else %}
+                                    <i id="avatarIcon" class="bi bi-person-fill placeholder-icon"></i>
+                                    <img id="avatarImage" src="" style="display:none;" alt="Mi Foto">
+                                {% endif %}
+                            </div>
+                            
+                            <label class="camera-btn-wrapper" title="Subir foto" style="cursor: pointer;">
+                                <i class="bi bi-camera-fill fs-5"></i>
+                                {{ form.foto }}
+                            </label>
+                        </div>
+                        
+                        <h4 class="fw-bold text-dark mt-3 mb-1">{{ user.get_full_name|default:"Completar Perfil" }}</h4>
+                        <p class="text-success fw-bold small mb-3 ls-1">APRENDIZ SENA</p>
+                        
+                        <div class="border-top pt-3 mt-2 text-start px-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="bg-light rounded p-2 me-3"><i class="bi bi-envelope-at text-success fs-5"></i></div>
+                                <div>
+                                    <small class="text-muted d-block fw-bold" style="font-size: 0.65rem;">CORREO</small>
+                                    <span class="text-dark fw-semibold small">{{ user.email }}</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded p-2 me-3"><i class="bi bi-shield-check text-success fs-5"></i></div>
+                                <div>
+                                    <small class="text-muted d-block fw-bold" style="font-size: 0.65rem;">ESTADO</small>
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill mt-1">Cuenta Activa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-7">
+                <div class="card-studio p-4 p-md-5">
+                    
+                    <div class="mb-4">
+                        <h3 class="fw-bold text-dark mb-1">Configuración de Perfil</h3>
+                        <p class="text-muted small">Mantén tu información actualizada para la gestión de tus bitácoras.</p>
+                    </div>
+
+                    <h5 class="form-section-title"><i class="bi bi-person-vcard"></i> Información Personal</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="label-studio">Nombres *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-person icon-left"></i>
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Apellidos *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-person icon-left"></i>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Tipo Doc. *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-card-heading icon-left"></i>
+                                {{ form.tipo_documento }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">N° Documento *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-hash icon-left"></i>
+                                {{ form.documento }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="form-section-title"><i class="bi bi-telephone"></i> Datos de Contacto</h5>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="label-studio">Correo Institucional *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-envelope-check icon-left"></i>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Celular *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-phone icon-left"></i>
+                                {{ form.telefono }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Correo Personal</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-envelope icon-left"></i>
+                                {{ form.correo_personal }}
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="label-studio">Dirección de Residencia</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-geo-alt icon-left"></i>
+                                {{ form.direccion_residencia }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="form-section-title"><i class="bi bi-mortarboard"></i> Perfil SENA</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="label-studio">Ficha de Formación *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-people icon-left"></i>
+                                {{ form.numero_ficha }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Modalidad Formación</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-laptop icon-left"></i>
+                                {{ form.modalidad_formacion }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Modalidad Etapa *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-briefcase icon-left"></i>
+                                {{ form.modalidad_etapa }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">País de la Etapa</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-globe-americas icon-left"></i>
+                                {{ form.pais_etapa }}
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="form-check-studio">
+                                {{ form.etapa_exterior }}
+                                <label class="form-check-label fw-bold text-dark ms-2" for="{{ form.etapa_exterior.id_for_label }}">
+                                    Marcar si la etapa productiva se realiza fuera de Colombia
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-4 border-top">
+                        <a href="{% url 'core:dashboard' %}" class="btn btn-light fw-bold rounded-pill px-5 py-3 text-dark border-2 shadow-sm">Cancelar</a>
+                        <button type="submit" class="btn-save-studio flex-grow-1">
+                            <i class="bi bi-cloud-arrow-up-fill me-2"></i> Guardar Mi Perfil
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Buscamos el input real de tipo file en la página
+        const fileInput = document.querySelector('input[type="file"]');
+        const avatarImg = document.getElementById('avatarImage');
+        const avatarIcon = document.getElementById('avatarIcon');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Mostramos la foto en el círculo al instante
+                        avatarImg.src = e.target.result;
+                        avatarImg.style.display = 'block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                    }
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
