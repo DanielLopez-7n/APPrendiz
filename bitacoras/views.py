@@ -6,6 +6,9 @@ from django.db import transaction
 from django.db.models import Q
 from django.core.paginator import Paginator
 from xhtml2pdf import pisa
+from PIL import Image
+import io
+from django.core.files.base import ContentFile
 
 
 # Importamos Modelos y Formularios
@@ -249,8 +252,38 @@ def revisar_bitacora(request, id):
     if request.method == 'POST':
         nuevo_estado = request.POST.get('estado')
         observaciones = request.POST.get('observaciones_instructor')
-        
-        # Actualizamos y guardamos
+
+        # Manejo y validación de la firma (si fue enviada)
+        firma_archivo = request.FILES.get('firma_instructor') if request.FILES else None
+        if firma_archivo:
+            # Validaciones básicas
+            content_type = firma_archivo.content_type
+            max_size = 2 * 1024 * 1024  # 2 MB
+            if not content_type.startswith('image/'):
+                messages.error(request, 'El archivo de firma debe ser una imagen válida.')
+            elif firma_archivo.size > max_size:
+                messages.error(request, 'La firma es demasiado grande. Máx. 2 MB.')
+            else:
+                try:
+                    # Redimensionar para control de tamaño y aspecto
+                    img = Image.open(firma_archivo)
+                    img = img.convert('RGBA') if img.mode in ('P','LA','RGBA') else img.convert('RGB')
+                    max_w, max_h = 800, 300
+                    img.thumbnail((max_w, max_h), Image.ANTIALIAS)
+
+                    buffer = io.BytesIO()
+                    # Guardamos en PNG para mantener transparencia si existiera
+                    img.save(buffer, format='PNG', optimize=True)
+                    buffer.seek(0)
+
+                    nombre = f'firma_bitacora_{bitacora.id}.png'
+                    contenido = ContentFile(buffer.read())
+                    # Asignamos pero no guardamos aún la instancia
+                    bitacora.firma_instructor.save(nombre, contenido, save=False)
+                except Exception as e:
+                    messages.error(request, f'Error procesando la imagen de la firma: {e}')
+
+        # Actualizamos y guardamos el resto de campos
         bitacora.estado = nuevo_estado
         bitacora.observaciones_instructor = observaciones
         bitacora.save()

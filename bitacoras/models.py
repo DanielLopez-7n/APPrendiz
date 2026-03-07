@@ -88,6 +88,7 @@ class Bitacora(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADOS, default='Pendiente')
     fecha_entrega = models.DateTimeField(auto_now_add=True)
     observaciones_instructor = models.TextField(blank=True, null=True)
+    firma_instructor = models.ImageField(upload_to='firmas/', blank=True, null=True, verbose_name="Firma del Instructor")
 
     # LÓGICA DE NUMERACIÓN AUTOMÁTICA (1, 2, 3...)
     def save(self, *args, **kwargs):

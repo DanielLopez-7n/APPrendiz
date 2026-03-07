@@ -2,219 +2,364 @@
 
 {% block page_title %}Revisión de Bitácora #{{ bitacora.numero_bitacora }}{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
-    /* Estilos base para la pantalla (ya los teníamos) */
-    .btn-calificar { background-color: #39A900; color: white; }
-    .titulo-modulo { color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px; }
+    /* ==========================================
+       ESTILOS PREMIUM (PANTALLA) - MODO ALTO CONTRASTE
+       ========================================== */
+    .card-studio {
+        border: none;
+        border-radius: 25px;
+        background: #fff;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.07); /* Sombra más pronunciada */
+        overflow: hidden;
+    }
+    
+    .section-title {
+        color: #39A900;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+    }
+    .section-title::after {
+        content: ''; flex-grow: 1; height: 2px; background: #e0e0e0; margin-left: 15px;
+    }
 
-    /* ESTILOS EXCLUSIVOS PARA CUANDO SE IMPRIME EL DOCUMENTO */
+    /* Textos con más fuerza visual */
+    .data-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: #495057; /* Gris oscuro para mayor legibilidad */
+        margin-bottom: 6px;
+        display: block;
+    }
+    .data-value {
+        font-weight: 700;
+        color: #1a1a1a; /* Casi negro */
+        font-size: 1rem;
+        margin-bottom: 22px;
+    }
+
+    /* Cajas de información con bordes marcados */
+    .info-box {
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        height: 100%;
+        border: 2px solid #e0e0e0; /* Borde robusto */
+        box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+    }
+
+    /* Tabla Studio Reforzada */
+    .table-studio thead th {
+        background-color: #f8f9fa !important;
+        color: #495057 !important;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        padding: 18px 15px;
+        border-bottom: 2px solid #e0e0e0 !important;
+    }
+    .table-studio tbody tr { border-bottom: 1px solid #e0e0e0; transition: 0.2s; }
+    .table-studio tbody tr:hover { background-color: rgba(57, 169, 0, 0.04); }
+    .table-studio tbody td { padding: 18px 15px; vertical-align: middle; color: #1a1a1a; font-weight: 500; }
+
+    /* Badges */
+    .badge-studio {
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* ==========================================
+       MODAL DE CALIFICACIÓN - CAMPOS ROBUSTOS
+       ========================================== */
+    .input-group-studio {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        padding: 5px 15px;
+        border: 2px solid #e0e0e0; /* Borde grueso */
+        transition: 0.3s all ease-in-out;
+        display: flex;
+        align-items: flex-start;
+    }
+    .input-group-studio:focus-within {
+        border-color: #39A900; background-color: #fff; box-shadow: 0 0 0 5px rgba(57, 169, 0, 0.15);
+    }
+    .input-group-studio i {
+        color: #39A900; /* Iconos verdes desde el inicio */
+        margin-right: 15px;
+        margin-top: 12px;
+        font-size: 1.3rem;
+    }
+    .input-group-studio select, .input-group-studio textarea {
+        flex-grow: 1; border: none !important; background: transparent !important; width: 100%; 
+        outline: none !important; box-shadow: none !important;
+        color: #1a1a1a; font-weight: 600; padding: 12px 0;
+    }
+
+    /* Botón Guardar */
+    .btn-save-studio {
+        background: #39A900; color: white; border: none; padding: 15px 40px; border-radius: 50px;
+        font-weight: 800; transition: 0.3s;
+    }
+    .btn-save-studio:hover {
+        background: #2d8600; transform: translateY(-3px); box-shadow: 0 12px 25px rgba(57, 169, 0, 0.3);
+    }
+
+    /* ==========================================
+       ESTILOS EXCLUSIVOS PARA IMPRESIÓN (PDF)
+       ========================================== */
     @media print {
-        /* 1. Configuración de la hoja (Tamaño Carta y márgenes limpios) */
-        @page {
-            size: letter;
-            margin: 1.5cm;
-        }
-
-        /* 2. OCULTAR TODO LO QUE NO SEA DOCUMENTO (¡Aquí matamos el carrusel!) */
+        @page { size: letter; margin: 1.5cm; }
         .sidebar, .topbar, .btn, footer, .modal, .navbar, #a11y-container,
         .carousel, .slide, .carousel-inner, .carousel-indicators, .carousel-control-prev, .carousel-control-next,
-        .overlay, .bg-image, .background-image { 
-            display: none !important; 
+        .overlay, .bg-image, .background-image, .print-hide { display: none !important; }
+        body, html, #page-top, #wrapper, #content-wrapper, #content, .container-fluid, .card-studio, .info-box { 
+            background-color: #ffffff !important; background-image: none !important;
+            width: 100% !important; margin: 0 !important; padding: 0 !important; 
+            box-shadow: none !important; border: none !important; 
         }
-
-        /* 3. LIMPIAR FONDOS (Asegurar que sea una hoja blanca impecable) */
-        body, html, #page-top, #wrapper, #content-wrapper, #content, .container-fluid, .card { 
-            background-color: #ffffff !important; 
-            background-image: none !important; /* Mata cualquier imagen de fondo */
-            width: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            box-shadow: none !important; 
-            border: none !important; 
-        }
-        #content-wrapper, .container-fluid, .card { 
-            width: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            box-shadow: none !important; 
-            border: none !important; 
-        }
-
-        /* 4. Forzar que los colores (como el verde SENA) sí se impriman */
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        /* 5. Asegurar que los textos sean negros en papel */
-        p, span, td, th, label, strong {
-            color: #000 !important;
-            font-size: 11pt !important;
-        }
-
-        /* 6. Evitar que las tablas y firmas se corten entre dos páginas */
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        p, span, td, th, label, strong, .data-label, .data-value { color: #000 !important; }
         table { page-break-inside: auto; border-collapse: collapse !important; width: 100% !important; }
+        table, th, td { border: 1px solid #ddd !important; }
         tr { page-break-inside: avoid; page-break-after: auto; }
-        .firmas-section { page-break-inside: avoid; }
-
-        /* 7. Darle más espacio (respiro) a las secciones */
-        .mb-4 { margin-bottom: 2rem !important; }
-        .row { display: flex !important; flex-wrap: wrap !important; }
-        
-        /* 8. Mantener las dos columnas en papel (a veces el navegador las colapsa a una sola) */
+        .firmas-section { page-break-inside: avoid; margin-top: 50px !important; }
         .col-md-6 { width: 50% !important; float: left !important; }
+        .row { display: flex !important; flex-wrap: wrap !important; }
     }
 </style>
+{% endblock %}
 
-<div class="container-fluid">
+{% block content %}
+<div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-secondary shadow-sm">
-            <i class="bi bi-arrow-left me-1"></i> Volver al listado
+    <div class="d-flex justify-content-between align-items-center mb-4 print-hide">
+        <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-light rounded-pill px-4 fw-bold border-2 text-dark shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> Volver al listado
         </a>
 
-        <div class="d-flex align-items-center">
-            <button onclick="window.print()" class="btn btn-outline-info shadow-sm me-2">
-                <i class="bi bi-printer-fill me-1"></i> Descargar / PDF
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-white rounded-pill px-4 fw-bold border-2 border-info text-info shadow-sm hover-shadow">
+                <i class="bi bi-printer-fill me-2"></i> Descargar PDF
             </button>
-            <button type="button" class="btn text-white shadow-sm" style="background-color: #39A900;" data-bs-toggle="modal" data-bs-target="#modalCalificar">
-                <i class="bi bi-check-circle-fill me-1"></i> Calificar
+            <button type="button" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background-color: #39A900;" data-bs-toggle="modal" data-bs-target="#modalCalificar">
+                <i class="bi bi-check-circle-fill me-2"></i> Calificar Bitácora
             </button>
         </div>
     </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
-            <h5 class="m-0 brand">Formato de Seguimiento - Bitácora N° {{ bitacora.numero_bitacora }}</h5>
-            <span class="badge {% if bitacora.estado == 'Evaluada' %}bg-success{% elif bitacora.estado == 'Rechazada' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
-                {{ bitacora.estado }}
-            </span>
+    <div class="card-studio mb-4" id="documento-imprimible">
+        
+        <div class="p-4 d-flex justify-content-between align-items-center border-bottom border-2">
+            <div>
+                <h6 class="text-success text-uppercase fw-bold ls-1 mb-1" style="font-size: 0.75rem;">Formato de Seguimiento Etapa Productiva</h6>
+                <h3 class="fw-bold text-dark mb-0">Bitácora N° {{ bitacora.numero_bitacora }}</h3>
+            </div>
+            <div>
+                {% if bitacora.estado == 'Evaluada' %}
+                    <span class="badge-studio bg-success bg-opacity-10 text-success border border-2 border-success">✅ Aprobada / Evaluada</span>
+                {% elif bitacora.estado == 'Rechazada' %}
+                    <span class="badge-studio bg-danger bg-opacity-10 text-danger border border-2 border-danger">❌ Rechazada</span>
+                {% else %}
+                    <span class="badge-studio bg-warning bg-opacity-10 text-warning border border-2 border-warning">⚠️ Pendiente Revisión</span>
+                {% endif %}
+            </div>
         </div>
 
-        <div class="card-body p-4">
+        <div class="p-4 p-md-5">
 
-            <!-- 1. Generalidades -->
-            <h6 class="font-weight-bold text-uppercase mb-3" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">1. Generalidades</h6>
-            <div class="row mb-4">
+            <h6 class="section-title">1. Información General del Aprendiz</h6>
+            <div class="row mb-5">
                 <div class="col-md-6">
-                    <p class="mb-1"><span class="label-strong">Aprendiz:</span> {{ bitacora.aprendiz.usuario.first_name }} {{ bitacora.aprendiz.usuario.last_name }}</p>
-                    <p class="mb-1"><span class="label-strong">Documento:</span> {{ bitacora.aprendiz.get_tipo_documento_display }} {{ bitacora.aprendiz.documento }}</p>
-                    <p class="mb-1"><span class="label-strong">Ficha:</span> {{ bitacora.aprendiz.numero_ficha }}</p>
+                    <span class="data-label"><i class="bi bi-person-badge text-success me-2"></i>Aprendiz</span>
+                    <div class="data-value fs-5">{{ bitacora.aprendiz.usuario.first_name }} {{ bitacora.aprendiz.usuario.last_name }}</div>
+                    
+                    <span class="data-label"><i class="bi bi-card-heading text-success me-2"></i>Documento de Identidad</span>
+                    <div class="data-value">{{ bitacora.aprendiz.get_tipo_documento_display }} {{ bitacora.aprendiz.documento }}</div>
+                    
+                    <span class="data-label"><i class="bi bi-hash text-success me-2"></i>Ficha de Formación</span>
+                    <div class="data-value text-primary fs-5">{{ bitacora.aprendiz.numero_ficha }}</div>
                 </div>
                 <div class="col-md-6">
-                    <p class="mb-1"><span class="label-strong">Período Reportado:</span> {{ bitacora.fecha_inicio|date:"d/m/Y" }} - {{ bitacora.fecha_fin|date:"d/m/Y" }}</p>
-                    <p class="mb-1"><span class="label-strong">Fecha de Entrega:</span> {{ bitacora.fecha_entrega|date:"d/m/Y h:i A" }}</p>
-                    <p class="mb-1"><span class="label-strong">Estado:</span> <span class="badge bg-secondary">{{ bitacora.estado }}</span></p>
+                    <span class="data-label"><i class="bi bi-calendar-range text-success me-2"></i>Período Reportado</span>
+                    <div class="data-value">{{ bitacora.fecha_inicio|date:"d M Y" }} &nbsp;—&nbsp; {{ bitacora.fecha_fin|date:"d M Y" }}</div>
+                    
+                    <span class="data-label"><i class="bi bi-clock-history text-success me-2"></i>Fecha de Entrega al Sistema</span>
+                    <div class="data-value">{{ bitacora.fecha_entrega|date:"d/m/Y h:i A" }}</div>
                 </div>
             </div>
 
-            <!-- 2. Ente Co-Formador y SST -->
-            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">2. Ente Co-Formador y SST</h6>
-            <div class="row mb-4 bg-light border rounded p-3">
-                <div class="col-md-6">
-                    <p class="mb-1"><span class="label-strong">Empresa:</span> {{ bitacora.razon_social_empresa }} (NIT: {{ bitacora.nit_empresa }})</p>
-                    <p class="mb-1"><span class="label-strong">Dirección:</span> {{ bitacora.direccion_empresa|default:"N/A" }}</p>
-                    <p class="mb-1"><span class="label-strong">Jefe Inmediato:</span> {{ bitacora.nombre_jefe }} ({{ bitacora.cargo_jefe }})</p>
-                    <p class="mb-1"><span class="label-strong">Contacto:</span> {{ bitacora.telefono_jefe }} | {{ bitacora.email_jefe }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p class="mb-1"><span class="label-strong">Modalidad:</span> {{ bitacora.modalidad }} ({{ bitacora.pais_etapa }})</p>
-                    <p class="mb-1"><span class="label-strong">Afiliación ARL:</span> {{ bitacora.get_afiliado_arl_display }} &nbsp; <span class="label-strong">Riesgo:</span> {{ bitacora.get_nivel_riesgo_display }}</p>
-                    <p class="mb-1"><span class="label-strong">Uso de EPP:</span> {{ bitacora.get_uso_epp_display }}</p>
+            <h6 class="section-title">2. Ente Co-Formador y Seguridad (SST)</h6>
+            <div class="info-box mb-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="data-label"><i class="bi bi-building text-success me-2"></i>Empresa / Razón Social</span>
+                        <div class="data-value">{{ bitacora.razon_social_empresa }} <br><span class="text-muted fs-6 fw-bold">NIT: {{ bitacora.nit_empresa }}</span></div>
+                        
+                        <span class="data-label"><i class="bi bi-geo-alt text-success me-2"></i>Dirección Empresa</span>
+                        <div class="data-value">{{ bitacora.direccion_empresa|default:"No registrada" }}</div>
+                        
+                        <span class="data-label"><i class="bi bi-person-workspace text-success me-2"></i>Jefe Inmediato</span>
+                        <div class="data-value mb-1">{{ bitacora.nombre_jefe }} <span class="text-muted">({{ bitacora.cargo_jefe }})</span></div>
+                        <div class="fw-bold text-dark small mb-3"><i class="bi bi-telephone text-success me-1"></i> {{ bitacora.telefono_jefe }} &nbsp;|&nbsp; <i class="bi bi-envelope text-success me-1"></i> {{ bitacora.email_jefe }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="data-label"><i class="bi bi-briefcase text-success me-2"></i>Modalidad Etapa Productiva</span>
+                        <div class="data-value">{{ bitacora.modalidad }} ({{ bitacora.pais_etapa }})</div>
+                        
+                        <span class="data-label"><i class="bi bi-hospital text-success me-2"></i>Afiliación ARL / Nivel de Riesgo</span>
+                        <div class="data-value">{{ bitacora.get_afiliado_arl_display }} &nbsp;—&nbsp; Riesgo {{ bitacora.get_nivel_riesgo_display }}</div>
+                        
+                        <span class="data-label"><i class="bi bi-shield-check text-success me-2"></i>Uso de Elementos de Protección (EPP)</span>
+                        <div class="data-value mb-0">{{ bitacora.get_uso_epp_display }}</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 3. Actividades Ejecutadas -->
-            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">3. Actividades Ejecutadas</h6>
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover align-middle mb-0">
-                    <thead class="table-light text-center">
+            <h6 class="section-title">3. Detalle de Actividades Ejecutadas</h6>
+            <div class="table-responsive mb-5 border border-2 border-light rounded-4 overflow-hidden">
+                <table class="table table-studio mb-0">
+                    <thead>
                         <tr>
                             <th style="width:15%">Fecha</th>
                             <th style="width:65%">Descripción de la Actividad</th>
-                            <th style="width:20%">Evidencia</th>
+                            <th style="width:20%" class="text-center print-hide">Evidencia</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for actividad in bitacora.actividades.all %}
                         <tr>
-                            <td class="text-center">{{ actividad.fecha_ejecucion|date:"d/m/Y" }}</td>
+                            <td class="fw-bold text-success">{{ actividad.fecha_ejecucion|date:"d M, Y" }}</td>
                             <td>{{ actividad.descripcion|linebreaksbr }}</td>
-                            <td class="text-center">
+                            <td class="text-center print-hide">
                                 {% if actividad.evidencia %}
-                                    <a href="{{ actividad.evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-paperclip"></i> Ver
+                                    <a href="{{ actividad.evidencia.url }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold rounded-pill px-3 shadow-sm border-2">
+                                        <i class="bi bi-paperclip me-1"></i> Ver Adjunto
                                     </a>
                                 {% else %}
-                                    <span class="text-muted small">Sin adjunto</span>
+                                    <span class="text-muted fw-bold small">Sin evidencia</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-3">El aprendiz no registró actividades.</td>
+                            <td colspan="3" class="text-center text-muted py-5 fw-bold">
+                                <i class="bi bi-inbox fs-2 opacity-50 d-block mb-2 text-dark"></i>
+                                No se registraron actividades en este periodo.
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
 
-            <!-- 4. Observaciones del Instructor -->
-            <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">4. Observaciones del Instructor</h6>
-            <div class="mb-4 p-3 border rounded bg-white" style="min-height:100px;">
-                {{ bitacora.observaciones_instructor|default:"Sin observaciones registradas."|linebreaks }}
+            <h6 class="section-title">4. Observaciones del Instructor</h6>
+            <div class="info-box mb-5 p-4" style="min-height:120px;">
+                <p class="text-dark fw-bold mb-0" style="font-size: 1.05rem;">
+                    {{ bitacora.observaciones_instructor|default:"<span class='text-muted'>Sin observaciones registradas hasta el momento.</span>"|safe|linebreaks }}
+                </p>
             </div>
 
-            <!-- Firmas -->
-            <div class="row mt-5 pt-5 text-center firmas-section">
+            <div class="row mt-5 pt-4 text-center firmas-section">
                 <div class="col-6">
-                    <hr class="w-75 mx-auto border-dark">
-                    <p class="mt-2 mb-0 font-weight-bold text-dark text-uppercase">Firma del Aprendiz</p>
-                    <p class="small text-muted text-dark">{{ bitacora.aprendiz }}</p>
+                    <hr class="w-75 mx-auto border-2 border-dark opacity-25">
+                    <p class="mt-3 mb-0 font-weight-bold text-dark text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">Firma del Aprendiz</p>
+                    <p class="fw-bold text-muted">{{ bitacora.aprendiz.usuario.get_full_name }}</p>
                 </div>
                 <div class="col-6">
-                    <hr class="w-75 mx-auto border-dark">
-                    <p class="mt-2 mb-0 font-weight-bold text-dark text-uppercase">Firma del Instructor</p>
-                    <p class="small text-muted text-dark">{{ bitacora.instructor_seguimiento|default:"_____________________" }}</p>
+                    {% if bitacora.firma_instructor %}
+                        <p class="mb-1 text-center"><img src="{{ bitacora.firma_instructor.url }}" alt="Firma Instructor" style="max-width:220px; max-height:100px; object-fit:contain; display:block; margin: 0 auto 8px;" /></p>
+                    {% endif %}
+                    <hr class="w-75 mx-auto border-2 border-dark opacity-25">
+                    <p class="mt-3 mb-0 font-weight-bold text-dark text-uppercase" style="font-size: 0.85rem; letter-spacing: 1px;">Firma del Instructor</p>
+                    <p class="fw-bold text-muted">{{ bitacora.instructor_seguimiento.usuario.get_full_name|default:"_____________________" }}</p>
                 </div>
             </div>
 
         </div>
     </div>
-
 </div>
 
 <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form method="POST">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px; overflow: hidden;">
+            
+            <div class="modal-header border-0 p-4 pb-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 55px; height: 55px;">
+                        <i class="bi bi-journal-check fs-3"></i>
+                    </div>
+                    <div>
+                        <h4 class="modal-title fw-bold text-dark mb-0">Evaluar Bitácora</h4>
+                        <p class="text-muted fw-bold small mb-0">Reporte N° {{ bitacora.numero_bitacora }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="modal-header" style="background-color: #39A900; color: white;">
-                    <h5 class="modal-title text-white"><i class="bi bi-pencil-square me-2"></i>Calificar Bitácora #{{ bitacora.numero_bitacora }}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
+                <div class="modal-body p-4 pt-3">
+                    
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-dark">Estado de Evaluación</label>
-                        <select name="estado" class="form-select border-dark" required>
-                            <option value="">Seleccione el estado final...</option>
-                            <option value="Evaluada" {% if bitacora.estado == 'Evaluada' %}selected{% endif %}>Aprobar (Evaluada)</option>
-                            <option value="Rechazada" {% if bitacora.estado == 'Rechazada' %}selected{% endif %}>Rechazar (Con correcciones)</option>
-                        </select>
+                        <label class="label-studio">Veredicto Final *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-shield-check"></i>
+                            <select name="estado" required>
+                                <option value="">Seleccione una opción...</option>
+                                <option value="Evaluada" {% if bitacora.estado == 'Evaluada' %}selected{% endif %}>✅ Aprobar Reporte</option>
+                                <option value="Rechazada" {% if bitacora.estado == 'Rechazada' %}selected{% endif %}>❌ Rechazar (Requiere correcciones)</option>
+                            </select>
+                        </div>
                     </div>
+                    
                     <div class="mb-2">
-                        <label class="form-label fw-bold text-dark">Observaciones para el Aprendiz</label>
-                        <textarea name="observaciones_instructor" class="form-control border-dark" rows="5" placeholder="Escriba aquí sus comentarios, felicitaciones o correcciones...">{{ bitacora.observaciones_instructor|default:"" }}</textarea>
+                        <label class="label-studio">Retroalimentación para el aprendiz</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-chat-left-text"></i>
+                            <textarea name="observaciones_instructor" rows="5" placeholder="Escriba aquí sus comentarios, felicitaciones o aspectos a mejorar...">{{ bitacora.observaciones_instructor|default:"" }}</textarea>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="label-studio">Subir Firma del Instructor (opcional)</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-card-image"></i>
+                            <input type="file" name="firma_instructor" accept="image/*" />
+                        </div>
+                        <div class="form-text small text-muted mt-1">La imagen subida se mostrará en la sección de firmas del documento impreso.</div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn text-white" style="background-color: #39A900;">Guardar Calificación</button>
+                
+                <div class="modal-footer border-0 p-4 pt-0 gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold text-dark border-2 flex-grow-1" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-save-studio shadow-sm flex-grow-1">
+                        <i class="bi bi-send-fill me-2"></i>Guardar Evaluación
+                    </button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modales = document.querySelectorAll('.modal');
+        modales.forEach(modal => {
+            document.body.appendChild(modal);
+        });
+    });
+</script>
 
 {% endblock %}

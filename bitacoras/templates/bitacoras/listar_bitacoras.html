@@ -1,121 +1,154 @@
 {% extends 'core/panel_admin_base.html' %} 
-{% block page_title %}Gestión de Bitacoras{% endblock %}
-{% block title %}Historial de Bitácoras{% endblock %}
+{% load static %}
+
+{% block page_title %}Gestión de Bitácoras{% endblock %}
+{% block title %}Historial de Bitácoras | APPrendiz{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 1. Estilos Premium para Tablas */
+    .table-studio thead th {
+        background-color: #f8f9fa !important;
+        color: #636e72 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        padding: 20px 15px;
+        border: none;
+    }
+    .table-studio tbody tr { transition: all 0.2s ease; border-bottom: 1px solid #f8f9fa; }
+    .table-studio tbody tr:hover { background-color: rgba(57, 169, 0, 0.02) !important; }
+    .table-studio tbody td { padding: 16px 15px; vertical-align: middle; color: #2d3436; font-size: 0.88rem; }
+
+    /* 2. Avatares y Badges Studio */
+    .avatar-studio {
+        width: 40px; height: 40px; border-radius: 12px;
+        background-color: rgba(57, 169, 0, 0.1); color: #39A900;
+        display: flex; align-items: center; justify-content: center; font-weight: 800;
+        overflow: hidden;
+    }
+    .avatar-studio img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .badge-studio {
+        padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 0.7rem; letter-spacing: 0.5px;
+    }
+
+    /* 3. Input de búsqueda y Botones */
+    .search-card { border: none; border-radius: 20px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+    .form-control-studio { border-radius: 12px; border: 1px solid #eee; padding: 10px 15px; background: #fcfcfc; }
+    .form-control-studio:focus { border-color: #39A900; box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1); background: #fff; }
+    
+    .btn-action-studio {
+        padding: 6px 15px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; transition: 0.3s;
+    }
+    .btn-action-studio:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+</style>
+{% endblock %}
 
 {% block content %}
+<div class="container-fluid py-4">
 
-<form method="GET" action="" class="mb-4">
-    <div class="row g-2 align-items-center bg-white p-3 rounded shadow-sm border">
-        
-        <div class="col-md-8">
-            <div class="input-group">
-                <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
-                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Escribe aquí para buscar..." value="{{ request.GET.q }}">
-            </div>
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Etapa Productiva</h6>
+            <h1 class="display-6 fw-bold text-dark mb-0">Historial de Bitácoras</h1>
         </div>
-
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-light me-2">Limpiar</a>
-            <button type="submit" class="btn btn-primary px-4">
-                <i class="bi bi-search me-1"></i> Buscar
-            </button>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            {% if es_aprendiz %}
+                <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" style="background-color: #39A900; border: none;">
+                    <i class="bi bi-plus-lg me-2"></i>Nueva Bitácora
+                </a>
+            {% endif %}
         </div>
-        
-    </div>
-</form>
-
-<div class="container py-4">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold text-primary mb-0"><i class="bi bi-collection me-2"></i>Historial de Bitácoras</h2>
-            <p class="text-muted mb-0">Gestiona y revisa tus reportes de etapa productiva</p>
-        </div>
-        
-        {% if es_aprendiz %}
-            <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
-                <i class="bi bi-plus-lg me-2"></i>Nueva Bitácora
-            </a>
-        {% endif %}
     </div>
 
-    <div class="card shadow border-0">
+    <div class="card search-card mb-4 shadow-sm">
+        <div class="card-body p-3 p-md-4">
+            <form method="GET" action="" class="row g-2 align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="q" class="form-control form-control-studio border-0" 
+                               placeholder="Buscar por aprendiz, ficha o empresa..." value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+                    <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold w-100 w-md-auto">Buscar</button>
+                    <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-light border rounded-pill px-3" title="Limpiar"><i class="bi bi-arrow-clockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
         <div class="card-body p-0">
-            
             {% if page_obj %}
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
+                    <table class="table table-studio align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th class="ps-4 py-3"># Bitácora</th>
-                                <th class="py-3">Período</th>
-                                
+                                <th class="ps-4">Reporte</th>
+                                <th>Período</th>
                                 {% if not es_aprendiz %}
-                                    <th class="py-3">Aprendiz / Ficha</th>
-                                    <th class="py-3">Instructor</th>
+                                    <th>Aprendiz / Ficha</th>
                                 {% endif %}
-
-                                <th class="py-3">Empresa</th>
-                                <th class="py-3 text-center">Estado</th>
-                                <th class="py-3 text-end pe-4">Acciones</th>
+                                <th>Empresa</th>
+                                <th class="text-center">Estado</th>
+                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for bit in page_obj %}
                             <tr>
-                                <td class="ps-4 fw-bold text-primary">
-                                    # {{ bit.numero_bitacora }}
+                                <td class="ps-4">
+                                    <span class="fw-bold fs-5 text-dark">#{{ bit.numero_bitacora }}</span>
                                 </td>
                                 
                                 <td>
-                                    <div class="d-flex flex-column">
-                                        <small class="text-muted">Inicio: {{ bit.fecha_inicio|date:"d M" }}</small>
-                                        <small class="text-dark fw-bold">Fin: {{ bit.fecha_fin|date:"d M Y" }}</small>
-                                    </div>
+                                    <div class="small fw-semibold text-dark">{{ bit.fecha_inicio|date:"d M, Y" }}</div>
+                                    <div class="text-muted small">hasta {{ bit.fecha_fin|date:"d M, Y" }}</div>
                                 </td>
 
                                 {% if not es_aprendiz %}
-                                    <td>
-                                        <div class="d-flex align-items-center">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-studio me-3">
                                             {% if bit.aprendiz.usuario.perfil.foto_perfil %}
-                                                <img src="{{ bit.aprendiz.usuario.perfil.foto_perfil.url }}" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                                                <img src="{{ bit.aprendiz.usuario.perfil.foto_perfil.url }}" alt="Foto">
                                             {% else %}
-                                                <div class="rounded-circle bg-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
-                                                    <i class="bi bi-person text-secondary"></i>
-                                                </div>
+                                                {{ bit.aprendiz.usuario.first_name|first|upper }}
                                             {% endif %}
-                                            <div>
-                                                <div class="fw-bold">{{ bit.aprendiz.usuario.get_full_name }}</div>
-                                                <small class="text-muted">{{ bit.aprendiz.numero_ficha }}</small>
-                                            </div>
                                         </div>
-                                    </td>
-                                    <td>
-                                        <small>{{ bit.instructor_seguimiento.usuario.get_full_name|default:"--"}}</small>
-                                    </td>
+                                        <div>
+                                            <div class="fw-bold text-dark mb-0">{{ bit.aprendiz.usuario.get_full_name }}</div>
+                                            <div class="text-muted small" style="font-size: 0.75rem;">Ficha: {{ bit.aprendiz.numero_ficha }}</div>
+                                        </div>
+                                    </div>
+                                </td>
                                 {% endif %}
 
                                 <td>
-                                    {{ bit.razon_social_empresa|truncatechars:20 }}
+                                    <div class="fw-semibold text-dark">{{ bit.razon_social_empresa|truncatechars:25 }}</div>
                                 </td>
 
                                 <td class="text-center">
                                     {% if bit.estado == 'Evaluada' %}
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Evaluada</span>
+                                        <span class="badge-studio bg-success bg-opacity-10 text-success">Evaluada</span>
                                     {% elif bit.estado == 'Rechazada' %}
-                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3">Rechazada</span>
+                                        <span class="badge-studio bg-danger bg-opacity-10 text-danger">Rechazada</span>
                                     {% else %}
-                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3">Pendiente</span>
+                                        <span class="badge-studio bg-warning bg-opacity-10 text-warning">Pendiente</span>
                                     {% endif %}
                                 </td>
 
-                                <td class="text-end pe-4">
+                                <td class="text-center">
                                     {% if es_aprendiz %}
-                                        <a href="{% url 'bitacoras:ver_bitacora_aprendiz' bit.id %}" class="btn btn-sm btn-outline-primary rounded-pill" title="Ver Detalle">
+                                        <a href="{% url 'bitacoras:ver_bitacora_aprendiz' bit.id %}" class="btn-action-studio bg-primary bg-opacity-10 text-primary border-0 text-decoration-none">
                                             Ver Detalle <i class="bi bi-arrow-right ms-1"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'bitacoras:revisar_bitacora' bit.id %}" class="btn btn-sm btn-outline-info rounded-pill" title="Revisar">
+                                        <a href="{% url 'bitacoras:revisar_bitacora' bit.id %}" class="btn-action-studio bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="color: #0dcaf0 !important;">
                                             Revisar <i class="bi bi-eye ms-1"></i>
                                         </a>
                                     {% endif %}
@@ -125,43 +158,49 @@
                         </tbody>
                     </table>
                 </div>
-            {% else %}
-                <div class="text-center py-5">
-                    <i class="bi bi-folder-x display-1 text-muted opacity-25"></i>
-                    <h5 class="mt-3 fw-bold text-muted">No hay bitácoras registradas</h5>
-                    <p class="text-muted small">
-                        {% if es_aprendiz %}
-                            ¡Comienza creando tu primera bitácora de seguimiento!
-                        {% else %}
-                            Aún no hay aprendices que hayan enviado reportes.
-                        {% endif %}
-                    </p>
-                    {% if es_aprendiz %}
-                        <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-primary rounded-pill mt-2">
-                            Crear Bitácora Ahora
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
-            </div> <div class="mt-4 mb-2 d-flex justify-content-center">
+
+                <div class="d-flex justify-content-center bg-white py-3 border-top">
                     <nav aria-label="Navegación de páginas">
-                        <ul class="pagination pagination-sm shadow-sm">
+                        <ul class="pagination pagination-sm mb-0">
                             {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link text-primary" href="?page=1&q={{ request.GET.q }}">&laquo; Primera</a></li>
-                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}">Anterior</a></li>
+                                <li class="page-item"><a class="page-link text-success border-0 rounded-pill mx-1" href="?page=1&q={{ request.GET.q }}">&laquo;</a></li>
+                                <li class="page-item"><a class="page-link text-success border-0 rounded-pill mx-1" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}">Anterior</a></li>
                             {% endif %}
 
                             <li class="page-item disabled">
-                                <span class="page-link bg-light text-muted fw-bold">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                                <span class="page-link bg-light border-0 text-dark fw-bold rounded-pill mx-2 px-3">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
                             </li>
 
                             {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}">Siguiente</a></li>
-                                <li class="page-item"><a class="page-link text-primary" href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}">Última &raquo;</a></li>
+                                <li class="page-item"><a class="page-link text-success border-0 rounded-pill mx-1" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}">Siguiente</a></li>
+                                <li class="page-item"><a class="page-link text-success border-0 rounded-pill mx-1" href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}">&raquo;</a></li>
                             {% endif %}
                         </ul>
                     </nav>
                 </div>
+
+            {% else %}
+                <div class="text-center py-5 my-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-4" style="width: 100px; height: 100px;">
+                        <i class="bi bi-inbox fs-1 text-muted opacity-50"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark">No hay bitácoras registradas</h4>
+                    <p class="text-muted mb-4">
+                        {% if es_aprendiz %}
+                            Aún no has enviado reportes. ¡Comienza creando tu primera bitácora!
+                        {% else %}
+                            Aún no hay aprendices que hayan enviado reportes en este período.
+                        {% endif %}
+                    </p>
+                    {% if es_aprendiz %}
+                        <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" style="background-color: #39A900; border: none;">
+                            <i class="bi bi-plus-lg me-2"></i>Crear Bitácora Ahora
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
