@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -35,78 +35,87 @@ def contactanos(request):
 def dashboard(request):
     """
     Vista principal del panel de administración (Dashboard).
-    Reúne estadísticas de todas las apps.
+    Muestra gráficas de Usuarios al Administrador y gráficas de Bitácoras al Instructor.
     """
-    # ==========================================
-    # 1. ESTADÍSTICAS GENERALES (Las que ya tenías)
-    # ==========================================
-    total_aprendices = Aprendiz.objects.count()
-    total_empresas = Empresa.objects.count()
-    bitacoras_pendientes = Bitacora.objects.filter(estado='Pendiente').count()
-    ultimas_bitacoras = Bitacora.objects.all().order_by('-fecha_entrega')[:5]
-
-    total_fichas = Ficha.objects.count()
-    total_programas = Programa.objects.count()
-
-    # ==========================================
-    # 2. ESTADÍSTICAS DE USUARIOS (Para las tarjetas y la tabla)
-    # ==========================================
-    total_usuarios = User.objects.count()
-    usuarios_activos = User.objects.filter(is_active=True).count()
-    usuarios_staff = User.objects.filter(is_staff=True).count()
-    
-    # Usuarios nuevos registrados este mes
+    user = request.user
     hoy = timezone.now()
-    nuevos_usuarios_mes = User.objects.filter(date_joined__year=hoy.year, date_joined__month=hoy.month).count()
     
-    # Últimos 5 usuarios registrados (Para tu tabla de Registros Recientes)
-    ultimos_usuarios = User.objects.all().order_by('-date_joined')[:5]
-
-    # ==========================================
-    # 3. DATOS PARA LOS GRÁFICOS (CHART.JS)
-    # ==========================================
+    # 1. ¿Quién está entrando? (Lógica "Bipolar")
+    es_admin = user.is_superuser or (user.is_staff and not hasattr(user, 'instructor'))
     
-    # Gráfico 1: Estado de las Bitácoras (Dona)
-    bitacoras_estado = Bitacora.objects.values('estado').annotate(total=Count('id'))
-    labels_bitacoras = [item['estado'] for item in bitacoras_estado]
-    data_bitacoras = [item['total'] for item in bitacoras_estado]
-    
-    # Gráfico 2: Distribución de Usuarios (Barras)
-    total_admin = User.objects.filter(is_superuser=True).count()
-    total_instructores = User.objects.filter(is_staff=True, is_superuser=False).count()
-    total_solo_aprendices = User.objects.filter(is_staff=False, is_superuser=False).count()
-    
-    labels_usuarios = ['Administradores', 'Instructores', 'Aprendices']
-    data_usuarios = [total_admin, total_instructores, total_solo_aprendices]
-
-    # ==========================================
-    # 4. EMPAQUETAR Y ENVIAR AL TEMPLATE
-    # ==========================================
+    # 2. Alerta de Contraseña (Seguridad)
+    alerta_password = False
+    if not user.is_superuser:
+        alerta_password = user.check_password(user.username)
+        
+    # 3. Empaquetamos los datos BASE que comparten ambos
     context = {
         'titulo': 'Panel de Control',
-        
-        # Datos extraídos (los tuyos originales)
-        'total_aprendices': total_aprendices,
-        'total_empresas': total_empresas,
-        'bitacoras_pendientes': bitacoras_pendientes,
-        'ultimas_bitacoras': ultimas_bitacoras,
-        'total_fichas': total_fichas,
-        'total_programas': total_programas,
-        
-        # Datos vitales para el HTML del Dashboard actual
-        'total_usuarios': total_usuarios,
-        'usuarios_activos': usuarios_activos,
-        'usuarios_staff': usuarios_staff,
-        'nuevos_usuarios_mes': nuevos_usuarios_mes,
-        'ultimos_usuarios': ultimos_usuarios,
-        
-        # Listas de Python convertidas a formato JSON para JavaScript
-        'labels_bitacoras': json.dumps(labels_bitacoras),
-        'data_bitacoras': json.dumps(data_bitacoras),
-        'labels_usuarios': json.dumps(labels_usuarios),
-        'data_usuarios': json.dumps(data_usuarios),
+        'es_admin': es_admin,
+        'alerta_password': alerta_password,
     }
-    
+
+    if es_admin:
+        # ==========================================
+        # 🟢 LÓGICA PARA EL ADMINISTRADOR
+        # ==========================================
+        # Tarjetas Superiores
+        total_usuarios = User.objects.count()
+        usuarios_activos = User.objects.filter(is_active=True).count()
+        total_aprendices = Aprendiz.objects.count()
+        total_instructores = User.objects.filter(is_staff=True, is_superuser=False).count()
+        ultimos_usuarios = User.objects.all().order_by('-date_joined')[:5]
+        
+        # Agregamos los datos al contexto usando .update() para no borrar lo anterior
+        context.update({
+            'total_usuarios': total_usuarios,
+            'usuarios_activos': usuarios_activos,
+            'total_aprendices': total_aprendices,
+            'total_instructores': total_instructores,
+            # Mantenemos las tuyas por si las necesitas en otra parte:
+            'total_empresas': Empresa.objects.count() if 'Empresa' in globals() else 0,
+            'total_fichas': Ficha.objects.count() if 'Ficha' in globals() else 0,
+            'total_programas': Programa.objects.count() if 'Programa' in globals() else 0,
+            'ultimos_usuarios': ultimos_usuarios,
+        })
+        
+        # Datos para Gráfica de Admin (Distribución de Usuarios)
+        labels_usuarios = ['Administradores', 'Instructores', 'Aprendices']
+        data_usuarios = [
+            User.objects.filter(is_superuser=True).count(),
+            total_instructores,
+            total_aprendices
+        ]
+        context['chart_labels'] = json.dumps(labels_usuarios)
+        context['chart_data'] = json.dumps(data_usuarios)
+
+    else:
+        # ==========================================
+        # 🟠 LÓGICA PARA EL INSTRUCTOR
+        # ==========================================
+        try:
+            instructor = user.instructor
+            # Consultamos solo las bitácoras asignadas a ÉL
+            pendientes = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Pendiente').count()
+            evaluadas = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Evaluada').count()
+            rechazadas = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Rechazada').count()
+            
+            context.update({
+                'pendientes': pendientes,
+                'evaluadas': evaluadas,
+                'total_bitacoras': pendientes + evaluadas + rechazadas,
+            })
+            
+            # Datos para Gráfica de Instructor (Estado de sus Bitácoras)
+            context['chart_labels'] = json.dumps(['Pendientes', 'Evaluadas', 'Rechazadas'])
+            context['chart_data'] = json.dumps([pendientes, evaluadas, rechazadas])
+            
+        except Exception:
+            # En caso de que el instructor no tenga datos aún
+            context['chart_labels'] = json.dumps(['Sin datos'])
+            context['chart_data'] = json.dumps([0])
+
+    # Enviamos el paquete completo de forma segura
     return render(request, 'core/dashboard.html', context)
 
 # --- VISTAS UTILITARIAS ---
@@ -184,17 +193,23 @@ def busqueda_global(request):
 # --- VISTA DE LOGIN PERSONALIZADA ---
 
 class CustomLoginView(LoginView):
-    template_name = 'core/index.html' 
-    
+    # plantilla usada por defecto al POST exitoso; para GET redirigimos al index
+    template_name = 'core/index.html'
+
+    def get(self, request, *args, **kwargs):
+        # Si el usuario visita directamente la URL de login, redirigimos al index
+        return redirect('core:index')
+
     def form_valid(self, form):
-        # Capturamos si el usuario marcó el checkbox (devuelve 'on' si está marcado, o None si no)
         remember_me = self.request.POST.get('remember_me')
-        
         if not remember_me:
-            # Si NO la marcó, la sesión caduca al cerrar el navegador (0 segundos)
             self.request.session.set_expiry(0)
         else:
-            # Si SÍ la marcó, la sesión dura 2 semanas (1209600 segundos)
             self.request.session.set_expiry(1209600)
-            
         return super().form_valid(form)
+
+    def form_invalid(self, form):
+        # Cuando las credenciales son inválidas, mostramos la vista completa de login
+        context = self.get_context_data(form=form)
+        # renderizamos la plantilla dedicada donde el usuario puede corregir credenciales
+        return render(self.request, 'usuarios/login.html', context, status=401)

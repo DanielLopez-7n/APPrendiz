@@ -1,16 +1,133 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}APPrendiz | Gestión SENA{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}APPrendiz | Gestión SENA{% endblock %}</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-  
-  <link rel="stylesheet" href="{% static 'css/styles_apprendiz.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/styles_apprendiz.css' %}">
+    
+    <style>
+        :root {
+            --sena-green: #39A900;
+            --sena-dark: #1a1e21;
+            --sena-orange: #FF671F;
+            --sena-deep-green: #0f3f19;
+        }
+
+        /* NAVBAR PREMIUM */
+        .navbar { padding: 0.8rem 0; transition: all 0.3s; }
+        .nav-link {
+            position: relative;
+            font-weight: 600;
+            color: #444 !important;
+            transition: 0.3s;
+            padding: 0.5rem 1rem !important;
+        }
+        .nav-link:hover { color: var(--sena-green) !important; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 2px;
+            bottom: 5px; left: 10px;
+            background-color: var(--sena-green);
+            transition: 0.3s;
+        }
+        .nav-link:hover::after { width: calc(100% - 20px); }
+
+        /* FOOTER GRADIENT INSTITUCIONAL */
+        .sena-footer {
+            background: linear-gradient(180deg, #0f3f19 0%, #07170b 100%) !important;
+            color: rgba(237,243,238,0.95) !important;
+            padding: 4rem 0 2rem 0;
+            margin-top: auto;
+            box-shadow: inset 0 6px 30px rgba(0,0,0,0.25);
+        }
+        .sena-footer h5 {
+            color: rgba(255,255,255,0.95) !important;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .sena-footer a { color: rgba(189, 245, 195, 0.9) !important; text-decoration: none; transition: 0.2s; }
+        .sena-footer a:hover { color: #ffffff !important; padding-left: 6px; }
+        
+        .social-icon {
+            width: 40px; height: 40px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 50%; background-color: rgba(255,255,255,0.05);
+            transition: 0.2s; font-size: 1.1rem; margin-right: 8px;
+            color: white !important;
+        }
+        .social-icon:hover { background-color: var(--sena-green) !important; transform: translateY(-3px); }
+
+        .contact-item { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+        .contact-item i { font-size: 1.2rem; margin-right: 15px; color: var(--sena-green) !important; }
+
+        /* MODAL LOGIN ESTILO STUDIO (MEJOR CONTRASTE - MÁS OSCURO) */
+        .modal-content { border-radius: 20px; border: none; }
+        .form-control-studio {
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.22);   /* borde más oscuro */
+            padding: 12px 15px;
+            background-color: #e6efe6 !important;  /* fondo más visible, tono verde claro */
+            color: #062014;                        /* texto muy oscuro */
+            box-shadow: 0 10px 28px rgba(4,10,6,0.12);
+            transition: border-color .16s, box-shadow .16s, background .16s;
+        }
+        .form-control-studio::placeholder { color: #556862; opacity: 1; }
+        .form-control-studio:focus {
+            background-color: #ffffff;
+            border-color: var(--sena-deep-green);
+            outline: none;
+            box-shadow: 0 0 0 10px rgba(15,63,25,0.12);
+        }
+
+        /* Input group icon / prefix (más contraste) */
+        .input-group-text {
+            background-color: #d9edd8 !important;        /* fondo más oscuro para el prefijo */
+            border: 1px solid rgba(0,0,0,0.18) !important;
+            color: var(--sena-deep-green) !important;
+            border-radius: 12px 0 0 12px;
+            min-width: 46px;
+            justify-content: center;
+        }
+
+        /* Forzar contraste cuando el input trae bg-light/border-0 (override inline) */
+        .input-group .form-control.form-control-studio.bg-light,
+        .input-group .form-control.form-control-studio[style] {
+            background-color: #e6efe6 !important;
+            border: 1px solid rgba(0,0,0,0.22) !important;
+            box-shadow: none !important;
+        }
+
+        /* Cuando el input está enfocado, resaltar también el prefijo */
+        .input-group:has(.form-control-studio:focus) .input-group-text,
+        .form-control-studio:focus ~ .input-group-text {
+            background-color: #cfe9c9 !important;
+            color: var(--sena-deep-green) !important;
+            border-color: var(--sena-deep-green) !important;
+        }
+
+        /* Botón mostrar contraseña */
+        .btn-password-toggle {
+            border: none;
+            background: transparent;
+            color: #0f3f19;
+            min-width: 46px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 12px 12px 0;
+        }
+        .btn-password-toggle:focus { outline: none; box-shadow: none; }
+    </style>
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body class="d-flex flex-column min-vh-100 bg-light">
@@ -18,12 +135,11 @@
 <header class="sticky-top">
   <nav class="navbar navbar-expand-lg bg-white shadow-sm">
     <div class="container">
-
       <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'core:index' %}">
-        <img src="{% static 'img/LogoSENA.png' %}" alt="Logo SENA" height="45"> 
+        <img src="{% static 'img/LogoSENA.png' %}" alt="Logo SENA" height="48"> 
         <div class="d-flex flex-column justify-content-center lh-1">
-          <span class="fs-5 fw-bold text-success">APPrendiz</span>
-          <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">Sistema de Gestión de Contratos</span>
+          <span class="fs-5 fw-bold" style="color: var(--sena-green);">APPrendiz</span>
+          <span class="text-muted d-none d-sm-block" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Gestión de Etapa Productiva</span>
         </div>
       </a>
 
@@ -32,76 +148,57 @@
       </button>
 
       <div class="collapse navbar-collapse" id="navbarContent">
-        <ul class="navbar-nav ms-auto align-items-center gap-3">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item"><a class="nav-link" href="{% url 'core:index' %}">Inicio</a></li>
           
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="{% url 'core:index' %}">Inicio</a>
-          </li>
-          
-          {% if user.is_staff %}
-              <li class="nav-item">
-                  <a class="nav-link fw-medium" href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a>   
-              </li>  
-
-              <li class="nav-item">
-                <a class="nav-link fw-medium" href="{% url 'empresas:listar_empresas' %}">Empresas</a>
-              </li>
-              
-              <li class="d-none d-lg-block border-end mx-2" style="height: 24px;"></li>
+          {% if user.is_authenticated and user.is_staff %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a></li>  
+              <li class="nav-item"><a class="nav-link" href="{% url 'empresas:listar_empresas' %}">Empresas</a></li>
           {% endif %}
 
-          <li class="nav-item">
+          <li class="nav-item ms-lg-3">
             {% if user.is_authenticated %}
                 <div class="dropdown">
-                    <button class="btn btn-outline-primary btn-sm px-3 rounded-pill dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle me-1"></i> Hola, {{ user.first_name|default:user.username }}
+                    <button class="btn btn-outline-success btn-sm px-4 rounded-pill fw-bold" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i> {{ user.first_name|default:user.username }}
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="border-radius: 12px;">
                         {% if user.is_staff %}
-                            <li><a class="dropdown-item" href="{% url 'core:dashboard' %}">
-                                <i class="bi bi-speedometer2 me-2"></i>Ir al Dashboard
-                            </a></li>
-                        
+                            <li><a class="dropdown-item rounded-2" href="{% url 'core:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
                         {% else %}
-                            <li><a class="dropdown-item" href="{% url 'aprendices:perfil_aprendiz' %}">
-                                <i class="bi bi-person-badge me-2"></i>Mi Perfil
-                            </a></li>
+                            <li><a class="dropdown-item rounded-2" href="{% url 'aprendices:perfil_aprendiz' %}"><i class="bi bi-person-badge me-2"></i>Mi perfil</a></li>
                         {% endif %}
-                        
                         <li><hr class="dropdown-divider"></li>
-                        
                         <li>
-                            <form action="{% url 'usuarios:logout' %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
-                                </button>
-                            </form>
-                        </li>
+                              <form action="{% url 'usuarios:logout' %}" method="post" id="logoutForm" class="m-0">
+                                  {% csrf_token %}
+                                  <button type="submit" class="dropdown-item text-danger py-2 d-flex align-items-center">
+                                      <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                  </button>
+                              </form>
+                          </li>
                     </ul>
                 </div>
             {% else %}
-                <button type="button" class="btn btn-success btn-sm px-3 rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#loginModal">
-                  Ingresar <i class="bi bi-box-arrow-in-right ms-1"></i>
+                <button type="button" class="btn btn-success btn-sm px-4 rounded-pill fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal" style="background-color: var(--sena-green); border: none;">
+                  INGRESAR <i class="bi bi-box-arrow-in-right ms-1"></i>
                 </button>
             {% endif %}
           </li>
-          </ul>
+        </ul>
       </div>
-
     </div>
   </nav>
 </header>
 
 <main class="flex-grow-1">
-    
     {% if messages %}
     <div class="container mt-3">
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 border-start border-4 border-{% if message.tags == 'success' %}success{% else %}danger{% endif %}" role="alert">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-2"></i>
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-alert="close"></button>
         </div>
         {% endfor %}
     </div>
@@ -109,38 +206,157 @@
 
     {% block hero %}{% endblock %}
 
-    <div class="container py-4">
-        {% block content %}
-        {% endblock %}
+    <div class="main-wrapper">
+        {% block content %}{% endblock %}
     </div>
 </main>
 
-<footer class="mt-auto py-4 text-center text-md-start bg-white border-top">
-  <div class="container">
-    <div class="row align-items-center gy-3">
-      
-      <div class="col-md-4">
-        <div class="fw-bold text-success">APPrendiz</div>
-        <small class="text-muted d-block">Seguimiento etapa productiva</small>
-      </div>
+<footer class="sena-footer">
+    <div class="container">
+        <div class="row gy-4">
+            <div class="col-lg-4">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{% static 'img/LogoSENA.png' %}" alt="SENA" height="40" style="filter: brightness(0) invert(1);">
+                    <h4 class="text-white fw-bold mb-0 ms-2">APPrendiz</h4>
+                </div>
+                <p class="small opacity-75 lh-lg">
+                    Plataforma oficial del SENA para la gestión de Etapa Productiva. Unificando procesos entre aprendices, instructores y empresas.
+                </p>
+                <div class="mt-4">
+                    <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
 
-      <div class="col-md-4 text-center">
-        <small class="text-muted">
-          &copy; {% now "Y" %} Desarrollado para el SENA
-        </small>
-      </div>
+            <div class="col-6 col-lg-2 ms-auto">
+                <h5>Enlaces</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'core:index' %}">Inicio</a></li>
+                    <li><a href="#info">Módulos</a></li>
+                    <li><a href="#">Soporte</a></li>
+                </ul>
+            </div>
 
-      <div class="col-md-4 text-end">
-        <a href="#" class="text-decoration-none text-muted small me-3 hover-link">Ayuda</a>
-        <a href="#" class="text-decoration-none text-muted small hover-link">Contacto</a>
-      </div>
-
+            <div class="col-lg-5">
+                <h5>Atención al Ciudadano</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="contact-item">
+                            <i class="bi bi-geo-alt"></i>
+                            <div class="small text-white-50"><strong class="text-white d-block">Sede Principal</strong>Bogotá D.C, Colombia</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="contact-item">
+                            <i class="bi bi-telephone"></i>
+                            <div class="small text-white-50"><strong class="text-white d-block">Línea Nacional</strong>018000 910270</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="footer-divider">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="small mb-0 opacity-50">&copy; {% now "Y" %} SENA - APPrendiz. Todos los derechos reservados.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                <p class="small mb-0 fw-bold" style="color: var(--sena-green);">Formación Profesional Integral</p>
+            </div>
+        </div>
     </div>
-  </div>
 </footer>
+
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 25px; overflow: hidden;">
+            
+            <div style="height: 6px; background: linear-gradient(90deg, #39A900, #2D8600);"></div>
+
+            <div class="modal-body p-5">
+                <div class="text-center mb-4">
+                    <img src="{% static 'core/img/LogoSENA.png' %}" alt="Logo SENA" style="height: 80px; width: auto;" class="mb-3">
+                    <h4 class="fw-bold text-dark mb-1">Bienvenido a APPrendiz</h4>
+                    <p class="text-muted small">Ingresa tus datos para gestionar tu etapa productiva</p>
+                </div>
+
+                <form method="POST" action="{% url 'usuarios:login' %}">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Documento / Usuario</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                                <i class="bi bi-person-fill text-success"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-studio border-0 bg-light" 
+                                   name="username" placeholder="Ej: 10203040" required 
+                                   style="border-radius: 0 12px 12px 0; padding: 12px;">
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-secondary">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
+                                <i class="bi bi-lock-fill text-success"></i>
+                            </span>
+                            <input id="id_password_modal" type="password" class="form-control form-control-studio border-0 bg-light" 
+                                   name="password" placeholder="••••••••" required 
+                                   style="border-radius: 0; padding: 12px 12px 12px 16px;">
+                            <button type="button" class="btn btn-password-toggle" id="togglePassword" aria-label="Mostrar contraseña" title="Mostrar contraseña" >
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-end mb-4">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none small fw-bold" style="color: #FF671F;">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm mb-3" 
+                            style="border-radius: 15px; background: #39A900; border: none; transition: 0.3s;">
+                        INGRESAR AL SISTEMA
+                    </button>
+
+                    <div class="text-center">
+                        <button type="button" class="btn btn-link btn-sm text-muted text-decoration-none" data-bs-dismiss="modal">
+                            Cerrar ventana
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% include 'core/accesibilidad.html' %}
+{% block extra_js %}{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var toggle = document.getElementById('togglePassword');
+  var pwd = document.getElementById('id_password_modal');
+  if (toggle && pwd) {
+    toggle.addEventListener('click', function () {
+      var type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
+      pwd.setAttribute('type', type);
+      var icon = this.querySelector('i');
+      if (icon) {
+        icon.classList.toggle('bi-eye');
+        icon.classList.toggle('bi-eye-slash');
+      }
+      // accesibilidad: actualizar etiqueta
+      this.setAttribute('aria-pressed', type === 'text');
+      this.title = type === 'text' ? 'Ocultar contraseña' : 'Mostrar contraseña';
+    });
+  }
+});
+</script>
 
 </body>
 </html>

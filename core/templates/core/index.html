@@ -1,237 +1,281 @@
 {% extends "master.html" %}
 {% load static %}
 
-{% block title %}Inicio | APPrendiz{% endblock %}
+{% block title %}Inicio | SENA APPrendiz{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Hero Section con fondo suave */
-    .hero-section {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 4rem 0;
-        border-bottom: 1px solid #dee2e6;
+    /* Estilo inspirado en Andres Garcia Studio */
+    :root {
+        --sena-green: #39A900;
+        --sena-dark: #1a1e21;
+        --text-main: #2d3436;
+        --bg-light: #ffffff;
     }
 
-    /* Tarjetas de características */
-    .feature-card {
-        border: none;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    body {
+        color: var(--text-main);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Hero Section Limpio */
+    .hero-minimal {
+        padding: 100px 0;
+        background-color: var(--bg-light);
+    }
+
+    .hero-minimal h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -2px;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-gradient {
+        background: linear-gradient(90deg, #39A900, #2D8600);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-minimal p {
+        font-size: 1.25rem;
+        color: #636e72;
+        max-width: 550px;
+        line-height: 1.6;
+    }
+
+    /* Botones Estilo Studio */
+    .btn-studio {
+        padding: 15px 40px;
         border-radius: 12px;
-        background-color: white;
+        font-weight: 700;
+        transition: 0.3s;
+        text-transform: none;
     }
 
-    .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-    }
-
-    .feature-icon-box {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        margin: 0 auto 1.5rem;
-    }
-
-    /* --- ESTILOS DEL MODAL (Personalizados SENA) --- */
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-        overflow: hidden;
-    }
-
-    .modal-header {
-        background-color: var(--sena-green); /* Verde definido en master */
-        color: white;
-        border-bottom: none;
-        padding: 1.5rem 2rem;
-    }
-
-    .btn-close-white {
-        filter: brightness(0) invert(1);
-    }
-
-    .form-floating > .form-control {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-    }
-
-    .form-floating > .form-control:focus {
-        border-color: var(--sena-green);
-        box-shadow: 0 0 0 0.2rem rgba(57, 169, 0, 0.25);
-    }
-
-    .btn-login {
+    .btn-studio-primary {
         background-color: var(--sena-green);
         color: white;
-        font-weight: 600;
-        border-radius: 8px;
-        transition: all 0.3s;
+        border: none;
     }
 
-    .btn-login:hover {
-        background-color: #2d8500;
-        color: white;
-        transform: translateY(-2px);
+    .btn-studio-primary:hover {
+        background-color: var(--sena-dark);
+        transform: translateY(-3px);
     }
+
+    /* Sección de Problemas (¿Te pasa esto?) */
+    .section-problems {
+        background-color: #f9f9f9;
+        padding: 80px 0;
+        border-radius: 50px;
+    }
+
+    .problem-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        border: 1px solid #eee;
+        height: 100%;
+    }
+
+    .problem-card i {
+        font-size: 2rem;
+        color: #ff671f;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    /* Casos de Éxito / Beneficios */
+    .benefit-tag {
+        color: var(--sena-green);
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .img-hero-frame {
+        border-radius: 30px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        transition: 0.5s;
+    }
+
+    .img-hero-frame:hover {
+        transform: scale(1.02);
+    }
+
+    /*--------------------------------
+    /* Hero con Carrusel de Fondo */
+    --------------------------------*/
+
+    .hero-carousel-bg {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Ajuste de imágenes para que cubran todo el fondo */
+    .object-fit-cover {
+        object-fit: cover;
+        filter: brightness(0.7); /* Oscurece un poco las fotos desde el origen */
+    }
+
+    /* Capa degradada para legibilidad del texto */
+    .hero-overlay {
+        background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+        top: 0;
+        left: 0;
+        z-index: 2;
+    }
+
+    .z-3 { z-index: 3; }
+
+    .min-vh-75 { min-height: 75vh; }
+
+    .text-sena-light {
+        color: #71d93d; /* Un verde más brillante para que resalte sobre el fondo oscuro */
+        font-weight: 800;
+    }
+
+    .shadow-text {
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Botón Outline Blanco para fondo oscuro */
+    .btn-outline-light {
+        border: 2px solid #ffffff;
+        color: #ffffff;
+        background: transparent;
+    }
+
+    .btn-outline-light:hover {
+        background: #ffffff;
+        color: #000000;
+    }
+
 </style>
 {% endblock %}
 
 {% block hero %}
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 text-center text-lg-start">
-                <span class="badge bg-success bg-opacity-10 text-success mb-3 px-3 py-2 rounded-pill border border-success border-opacity-25">
-                    Sistema de Gestión
-                </span>
-                <h1 class="display-4 fw-bold text-dark mb-3">
-                    Seguimiento de <span class="text-sena">Etapa Productiva</span>
+<section class="hero-carousel-bg position-relative overflow-hidden">
+    <div id="heroCarousel" class="carousel slide carousel-fade position-absolute w-100 h-100" data-bs-ride="carousel">
+        <div class="carousel-inner h-100">
+            <div class="carousel-item active h-100">
+                <img src="{% static 'core/img_bg/fondo1.png' %}" class="d-block w-100 h-100 object-fit-cover" alt="SENA 1">
+            </div>
+            <div class="carousel-item h-100">
+                <img src="{% static 'core/img_bg/fondo2.png' %}" class="d-block w-100 h-100 object-fit-cover" alt="SENA 2">
+            </div>
+            <div class="carousel-item h-100">
+                <img src="{% static 'core/img_bg/fondo3.png' %}" class="d-block w-100 h-100 object-fit-cover" alt="SENA 3">
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-overlay position-absolute w-100 h-100"></div>
+
+    <div class="container position-relative z-3 text-white py-5">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-8">
+                <span class="benefit-tag text-white opacity-75">SISTEMA INTEGRAL SENA</span>
+                <h1 class="display-3 fw-bold mb-4">
+                    Diseño y Seguimiento para tu <br>
+                    <span class="text-sena-light">Etapa Productiva</span>
                 </h1>
-                <p class="lead text-muted mb-4">
-                    Plataforma unificada para la gestión de contratos de aprendizaje, bitácoras y visitas de seguimiento entre el SENA y las empresas.
+                <p class="fs-4 mb-5 opacity-90 text-light shadow-text">
+                    Transformamos la gestión de bitácoras y contratos en una experiencia digital sólida, profesional y sin complicaciones.
                 </p>
-                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
-                    <button type="button" class="btn btn-sena btn-lg px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                <div class="d-flex gap-3">
+                    <button class="btn btn-studio btn-studio-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        Ingresar ahora
                     </button>
-                    <a href="#info" class="btn btn-outline-secondary btn-lg px-4">
-                        Más información
+                    <a href="#metodologia" class="btn btn-studio btn-outline-light">
+                        Ver metodología
                     </a>
                 </div>
             </div>
-            
-            <div class="col-lg-6 mt-5 mt-lg-0 text-center">
-                <img src="{% static 'core/img/aprendices_home.jpg' %}" alt="Gestión SENA" class="img-fluid" style="max-height: 380px;">            </div>
         </div>
     </div>
 </section>
 {% endblock %}
 
 {% block content %}
-<div id="info" class="py-5">
-    <div class="row text-center mb-5">
-        <div class="col-12">
-            <h2 class="fw-bold text-dark">Módulos Principales</h2>
-            <p class="text-muted">Herramientas integradas para instructores y aprendices</p>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card feature-card h-100 shadow-sm p-4">
-                <div class="card-body text-center">
-                    <div class="feature-icon-box bg-success bg-opacity-10 text-success">
-                        <i class="bi bi-mortarboard-fill fs-2"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Aprendices</h5>
-                    <p class="card-text text-muted">
-                        Seguimiento académico, registro de bitácoras y evaluación de desempeño.
-                    </p>
-                </div>
+<section class="section-problems mb-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold display-5">¿Estás pasando por algo de esto?</h2>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card feature-card h-100 shadow-sm p-4">
-                <div class="card-body text-center">
-                    <div class="feature-icon-box bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-buildings-fill fs-2"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Empresas</h5>
-                    <p class="card-text text-muted">
-                        Gestión de coformadores, asignación de jefes inmediatos y convenios activos.
-                    </p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="problem-card">
+                    <i class="bi bi-x-circle"></i>
+                    <h5 class="fw-bold">Pérdida de tiempo</h5>
+                    <p class="text-muted mb-0">Procesos manuales y desorganizados que consumen horas del día a día.</p>
                 </div>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card feature-card h-100 shadow-sm p-4">
-                <div class="card-body text-center">
-                    <div class="feature-icon-box bg-warning bg-opacity-10 text-warning">
-                        <i class="bi bi-calendar-check-fill fs-2"></i>
-                    </div>
-                    <h5 class="card-title fw-bold">Visitas</h5>
-                    <p class="card-text text-muted">
-                        Programación y registro de visitas de seguimiento a la etapa práctica.
-                    </p>
+            <div class="col-md-4">
+                <div class="problem-card">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h5 class="fw-bold">Falta de visibilidad</h5>
+                    <p class="text-muted mb-0">Dificultad para seguir el progreso real de aprendices y bitácoras.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="problem-card">
+                    <i class="bi bi-people"></i>
+                    <h5 class="fw-bold">Comunicación fragmentada</h5>
+                    <p class="text-muted mb-0">Correos y mensajes dispersos entre instructores y empresas.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg">
-            
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold" id="loginModalLabel">
-                    <i class="bi bi-person-circle me-2"></i>Ingreso al Sistema
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+<section id="metodologia" class="py-5">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-6 order-lg-2 ms-auto">
+                <span class="benefit-tag">NUESTRA SOLUCIÓN</span>
+                <h2 class="fw-bold display-6 mb-4">Un flujo de trabajo diseñado para el éxito</h2>
+                <p class="text-muted fs-5 mb-4">
+                    Centralizamos contratos, bitácoras y seguimiento en un solo lugar. Reportes claros y acceso rápido para instructores y empresarios.
+                </p>
+                <div class="d-flex mb-4">
+                    <div class="me-3">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                            <i class="bi bi-lightning-charge-fill fs-4"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Implementación Ágil</h5>
+                        <p class="text-muted">Carga tus contratos y bitácoras en segundos, no en horas.</p>
+                    </div>
+                </div>
+                <div class="d-flex mb-4">
+                    <div class="me-3">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                            <i class="bi bi-shield-check fs-4"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-1">Seguridad Total</h5>
+                        <p class="text-muted">Tu información está protegida y bajo los estándares institucionales.</p>
+                    </div>
+                </div>
             </div>
-
-            <div class="modal-body p-4 bg-white">
-                <div class="text-center mb-4">
-                    <p class="text-muted small">Por favor, ingresa tus credenciales registradas</p>
+            <div class="col-lg-6 order-lg-1"> <div class="p-3 bg-white rounded-5 text-center shadow-sm img-featured-container">
+                    <img src="{% static 'core/img/aprendices_home.jpg' %}" 
+                        alt="Aprendiz SENA" 
+                        class="img-fluid rounded-4 custom-img-grow">
                 </div>
-
-                <div id="modalMessages">
-                    {% if form.errors %}
-                        <div class="alert alert-danger py-2 small">Usuario o contraseña incorrectos.</div>
-                    {% endif %}
-                </div>
-
-                <form method="POST" action="{% url 'usuarios:login' %}" id="loginForm">
-                    {% csrf_token %}
-
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento" required autofocus>
-                        <label for="id_username" class="text-muted">
-                            <i class="bi bi-card-heading me-1"></i> Documento / Usuario
-                        </label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="id_password" name="password" placeholder="Contraseña" required>
-                        <label for="id_password" class="text-muted">
-                            <i class="bi bi-lock me-1"></i> Contraseña
-                        </label>
-                    </div>
-
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe" name="remember_me">
-                        <label class="form-check-label text-dark" for="rememberMe">Recordar mi sesión</label>
-                    </div>
-
-                    <button type="submit" class="btn btn-login w-100 py-3 mb-3 shadow-sm">
-                        INGRESAR
-                    </button>
-                    
-                    <div class="text-center">
-                        <a href="{% url 'password_reset' %}" style="color: #878787; text-decoration: none;">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
-
-{% block extra_js %}
-<script>
-
-    document.addEventListener("DOMContentLoaded", function() {
-
-    });
-</script>
-{% endblock %}
-{% include 'core/accesibilidad.html' %}
-</body>
-</html>

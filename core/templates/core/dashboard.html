@@ -1,426 +1,315 @@
 {% extends 'core/panel_admin_base.html' %}
 {% load static %}
 
-{% block title %}Panel Administrativo{% endblock %}
+{% block title %}Panel Administrativo | APPrendiz{% endblock %}
 
 {% block extra_css %}
 <style>
     /* ==========================================
-       ESTADÍSTICAS: EFECTO PREMIUM Y GLASSMORPHISM
+       ESTILOS "STUDIO" PREMIUM
        ========================================== */
-    .stats-grid { gap: 1.2rem; }
-    
+    :root {
+        --sena-green: #39A900;
+        --sena-orange: #FF671F;
+        --sena-dark: #1a1e21;
+    }
+
+    /* Contenedor de estadísticas con aire y minimalismo */
     .stats-card {
-        border-radius: 16px;
-        padding: 25px 20px;
-        margin-bottom: 10px;
-        color: #fff;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: none;
+        border-radius: 24px;
+        padding: 30px 24px;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
-        min-height: 120px;
-        display: flex; flex-direction: column; justify-content: center;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(8px);
+        border: 1px solid rgba(0,0,0,0.02);
     }
 
-    /* Efecto de elevación y brillo al pasar el mouse */
-    .stats-card:hover { 
-        transform: translateY(-8px); 
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+    .stats-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(57, 169, 0, 0.08);
     }
-    
-    /* Brillo diagonal interno */
-    .stats-card::before {
-        content: '';
+
+    /* Iconos sutiles de fondo */
+    .stats-card .icon {
         position: absolute;
-        top: 0; left: -100%; width: 50%; height: 100%;
-        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-        transform: skewX(-25deg);
-        transition: 0.6s;
-    }
-    .stats-card:hover::before { left: 200%; }
-
-    /* Iconos gigantes de fondo */
-    .stats-card .icon { 
-        font-size: 4.5rem; 
-        opacity: 0.15; 
-        position: absolute; 
-        right: -5px; 
-        top: 50%; 
-        transform: translateY(-50%);
+        right: -10px;
+        bottom: -10px;
+        font-size: 5rem;
+        color: var(--sena-green);
+        opacity: 0.05;
         transition: 0.3s;
     }
-    .stats-card:hover .icon { transform: translateY(-50%) scale(1.1); opacity: 0.25; }
-    
-    /* Textos */
-    .stats-card .label { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
-    .stats-card .value { font-size: 2.5rem; font-weight: 900; margin: 0; line-height: 1.1; }
+    .stats-card:hover .icon { transform: scale(1.1) rotate(-10deg); opacity: 0.1; }
 
-    /* Gradientes SENA (Semi-translúcidos para combinar con el cristal) */
-    .card-usuarios { background: linear-gradient(135deg, rgba(57, 169, 0, 0.85) 0%, rgba(45, 134, 0, 0.95) 100%); }
-    .card-activos { background: linear-gradient(135deg, rgba(255, 103, 31, 0.85) 0%, rgba(230, 81, 0, 0.95) 100%); }
-    .card-staff { background: linear-gradient(135deg, rgba(45, 134, 0, 0.85) 0%, rgba(30, 90, 0, 0.95) 100%); }
-    .card-nuevos { background: linear-gradient(135deg, rgba(162, 207, 0, 0.85) 0%, rgba(57, 169, 0, 0.95) 100%); }
+    /* Etiquetas de valor */
+    .stats-card .label { 
+        font-size: 0.75rem; 
+        font-weight: 800; 
+        text-transform: uppercase; 
+        letter-spacing: 1.5px; 
+        color: #999; 
+        margin-bottom: 8px;
+        display: block;
+    }
+    .stats-card .value { 
+        font-size: 2.8rem; 
+        font-weight: 900; 
+        color: var(--sena-dark);
+        line-height: 1;
+    }
 
-    /* ==========================================
-       TARJETAS DEL DASHBOARD (Limpias y modernas)
-       ========================================== */
-    .dashboard-card {
+    /* Variantes de color sutiles en los bordes */
+    .border-sena { border-top: 5px solid var(--sena-green); }
+    .border-orange { border-top: 5px solid var(--sena-orange); }
+    .border-blue { border-top: 5px solid #0d6efd; }
+
+    /* Tarjetas de Contenido (Gráficas y Tablas) */
+    .studio-card {
         border: none;
-        border-radius: 16px;
-        background-color: rgba(255, 255, 255, 0.85) !important;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        transition: 0.3s;
+        border-radius: 28px;
+        background: #ffffff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.02);
     }
-    
-    .dashboard-card-header {
+
+    /* Tabla Estilo Studio */
+    .table-premium { border-collapse: separate; border-spacing: 0 8px; }
+    .table-premium thead th {
         background: transparent;
-        border-bottom: 2px solid rgba(57, 169, 0, 0.2);
-        padding: 20px 25px;
+        border: none;
+        color: #bbb;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px 20px;
     }
-    
-    .dashboard-card-header h5 {
-        color: var(--sena-dark-green) !important;
+    .table-premium tbody tr { background: #fff; transition: 0.2s; }
+    .table-premium tbody td { 
+        padding: 15px 20px; 
+        border-top: 1px solid #f8f9fa;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    .table-premium tbody tr:hover td { background: #fcfdfc; border-color: rgba(57, 169, 0, 0.1); }
+
+    .avatar-studio {
+        width: 45px; height: 45px;
+        background: rgba(57, 169, 0, 0.1);
+        color: var(--sena-green);
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
         font-weight: 800;
-        margin: 0;
     }
-
-    /* Botones de acción rápida redondeados */
-    .btn-action-quick {
-        border-radius: 50px;
-        padding: 10px 24px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
-    .btn-action-quick i { font-size: 1.1rem; vertical-align: text-bottom; }
-
-    /* Ajustes específicos para los botones rápidos del panel
-       - Usar paleta SENA
-       - Evitar subrayado al pasar el cursor (override global)
-       - Mantener color de texto blanco y bordes coherentes
-    */
-    .sena-btn { border-radius: 8px; color: #fff !important; text-decoration: none !important; }
-    .sena-btn.btn-primary { background: linear-gradient(135deg, var(--sena-green), var(--sena-dark-green)); border: none; }
-    .sena-btn.sena-dark { background: var(--sena-dark-green); border-color: var(--sena-dark-green); }
-    .sena-btn.sena-muted { background: #6a7280; border-color: #626b79; }
-    .btn-action-quick, .btn-action-quick:hover, .btn-action-quick:focus { text-decoration: none !important; }
-
-    /* Tabla más limpia */
-    .table-custom th { color: #555 !important; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; border-bottom: 2px solid #eee; }
-    .table-custom td { color: #222 !important; font-weight: 500; vertical-align: middle; border-bottom: 1px solid rgba(0,0,0,0.05); }
-
-    @media (max-width: 767px){
-        .stats-card { padding: 18px 15px; min-height: 100px; }
-        .stats-card .icon { font-size: 3rem; right: 10px; }
-        .stats-card .value { font-size: 2rem; }
-    }
-
-    /* ===== OVERRIDES PARA QUITAR AZUL Y MEJORAR CONTRASTE EN ESTA PÁGINA ===== */
-    /* Forzar links dentro del dashboard a paleta SENA (verde) */
-    .content-wrapper a, .container-fluid a { color: var(--sena-green) !important; text-decoration: none !important; }
-    .content-wrapper a:hover, .container-fluid a:hover { color: var(--sena-dark-green) !important; text-decoration: underline !important; }
-
-    /* Evitar azules que vienen de bootstrap */
-    .content-wrapper .text-primary, .container-fluid .text-primary { color: var(--sena-green) !important; }
-
-    /* Botones outline primary: convertir a verde consistente */
-    .btn-outline-primary { color: var(--sena-green) !important; border-color: rgba(57,169,0,0.18) !important; background-color: #fff !important; }
-    .btn-outline-primary:hover { background-color: rgba(57,169,0,0.06) !important; color: var(--sena-dark-green) !important; }
-
-    /* Tabla: reforzar líneas y contraste para mejor lectura */
-    .table-custom thead th { background-color: rgba(0,0,0,0.03) !important; color: #333 !important; border-bottom: 2px solid rgba(0,0,0,0.08) !important; }
-    .table-custom tbody td { border-bottom: 1px solid rgba(0,0,0,0.06) !important; }
-
-    /* Botón editar (pequeño): evitar texto azul, usar verde oscuro */
-    .btn-light.text-primary { color: var(--sena-dark-green) !important; border-color: rgba(0,0,0,0.06) !important; background-color: #fff !important; }
-    .btn-light.text-primary:hover { color: #fff !important; background-color: var(--sena-dark-green) !important; border-color: var(--sena-dark-green) !important; }
-
-    /* Links dentro de la tabla (por ejemplo: 'Ficha: 2993648') */
-    .table-custom a { color: var(--sena-green) !important; }
-
-    /* Badges y pequeñas piezas */
-    .badge.bg-light.text-dark { color: #222 !important; }
-    .badge.bg-white.text-dark { color: var(--neutral-text) !important; }
-
-    /* Búsqueda topbar: integrarla visualmente */
-    .topbar .form-control { border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); }
-
-    /* Iconos informativos en headers: verdes en lugar de azul */
-    .dashboard-card-header .text-info, .dashboard-card-header i.text-info { color: var(--sena-green) !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
     
-    <div class="row mb-4 align-items-center">
+    <div class="row mb-5 align-items-end">
         <div class="col-md-8">
-            <h1 class="display-6 fw-bold mb-1 text-dark">
-                Panel de <span style="color: var(--sena-green);">Administración</span>
+            <h6 class="text-uppercase fw-bold text-success ls-1 mb-2" style="letter-spacing: 2px;">Sistema APPrendiz</h6>
+            <h1 class="display-5 fw-bold text-dark mb-0">
+                Dashboard <span class="text-success">{% if es_admin %}Administrativo{% else %}de Control{% endif %}</span>
             </h1>
-            <p class="text-muted fs-5 mb-0">¡Qué bueno verte de nuevo, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>!</p>
+            <p class="text-muted fs-5 mt-2">Bienvenido, <span class="fw-bold text-dark">{{ request.user.first_name|default:request.user.username }}</span>. Aquí el estado actual del programa.</p>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0 d-none d-md-block">
-            <span class="badge bg-white text-dark border shadow-sm px-3 py-2 fs-6 rounded-pill">
-                <i class="bi bi-calendar3 text-success me-2"></i> {% now "l, j de F de Y" %}
-            </span>
+        <div class="col-md-4 text-md-end d-none d-md-block">
+            <div class="bg-white d-inline-block px-4 py-3 rounded-4 shadow-sm border border-light">
+                <i class="bi bi-calendar3 text-success me-2"></i> 
+                <span class="fw-bold text-dark">{% now "j \d\e F, Y" %}</span>
+            </div>
         </div>
     </div>
     
-    <div class="row stats-grid row-cols-1 row-cols-sm-2 row-cols-md-4 gx-3 mb-4">
-        
-        <div class="col">
-            <section class="stats-card card-usuarios shadow-sm">
+    {% if es_admin %}
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stats-card border-sena h-100">
                 <i class="bi bi-people-fill icon"></i>
-                <div class="label">Total Usuarios</div>
+                <span class="label">Total Usuarios</span>
                 <div class="value">{{ total_usuarios|default:"0" }}</div>
-            </section>
+            </div>
         </div>
-
-        <div class="col">
-            <section class="stats-card card-activos shadow-sm">
+        <div class="col-md-3">
+            <div class="stats-card border-orange h-100">
                 <i class="bi bi-person-check-fill icon"></i>
-                <div class="label">Usuarios Activos</div>
+                <span class="label">Usuarios Activos</span>
                 <div class="value">{{ usuarios_activos|default:"0" }}</div>
-            </section>
+            </div>
         </div>
-
-        <div class="col">
-            <section class="stats-card card-staff shadow-sm">
-                <i class="bi bi-shield-lock-fill icon"></i>
-                <div class="label">Administradores</div>
-                <div class="value">{{ usuarios_staff|default:"0" }}</div>
-            </section>
+        <div class="col-md-3">
+            <div class="stats-card border-sena h-100">
+                <i class="bi bi-mortarboard-fill icon"></i>
+                <span class="label">Aprendices</span>
+                <div class="value">{{ total_aprendices|default:"0" }}</div>
+            </div>
         </div>
-
-        <div class="col">
-            <section class="stats-card card-nuevos shadow-sm">
-                <i class="bi bi-person-plus-fill icon"></i>
-                <div class="label">Nuevos (Mes)</div>
-                <div class="value">{{ nuevos_usuarios_mes|default:"0" }}</div>
-            </section>
+        <div class="col-md-3">
+            <div class="stats-card border-blue h-100">
+                <i class="bi bi-briefcase-fill icon"></i>
+                <span class="label">Instructores</span>
+                <div class="value">{{ total_instructores|default:"0" }}</div>
+            </div>
         </div>
-        
     </div>
 
-        <!-- Gráficos y tabla -->
-    <div class="row mb-4">
-        
-        <div class="col-lg-5 mb-4 mb-lg-0">
-            <div class="card dashboard-card h-100">
-                <div class="dashboard-card-header">
-                    <h5><i class="bi bi-pie-chart-fill me-2" style="color: var(--sena-orange);"></i> Estado de Bitácoras</h5>
+    <div class="row g-4 mb-5">
+        <div class="col-lg-5">
+            <div class="studio-card h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0 text-dark">Distribución</h5>
+                    <i class="bi bi-pie-chart-fill text-success"></i>
                 </div>
-                <div class="card-body d-flex justify-content-center align-items-center p-4">
-                    <div style="position: relative; height:280px; width:100%">
-                        <canvas id="chartBitacoras"></canvas>
-                    </div>
+                <div style="height:280px;">
+                    <canvas id="miGrafica"></canvas>
                 </div>
             </div>
         </div>
-
+        
         <div class="col-lg-7">
-            <div class="card dashboard-card h-100">
-                <div class="dashboard-card-header">
-                    <h5><i class="bi bi-bar-chart-line-fill me-2 text-success"></i> Distribución de Usuarios</h5>
+            <div class="studio-card h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0 text-dark">Últimos Registros</h5>
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light btn-sm rounded-pill px-3 fw-bold text-success">Ver Todo</a>
                 </div>
-                <div class="card-body p-4">
-                    <div style="position: relative; height:280px; width:100%">
-                        <canvas id="chartUsuarios"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-    </div>
-    
-    <div class="row">
-        
-        <div class="col-lg-4 mb-4">
-            <div class="card dashboard-card h-100">
-                <div class="dashboard-card-header">
-                    <h5><i class="bi bi-lightning-charge-fill me-2 text-warning"></i> Acciones Rápidas</h5>
-                </div>
-                <div class="card-body d-flex flex-column gap-3 justify-content-center p-4">
-                    
-                    <a href="{% url 'usuarios:crear_usuario' %}" class="btn btn-primary btn-action-quick sena-btn w-100 shadow-sm text-start py-2">
-                        <i class="bi bi-person-plus-fill me-2 text-white fs-5 align-middle"></i> 
-                        <span class="align-middle fw-bold">Crear Usuario</span>
-                    </a>
-                    
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-action-quick sena-btn sena-dark w-100 shadow-sm text-start py-2">
-                        <i class="bi bi-people-fill me-2 text-white fs-5 align-middle"></i> 
-                        <span class="align-middle fw-bold">Gestionar Usuarios</span>
-                    </a>
-                    
-                    <a href="{% url 'usuarios:perfil' %}" class="btn btn-action-quick sena-btn sena-muted w-100 shadow-sm text-start py-2">
-                        <i class="bi bi-person-badge-fill me-2 text-white fs-5 align-middle"></i> 
-                        <span class="align-middle fw-bold">Ver Mi Perfil</span>
-                    </a>
-
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-8 mb-4">
-            <div class="card dashboard-card h-100">
-                <div class="dashboard-card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="bi bi-clock-history me-2 text-info"></i> Registros Recientes</h5>
-                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-sm btn-link text-decoration-none">Ver todos <i class="bi bi-arrow-right"></i></a>
-                </div>
-                
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom table-hover align-middle mb-0">
-                            <thead class="bg-light bg-opacity-50">
-                                <tr>
-                                    <th class="ps-4">Usuario</th>
-                                    <th>Documento / Email</th>
-                                    <th>Registro</th>
-                                    <th class="text-center">Estado</th>
-                                    <th class="pe-4 text-end">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for usuario in ultimos_usuarios %}
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
-                                                <i class="bi bi-person-fill fs-5"></i>
-                                            </div>
-                                            <div class="fw-bold text-dark">{{ usuario.get_full_name|default:usuario.username }}</div>
+                <div class="table-responsive">
+                    <table class="table table-premium align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th class="text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in ultimos_usuarios %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-studio me-3">
+                                            {{ u.first_name|first|upper }}
                                         </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-dark">{{ usuario.username }}</div>
-                                        <div class="small text-muted">{{ usuario.email|default:"Sin correo" }}</div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border shadow-sm"><i class="bi bi-calendar-event me-1"></i>{{ usuario.date_joined|date:"d/m/Y" }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        {% if usuario.is_active %}
-                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill">Activo</span>
-                                        {% else %}
-                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2 rounded-pill">Inactivo</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="pe-4 text-end">
-                                        <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn btn-sm btn-light border text-primary rounded-circle shadow-sm" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;" title="Editar">
-                                            <i class="bi bi-pencil-fill"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-5">
-                                        <i class="bi bi-inbox fs-1 text-muted opacity-50 mb-3 d-block"></i>
-                                        <h6 class="text-muted">No hay usuarios registrados recientemente</h6>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">{{ u.get_full_name|default:u.username }}</div>
+                                            <div class="text-muted" style="font-size: 0.7rem;">{{ u.date_joined|date:"d M, Y" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if u.is_superuser %}
+                                        <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3">Admin</span>
+                                    {% elif u.is_staff %}
+                                        <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3">Instructor</span>
+                                    {% else %}
+                                        <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3">Aprendiz</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <i class="bi bi-circle-fill {% if u.is_active %}text-success{% else %}text-danger{% endif %}" style="font-size: 0.5rem;"></i>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        
     </div>
+
+    {% else %}
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stats-card border-sena h-100">
+                <i class="bi bi-journal-bookmark-fill icon"></i>
+                <span class="label">Bitácoras Asignadas</span>
+                <div class="value">{{ total_bitacoras|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card border-orange h-100">
+                <i class="bi bi-hourglass-split icon"></i>
+                <span class="label">Pendientes por Evaluar</span>
+                <div class="value">{{ pendientes|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card border-sena h-100">
+                <i class="bi bi-check-circle-fill icon"></i>
+                <span class="label">Evaluaciones Listas</span>
+                <div class="value">{{ evaluadas|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="studio-card p-4">
+                <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-bar-chart-line-fill text-orange me-2"></i> Rendimiento de Seguimiento</h5>
+                <div style="height:350px;">
+                    <canvas id="miGrafica"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if alerta_password %}
+        {% include 'core/snippets/modal_seguridad.html' %} 
+    {% endif %}
+
 </div>
-{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const labels = JSON.parse('{{ chart_labels|safe }}');
+        const data = JSON.parse('{{ chart_data|safe }}');
+        const isAdmin = '{{ es_admin }}' === 'True';
         
-        // 1. Obtener los datos desde Django de forma segura
-        const labelsBitacoras = JSON.parse('{{ labels_bitacoras|safe|default:"[]" }}');
-        const dataBitacoras = JSON.parse('{{ data_bitacoras|safe|default:"[]" }}');
-        
-        const labelsUsuarios = JSON.parse('{{ labels_usuarios|safe|default:"[]" }}');
-        const dataUsuarios = JSON.parse('{{ data_usuarios|safe|default:"[]" }}');
+        const coloresAdmin = ['#39A900', '#FF671F', '#0d6efd'];
+        const coloresInstru = ['#FF671F', '#39A900', '#dc3545'];
 
-        // Paleta de colores SENA
-        const colorSenaGreen = '#39a900';
-        const colorSenaDark = '#2d8600';
-        const colorSenaOrange = '#ff671f';
-        const colorGray = '#4a5568';
-        const colorLightGreen = '#a2cf00';
-
-        // ==========================================
-        // GRÁFICO 1: DONA (Estado de Bitácoras)
-        // ==========================================
-        const ctxBitacoras = document.getElementById('chartBitacoras').getContext('2d');
-        
-        // Si no hay datos, mostramos un gráfico vacío gris
-        const chartDataBitacoras = dataBitacoras.length > 0 ? dataBitacoras : [1];
-        const chartLabelsBitacoras = labelsBitacoras.length > 0 ? labelsBitacoras : ['Sin datos'];
-        const bgColorsBitacoras = dataBitacoras.length > 0 ? [colorSenaGreen, colorSenaOrange, colorGray] : ['#e2e8f0'];
-
-        new Chart(ctxBitacoras, {
-            type: 'doughnut',
+        const ctx = document.getElementById('miGrafica').getContext('2d');
+        new Chart(ctx, {
+            type: isAdmin ? 'doughnut' : 'bar',
             data: {
-                labels: chartLabelsBitacoras,
+                labels: labels,
                 datasets: [{
-                    data: chartDataBitacoras,
-                    backgroundColor: bgColorsBitacoras,
-                    borderWidth: 2,
-                    borderColor: '#ffffff',
-                    hoverOffset: 10
+                    label: 'Registros',
+                    data: data,
+                    backgroundColor: isAdmin ? coloresAdmin : coloresInstru,
+                    borderWidth: 0,
+                    borderRadius: isAdmin ? 0 : 15,
+                    hoverOffset: 20
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: isAdmin ? '75%' : undefined,
                 plugins: {
-                    legend: { position: 'bottom', labels: { font: { family: 'Arial', weight: 'bold' }, color: '#333' } }
-                },
-                cutout: '70%' // Hace que la dona sea más delgada y elegante
-            }
-        });
-
-        // ==========================================
-        // GRÁFICO 2: BARRAS (Distribución de Usuarios)
-        // ==========================================
-        const ctxUsuarios = document.getElementById('chartUsuarios').getContext('2d');
-        
-        new Chart(ctxUsuarios, {
-            type: 'bar',
-            data: {
-                labels: labelsUsuarios,
-                datasets: [{
-                    label: 'Cantidad Registrada',
-                    data: dataUsuarios,
-                    backgroundColor: [colorSenaDark, colorLightGreen, colorSenaOrange],
-                    borderRadius: 8, // Bordes redondeados en las barras
-                    barThickness: 40 // Grosor de la barra
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false } // Ocultamos la leyenda superior para que se vea más limpio
+                    legend: {
+                        display: isAdmin,
+                        position: 'bottom',
+                        labels: { padding: 30, usePointStyle: true, font: { weight: 'bold' } }
+                    }
                 },
                 scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] },
-                        ticks: { stepSize: 1, color: '#666', font: { weight: 'bold' } }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#333', font: { weight: 'bold' } }
-                    }
+                    y: { display: !isAdmin, beginAtZero: true, grid: { borderDash: [8, 4], color: '#f0f0f0' } },
+                    x: { display: !isAdmin, grid: { display: false } }
                 }
             }
         });
-        
+
+        {% if alerta_password %}
+        if (!sessionStorage.getItem('alerta_password_mostrada')) {
+            var myModal = new bootstrap.Modal(document.getElementById('modalSeguridadPassword'));
+            myModal.show();
+            sessionStorage.setItem('alerta_password_mostrada', 'true');
+        }
+        {% endif %}
     });
 </script>
-{% endblock %}
-
 {% endblock %}
