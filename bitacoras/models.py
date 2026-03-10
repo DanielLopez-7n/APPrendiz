@@ -58,7 +58,6 @@ class Bitacora(models.Model):
     numero_bitacora = models.PositiveIntegerField(verbose_name="Número de Bitácora", blank=True, null=True)
     fecha_inicio = models.DateField(verbose_name="Período: Desde")
     fecha_fin = models.DateField(verbose_name="Período: Hasta")
-    tipo_documento = models.CharField(max_length=2, choices=TIPO_DOC_CHOICES, default='CC')
 
     # --- MÓDULO 2: DATOS DEL ENTE CO-FORMADOR (EMPRESA) ---
     empresa = models.ForeignKey(

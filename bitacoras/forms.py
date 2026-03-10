@@ -42,7 +42,6 @@ class CrearBitacoraForm(forms.ModelForm):
             # Campos de selección estándar
             'instructor_seguimiento': forms.Select(attrs={'class': 'form-select'}),
             'modalidad': forms.Select(attrs={'class': 'form-select'}),
-            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'afiliado_arl': forms.Select(attrs={'class': 'form-select'}),
             'nivel_riesgo': forms.Select(attrs={'class': 'form-select'}),
             'uso_epp': forms.Select(attrs={'class': 'form-select'}),

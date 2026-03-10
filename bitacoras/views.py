@@ -109,10 +109,14 @@ def crear_bitacora(request):
             except Exception as e:
                 messages.error(request, f'Error al guardar: {e}')
         else:
-            # AQUÍ ESTÁ LA TRAMPA PARA VER EL ERROR REAL EN LA TERMINAL:
-            print("--- ERRORES DETECTADOS ---")
-            print("Errores de la Bitácora:", form.errors)
-            print("Errores de las Actividades:", formset.errors)
+            # 1. Este imprime en la terminal negra (donde corres el servidor)
+            print("--- 🔍 RASTREO DE ERRORES ---")
+            print("Errores del Formulario Principal:", form.errors)
+            print("Errores de las Actividades (Formset):", formset.errors)
+            
+            # 2. Este muestra el error exacto en la franja roja de la página web
+            error_detalle = form.errors.as_text()
+            messages.error(request, f"No se pudo guardar. Campos faltantes: {error_detalle}")
             
             messages.error(request, 'Hay errores en el formulario. Revisa los campos en rojo.')
     else:
