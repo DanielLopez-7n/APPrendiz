@@ -240,6 +240,9 @@ def crear_usuario_con_perfil(request):
     return render(request, 'usuarios/crear_usuario_dinamico.html', context)
 
 
+
+# --- VISTA PARA VER PERFIL PROPIO (READ) ---
+
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
 def editar_usuario_view(request, user_id):
@@ -302,6 +305,9 @@ def editar_usuario_view(request, user_id):
     return render(request, 'usuarios/editar_usuario.html', context)
 
 
+
+# --- VISTA PARA ELIMINAR USUARIOS (DELETE) ---
+
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
 def eliminar_usuario_view(request, user_id):
@@ -333,6 +339,8 @@ def eliminar_usuario_view(request, user_id):
     return redirect('usuarios:lista_usuarios')
 
 
+# ==================== VISTAS DE PERFIL Y CONFIGURACIÓN PERSONAL ====================
+
 @login_required
 def perfil_view(request):
     """
@@ -348,7 +356,8 @@ def perfil_view(request):
             form_usuario.save()
             form_perfil.save()
             messages.success(request, 'Perfil actualizado exitosamente.')
-            return redirect('usuarios:perfil')
+            
+            return redirect('usuarios:perfil') 
     else:
         form_usuario = EditarUsuarioForm(instance=usuario)
         form_perfil = EditarPerfilForm(instance=usuario.perfil)
@@ -360,6 +369,9 @@ def perfil_view(request):
     }
     return render(request, 'usuarios/perfil.html', context)
 
+
+
+# --- VISTA PARA LISTAR APRENDICES (READ) ---
 
 @login_required
 def editar_mi_perfil(request):

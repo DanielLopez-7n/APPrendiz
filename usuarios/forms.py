@@ -165,8 +165,9 @@ class EditarPerfilForm(forms.ModelForm):
     """
     class Meta:
         model = PerfilUsuario
-        fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']
+        fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
         widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}), # Añadido para el username
             'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),

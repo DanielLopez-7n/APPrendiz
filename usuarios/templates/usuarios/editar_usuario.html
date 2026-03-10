@@ -1,88 +1,151 @@
 {% extends 'core/panel_admin_base.html' %}
 
-{% block title %}Editar Usuario | Panel Admin{% endblock %}
+{% block title %}Seguridad de Usuario | APPrendiz{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'usuarios:lista_usuarios' %}">Usuarios</a></li>
-    <li class="breadcrumb-item active">Editar: {{ usuario.username }}</li>
+    <li class="breadcrumb-item"><a href="{% url 'usuarios:lista_usuarios' %}" class="text-success text-decoration-none">Usuarios</a></li>
+    <li class="breadcrumb-item active">Seguridad: {{ usuario.username }}</li>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow border-0">
-            
-            <div class="card-header bg-primary text-white py-3">
-                <h5 class="mb-0">
-                    <i class="bi bi-pencil-square me-2"></i>{{ titulo }}
-                </h5>
-            </div>
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - SEGURIDAD Y ACCESO
+       ========================================== */
+    .form-container-studio { max-width: 750px; margin: 0 auto; }
+    
+    .card-form {
+        border: none; border-radius: 30px; background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05); padding: 40px;
+    }
 
-            <div class="card-body p-4">
+    /* Títulos de sección con línea decorativa */
+    .section-title {
+        color: #1a1a1a; font-weight: 800; font-size: 1rem;
+        margin-bottom: 25px; margin-top: 10px; display: flex; align-items: center;
+    }
+    .section-title i { color: #39A900; margin-right: 12px; font-size: 1.3rem; }
+    .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #f0f0f0; margin-left: 15px; }
+
+    /* Estilo de los campos */
+    .label-studio {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1.2px; color: #6c757d; margin-left: 5px; margin-bottom: 8px; display: block;
+    }
+    .input-group-studio {
+        background-color: #f8f9fa; border-radius: 12px; padding: 5px 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900;
+        transition: 0.3s all ease-in-out; display: flex; align-items: center; margin-bottom: 20px;
+    }
+    .input-group-studio:focus-within { border-color: #39A900; background-color: #fff; box-shadow: 0 0 0 5px rgba(57, 169, 0, 0.1); }
+    .input-group-studio i.icon-left { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
+    .input-group-studio input {
+        flex-grow: 1; border: none !important; background: transparent !important; width: 100%;
+        padding: 12px 0; outline: none !important; box-shadow: none !important; color: #1a1a1a; font-weight: 700;
+    }
+
+    /* Tarjeta de Estado Activo */
+    .status-card {
+        background: rgba(57, 169, 0, 0.03); border: 1px solid rgba(57, 169, 0, 0.08);
+        border-radius: 20px; padding: 20px; display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 30px;
+    }
+
+    /* Caja de Alerta de Correo (naranja claro) */
+    .recovery-alert {
+        background-color: #fff8e1; /* naranja muy claro */
+        border-left: 4px solid #ffb300; /* naranja fuerte */
+        border-radius: 15px; padding: 18px; margin-bottom: 25px;
+        display: flex; align-items: flex-start;
+    }
+
+    .btn-save-studio {
+        background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px;
+        font-weight: 800; transition: 0.3s; width: 100%;
+    }
+    .btn-save-studio:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
+</style>
+
+<div class="container py-4">
+    <div class="form-container-studio">
+        
+        <div class="text-center mb-5">
+            <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-shield-check fs-1"></i>
+            </div>
+            <h2 class="fw-bold text-dark">Gestión de Acceso</h2>
+            <p class="text-muted">Control de estado y recuperación de credenciales para <strong class="text-dark">{{ usuario.get_full_name }}</strong></p>
+        </div>
+
+        <div class="card-form">
+            <form method="post" novalidate>
+                {% csrf_token %}
                 
-                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
-                    {% csrf_token %}
-                    
-                    <div class="p-3 mb-4 bg-light border rounded d-flex align-items-center justify-content-between">
-                        <div>
-                            <h6 class="mb-0 fw-bold text-primary"><i class="bi bi-power me-2"></i>Estado de la Cuenta</h6>
-                            <small class="text-muted">Si desactivas la cuenta, el usuario no podrá ingresar.</small>
+                <div class="status-card">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success text-white rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 45px; height: 45px;">
+                            <i class="bi bi-power fs-5"></i>
                         </div>
-                        <div class="form-check form-switch">
-                            {{ form_usuario.is_active }}
-                            <label class="form-check-label" for="{{ form_usuario.is_active.id_for_label }}">
-                                ¿Usuario Activo?
-                            </label>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-success">Estado de la Cuenta</h6>
+                            <small class="text-muted">Habilita o deshabilita el ingreso al sistema.</small>
                         </div>
                     </div>
+                    <div class="form-check form-switch fs-4">
+                        {{ form_usuario.is_active }}
+                    </div>
+                </div>
 
-                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-person me-2"></i>Datos Básicos</h6>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Nombres</label>
+                <h5 class="section-title"><i class="bi bi-person-circle"></i> Información del Usuario</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="label-studio">Nombres</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person icon-left"></i>
                             {{ form_usuario.first_name }}
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Apellidos</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="label-studio">Apellidos</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-person icon-left"></i>
                             {{ form_usuario.last_name }}
                         </div>
-                        <div class="col-12">
-                            <label class="form-label">Correo Electrónico</label>
-                            {{ form_usuario.email }}
-                        </div>
                     </div>
+                </div>
 
-                    <hr class="my-4">
-
-                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-card-image me-2"></i>Perfil y Contacto</h6>
-                    
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label">Foto de Perfil</label>
-                            {{ form_perfil.foto_perfil }}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Teléfono / Celular (No editable)</label> {{ form_perfil.telefono }}
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Documento de Identidad (No editable)</label>
-                            {{ form_perfil.documento }}
-                        </div>
+                <h5 class="section-title mt-4"><i class="bi bi-envelope-heart"></i> Recuperación de Acceso</h5>
+                
+                <div class="recovery-alert">
+                    <i class="bi bi-info-circle-fill text-warning fs-4 me-3 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold text-warning mb-1">Correo de recuperación de contraseña</h6>
+                        <p class="text-muted mb-0 small">Asegúrate de que este correo sea válido. Es el único medio por el cual el aprendiz podrá restablecer su contraseña de forma segura si llega a olvidarla.</p>
                     </div>
+                </div>
 
-                    <hr class="my-4">
+                <div class="col-12">
+                    <label class="label-studio">Correo Electrónico Principal *</label>
+                    <div class="input-group-studio">
+                        <i class="bi bi-envelope-at icon-left"></i>
+                        {{ form_usuario.email }}
+                    </div>
+                </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-secondary me-md-2">
+                <div class="row align-items-center mt-5 pt-4 border-top">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light rounded-pill w-100 fw-bold border-2 py-3 text-muted">
                             Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="bi bi-save me-2"></i>Guardar Cambios
+                    </div>
+                    <div class="col-md-8">
+                        <button type="submit" class="btn-save-studio shadow-sm">
+                            <i class="bi bi-save2-fill me-2"></i>Guardar Cambios
                         </button>
                     </div>
-                </form>
-            </div>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>

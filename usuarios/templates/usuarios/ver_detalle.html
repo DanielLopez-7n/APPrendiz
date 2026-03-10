@@ -1,84 +1,172 @@
 {% extends 'core/panel_admin_base.html' %} 
 
-{% block title %}Detalle del Usuario{% endblock %}
+{% block title %}Detalle de Usuario | APPrendiz{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'usuarios:lista_usuarios' %}">Usuarios</a></li>
-    <li class="breadcrumb-item active">Detalle de Usuario</li>
+    <li class="breadcrumb-item"><a href="{% url 'usuarios:lista_usuarios' %}" class="text-success text-decoration-none">Usuarios</a></li>
+    <li class="breadcrumb-item active">Detalle: {{ usuario.username }}</li>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>Ficha Técnica del Usuario</h5>
-                <span class="badge bg-light text-primary rounded-pill">ID: {{ usuario.id }}</span>
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - DETALLE DE USUARIO
+       ========================================== */
+    .detail-container-studio { max-width: 850px; margin: 0 auto; }
+    
+    .card-studio {
+        border: none; border-radius: 30px; background: #fff;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05); overflow: hidden;
+    }
+
+    /* Franja Superior (Portada) */
+    .profile-cover-mini {
+        height: 120px;
+        background: linear-gradient(135deg, #39A900 0%, #2D8600 100%);
+        position: relative;
+    }
+    .profile-cover-mini::after {
+        content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+        background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none"/></svg>');
+        background-size: 100px; opacity: 0.5;
+    }
+
+    /* Avatar Central */
+    .avatar-wrapper { text-align: center; margin-top: -65px; position: relative; z-index: 10; padding-bottom: 20px; }
+    .avatar-view-circle {
+        width: 130px; height: 130px; border-radius: 50%; background-color: #f8f9fa;
+        border: 5px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        display: inline-flex; align-items: center; justify-content: center;
+        overflow: hidden; margin: 0 auto;
+    }
+    .avatar-view-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-view-circle .placeholder-icon { font-size: 5rem; color: #dee2e6; margin-top: 15px; }
+
+    /* Estilos de Textos y Etiquetas */
+    .section-title {
+        color: #1a1a1a; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 20px; margin-top: 10px; display: flex; align-items: center;
+    }
+    .section-title i { color: #39A900; margin-right: 12px; font-size: 1.2rem; }
+    .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #f0f0f0; margin-left: 15px; }
+
+    /* Cajas de Datos */
+    .info-box {
+        background: #f8f9fa; border: 1px solid #e0e0e0;
+        border-radius: 20px; padding: 25px; height: 100%;
+    }
+    .data-label {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1px; color: #6c757d; margin-bottom: 5px; display: block;
+    }
+    .data-value {
+        font-weight: 700; color: #1a1a1a; font-size: 1.05rem; margin-bottom: 20px;
+    }
+    .data-value:last-child { margin-bottom: 0; }
+
+    /* Badges Studio */
+    .badge-studio {
+        padding: 8px 15px; border-radius: 12px; font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;
+    }
+
+    /* Botones */
+    .btn-action-studio {
+        border-radius: 50px; font-weight: 800; padding: 12px 30px; transition: 0.3s;
+    }
+    .btn-primary-studio { background: #39A900; color: white; border: none; }
+    .btn-primary-studio:hover { background: #2d8600; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(57, 169, 0, 0.2); color: white;}
+</style>
+
+<div class="container py-4">
+    <div class="detail-container-studio">
+        
+        <div class="card-studio">
+            <div class="profile-cover-mini d-flex justify-content-end p-3">
+                <span class="badge bg-white text-success shadow-sm rounded-pill fw-bold" style="height: fit-content;">ID Sistema: {{ usuario.id }}</span>
             </div>
-            <div class="card-body p-4">
+
+            <div class="avatar-wrapper">
+                <div class="avatar-view-circle mb-3">
+                    {% if usuario.perfil.foto_perfil %}
+                        <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Foto de {{ usuario.get_full_name }}">
+                    {% else %}
+                        <i class="bi bi-person-fill placeholder-icon"></i>
+                    {% endif %}
+                </div>
+                <h3 class="fw-bold text-dark mb-1">{{ usuario.get_full_name|default:usuario.username }}</h3>
+                <p class="text-muted fw-bold mb-3"><i class="bi bi-envelope-check text-success me-2"></i>{{ usuario.email }}</p>
                 
-                <div class="text-center mb-4">
-                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                        <i class="bi bi-person-fill fs-1 text-secondary"></i>
-                    </div>
-                    <h3 class="fw-bold">{{ usuario.get_full_name }}</h3>
-                    <p class="text-muted">{{ usuario.email }}</p>
+                <div class="mt-2">
+                    {% if usuario.is_superuser %}
+                        <span class="badge-studio bg-danger bg-opacity-10 text-danger border border-danger">Superadmin</span>
+                    {% elif usuario.is_staff %}
+                        <span class="badge-studio bg-warning bg-opacity-10 text-warning border border-warning" style="color: #d39e00 !important;">Instructor / Staff</span>
+                    {% elif usuario.aprendiz %}
+                        <span class="badge-studio bg-info bg-opacity-10 text-info border border-info" style="color: #0dcaf0 !important;">Aprendiz SENA</span>
+                    {% else %}
+                        <span class="badge-studio bg-secondary bg-opacity-10 text-secondary border border-secondary">Usuario Estándar</span>
+                    {% endif %}
                 </div>
-
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <h6 class="text-uppercase text-muted small fw-bold">Información de Acceso</h6>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between px-0">
-                                <span>Usuario (Documento):</span>
-                                <span class="fw-medium">{{ usuario.username }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between px-0">
-                                <span>Rol:</span>
-                                <div>
-                                    {% if usuario.is_superuser %}
-                                        <span class="badge bg-danger">Superadmin</span>
-                                    {% elif usuario.is_staff %}
-                                        <span class="badge bg-warning text-dark">Instructor/Staff</span>
-                                    {%elif usuario.aprendiz %}
-                                        <span class="badge bg-info text-dark">Aprendiz</span>
-                                    {% else %}
-                                        <span class="badge bg-info text-dark">Usuario</span>
-                                    {% endif %}
-                                </div>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between px-0">
-                                <span>Estado:</span>
-                                {% if usuario.is_active %}
-                                    <span class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i>Activo</span>
-                                {% else %}
-                                    <span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>Inactivo</span>
-                                {% endif %}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="col-md-6">
-                        <h6 class="text-uppercase text-muted small fw-bold">Historial</h6>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between px-0">
-                                <span>Fecha de Registro:</span>
-                                <span class="fw-medium">{{ usuario.date_joined|date:"d M Y" }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between px-0">
-                                <span>Último Acceso:</span>
-                                <span class="fw-medium">{{ usuario.last_login|date:"d M Y H:i"|default:"Nunca" }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
             </div>
-            <div class="card-footer bg-light py-3 text-end">
-                <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-secondary me-2">Volver</a>
-                <a href="#" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Editar Usuario</a>
+
+            <div class="px-4 px-md-5 pb-5">
+                
+                <div class="row g-4 mt-2">
+                    <div class="col-md-6">
+                        <h6 class="section-title"><i class="bi bi-shield-lock-fill"></i> Información de Acceso</h6>
+                        <div class="info-box">
+                            <span class="data-label">Usuario (Login)</span>
+                            <div class="data-value text-primary"><i class="bi bi-at text-muted me-1"></i>{{ usuario.username }}</div>
+                            
+                            <hr class="opacity-10 my-3">
+
+                            <span class="data-label">Estado de la Cuenta</span>
+                            <div class="data-value">
+                                {% if usuario.is_active %}
+                                    <span class="badge-studio bg-success bg-opacity-10 text-success border border-success px-4 py-2">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Cuenta Activa
+                                    </span>
+                                {% else %}
+                                    <span class="badge-studio bg-danger bg-opacity-10 text-danger border border-danger px-4 py-2">
+                                        <i class="bi bi-x-circle-fill me-1"></i> Cuenta Inactiva
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="section-title"><i class="bi bi-clock-history"></i> Historial del Sistema</h6>
+                        <div class="info-box">
+                            <span class="data-label">Fecha de Registro</span>
+                            <div class="data-value">
+                                <i class="bi bi-calendar-check text-success me-2"></i>{{ usuario.date_joined|date:"d M Y" }}
+                            </div>
+                            
+                            <hr class="opacity-10 my-3">
+
+                            <span class="data-label">Último Inicio de Sesión</span>
+                            <div class="data-value">
+                                <i class="bi bi-box-arrow-in-right text-success me-2"></i>
+                                {% if usuario.last_login %}
+                                    {{ usuario.last_login|date:"d M Y - h:i A" }}
+                                {% else %}
+                                    <span class="text-muted fst-italic">Nunca ha ingresado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-end gap-3 mt-5 pt-4 border-top">
+                    <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light btn-action-studio border-2 text-dark shadow-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al Listado
+                    </a>
+                </div>
+
             </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

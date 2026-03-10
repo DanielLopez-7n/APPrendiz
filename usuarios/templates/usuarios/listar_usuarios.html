@@ -1,224 +1,232 @@
 {% extends 'core/panel_admin_base.html' %}
 {% load static %}
 
-{% block title %}Gestión de Usuarios | SENA APPrendiz{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* 1. Header de la Tabla: Solución al error de visibilidad */
-    .table-studio thead th {
-        background-color: #f8f9fa !important;
-        color: #636e72 !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 1px;
-        padding: 20px 15px;
-        border: none;
-    }
-
-    /* 2. Filas de la Tabla */
-    .table-studio tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f8f9fa;
-    }
-    .table-studio tbody tr:hover {
-        background-color: rgba(57, 169, 0, 0.02) !important;
-    }
-    .table-studio tbody td {
-        padding: 15px;
-        color: #2d3436;
-        font-size: 0.88rem;
-    }
-
-    /* 3. Estética de Filtros */
-    .filter-card {
-        border: none;
-        border-radius: 20px;
-        background: #ffffff;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    }
-    .form-control-studio, .form-select-studio {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        padding: 10px 15px;
-        background-color: #fcfcfc;
-    }
-    .form-control-studio:focus, .form-select-studio:focus {
-        border-color: var(--sena-green);
-        box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1);
-        background-color: #fff;
-    }
-
-    /* 4. Badges de Estado Studio */
-    .badge-studio {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.7rem;
-        letter-spacing: 0.5px;
-    }
-
-    /* 5. Avatar Studio */
-    .avatar-studio {
-        width: 48px; height: 48px;
-        border-radius: 12px;
-        background-color: rgba(57, 169, 0, 0.06);
-        color: var(--sena-green);
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800;
-        overflow: hidden;
-        flex: 0 0 48px;
-    }
-    .avatar-studio img {
-        display: block;
-        width: 100%; height: 100%;
-        object-fit: cover;
-    }
-    /* Nombre: permitir truncado y evitar que el avatar haga overflow sobre el texto */
-    .user-name-wrap { min-width: 0; }
-    .user-name { font-weight: 700; color: #222; }
-    .user-role { font-size: 0.85rem; }
-</style>
-{% endblock %}
+{% block title %}Gestión de Usuarios | APPrendiz{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - TABLAS Y BUSCADORES
+       ========================================== */
+    .card-studio {
+        border: none; border-radius: 25px; background: #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 25px; margin-bottom: 30px;
+    }
+
+    /* Buscador y Filtros Studio */
+    .filter-wrapper {
+        background-color: #f8f9fa; border-radius: 15px; padding: 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900;
+        transition: 0.3s;
+    }
+    .filter-wrapper:focus-within { background-color: #fff; border-color: #39A900; box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1); }
     
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Administración</h6>
-            <h1 class="display-6 fw-bold text-dark mb-0">Gestión de Usuarios</h1>
+    .input-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; }
+    .select-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; color: #6c757d; cursor: pointer; }
+
+    /* Botones Studio */
+    .btn-primary-studio {
+        background: #39A900; color: white !important; border: none; padding: 12px 25px;
+        border-radius: 50px; font-weight: 800; transition: 0.3s;
+    }
+    .btn-primary-studio:hover { background: #2d8600; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(57, 169, 0, 0.2); color: white !important; }
+
+    /* Tabla Premium */
+    .table-premium { border-collapse: separate; border-spacing: 0 8px; margin-bottom: 0; }
+    .table-premium thead th {
+        background: transparent; border: none; color: #a0a5ab;
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 20px;
+    }
+    .table-premium tbody tr { transition: 0.2s; }
+    .table-premium tbody td {
+        background: #fff; padding: 18px 20px; vertical-align: middle;
+        border-top: 1px solid #f1f3f5; border-bottom: 1px solid #f1f3f5;
+    }
+    .table-premium tbody tr:hover td { background: #f8faf9; border-color: rgba(57, 169, 0, 0.1); }
+    
+    .table-premium tbody td:first-child { border-left: 1px solid #f1f3f5; border-radius: 15px 0 0 15px; }
+    .table-premium tbody td:last-child { border-right: 1px solid #f1f3f5; border-radius: 0 15px 15px 0; }
+
+    /* Avatares y Roles */
+    .avatar-studio {
+        width: 45px; height: 45px; border-radius: 12px;
+        background-color: rgba(57, 169, 0, 0.08); color: #39A900;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; overflow: hidden; flex-shrink: 0;
+    }
+    .avatar-studio img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .badge-role { padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 0.7rem; margin-top: 4px; display: inline-block; }
+
+    /* Estado y Acciones */
+    .badge-status { padding: 8px 15px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; }
+    .action-pill { background: #fff; border: 1px solid #eee; border-radius: 50px; display: inline-flex; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .action-pill .btn { border: none; border-radius: 0; padding: 8px 15px; color: #6c757d; }
+    .action-pill .btn:hover { background: #f8f9fa; color: #39A900; }
+    .action-pill .btn-delete:hover { color: #dc3545; }
+
+    /* Modal Premium */
+    .modal-studio .modal-content { border-radius: 25px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+</style>
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px; font-size: 0.75rem;">Administración</h6>
+            <h2 class="fw-black text-dark mb-0">Gestión de Usuarios</h2>
         </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'usuarios:crear_usuario' %}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" style="background-color: var(--sena-green); border: none;">
-                <i class="bi bi-person-plus-fill me-2"></i>Nuevo Usuario
+        <div class="d-flex gap-2">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border text-muted shadow-sm d-flex align-items-center">
+                <i class="bi bi-arrow-left me-2"></i> Volver
             </a>
-            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border ms-2">
-                <i class="bi bi-arrow-left me-2"></i>Volver
+            <a href="{% url 'usuarios:crear_usuario' %}" class="btn btn-primary-studio shadow-sm d-flex align-items-center">
+                <i class="bi bi-person-plus-fill me-2 fs-5"></i> Nuevo Usuario
             </a>
         </div>
     </div>
-    
-    <div class="card filter-card mb-4">
-        <div class="card-body p-4">
-            <form method="GET" class="row g-3">
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 pe-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" name="buscar" class="form-control form-control-studio border-0" 
-                               placeholder="Buscar por documento o nombre..." value="{{ busqueda }}">
-                    </div>
+
+    <div class="card-studio mb-4">
+        <form method="GET" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="filter-wrapper d-flex align-items-center">
+                    <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
+                    <input type="text" name="buscar" class="input-studio" placeholder="Buscar por documento o nombre..." value="{{ busqueda }}">
                 </div>
-                <div class="col-md-3">
-                    <select name="activo" class="form-select form-select-studio">
+            </div>
+            <div class="col-md-3">
+                <div class="filter-wrapper" style="border-left-color: #adb5bd;">
+                    <select name="activo" class="select-studio">
                         <option value="">Estado: Todos</option>
                         <option value="true" {% if filtro_activo == 'true' %}selected{% endif %}>Activos</option>
                         <option value="false" {% if filtro_activo == 'false' %}selected{% endif %}>Inactivos</option>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <select name="staff" class="form-select form-select-studio">
+            </div>
+            <div class="col-md-3">
+                <div class="filter-wrapper" style="border-left-color: #adb5bd;">
+                    <select name="staff" class="select-studio">
                         <option value="">Rol: Todos</option>
                         <option value="true" {% if filtro_staff == 'true' %}selected{% endif %}>Administradores</option>
-                        <option value="false" {% if filtro_staff == 'false' %}selected{% endif %}>Aprendices/Instructores</option>
+                        <option value="false" {% if filtro_staff == 'false' %}selected{% endif %}>Aprendices / Instructores</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-dark w-100 rounded-pill fw-bold py-2">
-                        Filtrar
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="col-md-1 d-flex justify-content-end">
+                <button type="submit" class="btn btn-dark rounded-circle shadow-sm" style="width: 50px; height: 50px; background-color: #1a1a1a;" title="Aplicar Filtros">
+                    <i class="bi bi-funnel-fill"></i>
+                </button>
+            </div>
+        </form>
     </div>
-    
-    <div class="card border-0 shadow-sm" style="border-radius: 24px; overflow: hidden;">
+
+    <div class="card-studio p-4">
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-people-fill text-success me-2"></i> Usuarios Registrados</h5>
+            <span class="badge bg-light text-dark border ms-3 rounded-pill">{{ usuarios|length }} Registros</span>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-studio mb-0 align-middle">
+            <table class="table table-premium w-100">
                 <thead>
                     <tr>
-                        <th class="ps-4">Documento</th>
-                        <th>Nombre y Rol</th>
-                        <th>Contacto</th>
-                        <th>Registro</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Acciones</th>
+                        <th width="15%">Documento</th>
+                        <th width="35%">Nombre y Rol</th>
+                        <th width="20%">Contacto</th>
+                        <th width="15%" class="text-center">Estado</th>
+                        <th width="15%" class="text-end">Acciones</th>
                     </tr>
                 </thead>
-                
                 <tbody>
                     {% for usuario in usuarios %}
                     <tr>
-                        <td class="ps-4">
-                            <span class="fw-bold text-dark">
+                        <td>
+                            <div class="fw-bolder text-dark fs-6">
                                 {% if usuario.aprendiz %}{{ usuario.aprendiz.documento|default:"--" }}
                                 {% elif usuario.instructor %}{{ usuario.instructor.cedula|default:"--" }}
                                 {% else %}{{ usuario.perfil.documento|default:"--" }}{% endif %}
-                            </span>
+                            </div>
+                            <small class="text-muted d-block mt-1"><i class="bi bi-calendar3 me-1"></i>{{ usuario.date_joined|date:"d M, Y" }}</small>
                         </td>
 
                         <td>
                             <div class="d-flex align-items-center">
                                 <div class="avatar-studio me-3">
                                     {% if usuario.perfil.foto_perfil %}
-                                        <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Foto de {{ usuario.first_name }}">
+                                        <img src="{{ usuario.perfil.foto_perfil.url }}" alt="Foto">
                                     {% else %}
-                                        <span class="h6 mb-0">{{ usuario.first_name|first|default:usuario.username|first|upper }}</span>
+                                        {{ usuario.first_name|first|default:usuario.username|first|upper }}
                                     {% endif %}
                                 </div>
-                                <div class="user-name-wrap">
-                                    <div class="user-name">{{ usuario.get_full_name }}</div>
-                                    <div class="user-role small text-muted">
-                                        {% if usuario.aprendiz %}<span class="text-primary">Aprendiz (Ficha: {{ usuario.aprendiz.numero_ficha }})</span>
-                                        {% elif usuario.instructor %}<span class="text-warning text-dark">Instructor</span>
-                                        {% elif usuario.is_superuser %}<span class="text-danger">Administrador</span>
-                                        {% endif %}
-                                    </div>
+                                <div>
+                                    <div class="fw-bold text-dark fs-6" style="line-height: 1.2;">{{ usuario.get_full_name|default:usuario.username }}</div>
+                                    
+                                    {% if usuario.is_superuser %}
+                                        <span class="badge-role bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">Administrador</span>
+                                    {% elif usuario.is_staff %}
+                                        <span class="badge-role bg-warning bg-opacity-10 text-warning border border-warning border-opacity-50" style="color: #d39e00 !important;">Instructor</span>
+                                    {% elif usuario.aprendiz %}
+                                        <span class="badge-role bg-success bg-opacity-10 text-success border border-success border-opacity-25">Aprendiz (Ficha: {{ usuario.aprendiz.numero_ficha }})</span>
+                                    {% else %}
+                                        <span class="badge-role bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">Usuario General</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </td>
 
                         <td>
-                            <div class="small fw-semibold text-dark">{{ usuario.email }}</div>
-                            <div class="text-muted small">
+                            <div class="fw-semibold text-dark" style="font-size: 0.85rem;"><i class="bi bi-envelope-at text-muted me-1"></i> {{ usuario.email|default:"Sin correo" }}</div>
+                            <div class="text-muted mt-1" style="font-size: 0.8rem;">
+                                <i class="bi bi-telephone text-muted me-1"></i> 
                                 {% if usuario.aprendiz %}{{ usuario.aprendiz.telefono|default:"--" }}
                                 {% else %}{{ usuario.perfil.telefono|default:"--" }}{% endif %}
                             </div>
                         </td>
 
-                        <td><span class="text-muted small">{{ usuario.date_joined|date:"d M, Y" }}</span></td>
-                        
                         <td class="text-center">
                             {% if usuario.is_active %}
-                                <span class="badge-studio bg-success bg-opacity-10 text-success">Activo</span>
+                                <span class="badge-status bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Activo
+                                </span>
                             {% else %}
-                                <span class="badge-studio bg-danger bg-opacity-10 text-danger">Inactivo</span>
+                                <span class="badge-status bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Inactivo
+                                </span>
                             {% endif %}
                         </td>
-                        
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{% url 'usuarios:ver_detalle_usuario' usuario.id %}" class="btn btn-light btn-sm rounded-3 shadow-sm" title="Ver"><i class="bi bi-eye text-primary"></i></a>
-                                <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn btn-light btn-sm rounded-3 shadow-sm" title="Editar"><i class="bi bi-pencil text-info"></i></a>
-                                <button type="button" class="btn btn-light btn-sm rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ usuario.id }}"><i class="bi bi-trash text-danger"></i></button>
+
+                        <td class="text-end">
+                            <div class="action-pill">
+                                <a href="{% url 'usuarios:ver_detalle_usuario' usuario.id %}" class="btn" title="Ver Perfil">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <div class="vr opacity-25"></div>
+                                <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="btn" title="Editar Credenciales">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <div class="vr opacity-25"></div>
+                                <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ usuario.id }}" title="Eliminar Usuario">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
                             </div>
 
-                            <div class="modal fade" id="eliminarModal{{ usuario.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade modal-studio" id="eliminarModal{{ usuario.id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+                                    <div class="modal-content">
                                         <div class="modal-body p-5 text-center">
                                             <div class="mb-4">
-                                                <i class="bi bi-exclamation-octagon text-danger display-1 opacity-25"></i>
+                                                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle" style="width: 80px; height: 80px;">
+                                                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                                                </div>
                                             </div>
-                                            <h4 class="fw-bold mb-3">¿Eliminar usuario?</h4>
-                                            <p class="text-muted mb-4">Estás a punto de eliminar permanentemente a <strong>{{ usuario.get_full_name }}</strong>. Esta acción no se puede deshacer.</p>
+                                            <h4 class="fw-bold mb-3 text-dark">¿Eliminar usuario?</h4>
+                                            <p class="text-muted mb-4">Estás a punto de eliminar permanentemente a <strong>{{ usuario.get_full_name|default:usuario.username }}</strong> del sistema. Esta acción no se puede deshacer.</p>
                                             
                                             <div class="d-flex gap-2 justify-content-center">
-                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
                                                 <form action="{% url 'usuarios:eliminar_usuario' usuario.id %}" method="POST">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Sí, eliminar</button>
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Sí, eliminar</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -229,9 +237,12 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="bi bi-people display-4 text-muted opacity-25 mb-3 d-block"></i>
-                            <p class="text-muted">No se encontraron usuarios con esos filtros.</p>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-people fs-1 d-block mb-3 text-light"></i>
+                                <h6 class="fw-bold">No se encontraron usuarios</h6>
+                                <p class="small mb-0">Ajusta los filtros de búsqueda o crea un nuevo usuario.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -239,14 +250,13 @@
             </table>
         </div>
     </div>
+
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const modales = document.querySelectorAll('.modal');
-        modales.forEach(modal => {
-            document.body.appendChild(modal);
-        });
+        modales.forEach(modal => { document.body.appendChild(modal); });
     });
 </script>
 {% endblock %}

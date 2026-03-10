@@ -1,106 +1,131 @@
-{% extends 'core/panel_admin_base.html' %}
+{% extends 'core/base_simple.html' %}
+{% load static %}
 
-{% block page_title %}Mi información personal{% endblock %}
+{% block navbar_title %}Mi Perfil Personal{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body text-center p-4">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                    {% if user.perfil.foto_perfil %}
-                        <img src="{{ user.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle border border-3" style="width: 150px; height: 150px; object-fit: cover; border-color: var(--sena-green) !important;">
-                    {% else %}
-                        <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 150px; height: 150px; background-color: #f8f9fa; border: 3px solid var(--sena-green);">
-                            <i class="bi bi-person text-secondary" style="font-size: 5rem;"></i>
-                        </div>
-                    {% endif %}
-                </div>
+<style>
+    body { background-color: #f4f7f6 !important; }
+    .profile-card { border: none; border-radius: 25px; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.06); overflow: hidden; }
+    .cover-photo { height: 140px; background: linear-gradient(135deg, #39A900 0%, #2D8600 100%); position: relative; }
+    
+    /* Avatar e Input de Foto */
+    .avatar-container { text-align: center; margin-top: -75px; position: relative; z-index: 10; margin-bottom: 30px; }
+    .avatar-circle {
+        width: 150px; height: 150px; border-radius: 50%; background-color: #f8f9fa;
+        border: 6px solid #fff; box-shadow: 0 10px 25px rgba(57, 169, 0, 0.15);
+        display: inline-flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto;
+    }
+    .avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-circle i { font-size: 5rem; color: #dee2e6; }
+    
+    .camera-btn {
+        position: absolute; bottom: 5px; right: 50%; margin-right: -70px;
+        background: #39A900; color: white; width: 45px; height: 45px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2); cursor: pointer;
+    }
+
+    /* Formulario */
+    .section-title { color: #1a1a1a; font-weight: 800; font-size: 1rem; margin: 25px 0; display: flex; align-items: center; }
+    .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #f0f0f0; margin-left: 15px; }
+    .label-studio { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #6c757d; margin-bottom: 8px; display: block; }
+    
+    .input-group-studio {
+        background-color: #f8f9fa; border-radius: 12px; padding: 5px 15px; border: 1px solid #e0e0e0;
+        border-left: 4px solid #39A900; display: flex; align-items: center; margin-bottom: 20px;
+    }
+    .input-group-studio i { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
+    .input-group-studio input { flex-grow: 1; border: none !important; background: transparent !important; padding: 12px 0; font-weight: 700; outline: none; }
+
+    .btn-save { background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px; font-weight: 800; width: 100%; transition: 0.3s; }
+    .btn-save:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="profile-card">
+                <div class="cover-photo"></div>
                 
-                <h4 class="fw-bold mb-1" style="color: var(--sena-dark-green);">{{ user.get_full_name|default:user.username }}</h4>
-                <p class="text-muted mb-3">
-                    {% if user.is_superuser %}Superadministrador
-                    {% elif user.is_staff %}Instructor
-                    {% else %}Aprendiz{% endif %}
-                </p>
-                
-                <a href="{% url 'aprendices:editar_perfil_aprendiz' %}" class="btn btn-outline-success w-100 fw-bold rounded-pill">
-                    <i class="bi bi-pencil-square me-1"></i> Editar Información
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-8">
-        
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-transparent border-bottom p-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-person-lines-fill me-2" style="color: var(--sena-green);"></i> Información Detallada</h5>
-            </div>
-            <div class="card-body p-4">
-                <div class="row g-4">
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Nombres Completos</label>
-                            <p class="fw-semibold mb-0">{{ user.first_name }} {{ user.last_name }}</p>
+                <form method="POST" enctype="multipart/form-data" id="profileForm">
+                    {% csrf_token %}
+                    
+                    <div class="avatar-container">
+                        <div class="avatar-circle">
+                            {% if usuario.perfil.foto_perfil %}
+                                <img id="imgPreview" src="{{ usuario.perfil.foto_perfil.url }}">
+                            {% else %}
+                                <i id="userIcon" class="bi bi-person-fill"></i>
+                                <img id="imgPreview" style="display:none; width:100%; height:100%; object-fit:cover;">
+                            {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Documento de Identidad</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.tipo_documento }} {{ aprendiz.documento }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Correo Institucional</label>
-                            <p class="fw-semibold mb-0">{{ user.email|default:"---" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Correo Personal</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.correo_personal|default:"---" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Teléfono de Contacto</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.telefono|default:"---" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Dirección de Residencia</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.direccion_residencia|default:"---" }}</p>
-                        </div>
-                        
-                        <div class="col-12"><hr class="my-2"></div>
-                        
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Modalidad de Formación</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.modalidad_formacion|default:"---" }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="text-muted small fw-bold">Modalidad Etapa Productiva</label>
-                            <p class="fw-semibold mb-0">{{ aprendiz.modalidad_etapa|default:"---" }}</p>
-                        </div>
-                        {% if aprendiz.etapa_exterior %}
-                        <div class="col-md-12">
-                            <label class="text-muted small fw-bold">Etapa en el Exterior</label>
-                            <p class="fw-semibold mb-0 text-success"><i class="bi bi-airplane-fill me-1"></i> Sí, en {{ aprendiz.pais_etapa }}</p>
-                        </div>
-                        {% endif %}
+                        <label for="{{ form_perfil.foto_perfil.id_for_label }}" class="camera-btn">
+                            <i class="bi bi-camera-fill"></i>
+                        </label>
+                        <div style="display: none;">{{ form_perfil.foto_perfil }}</div>
                     </div>
-            </div>
-        </div>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent border-bottom p-3">
-                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-shield-lock-fill me-2 text-warning"></i> Seguridad de la Cuenta</h5>
-            </div>
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                    <div>
-                        <h6 class="fw-bold mb-1">Contraseña de Acceso</h6>
-                        <p class="text-muted small mb-0">Es recomendable cambiar tu contraseña periódicamente para mantener tu cuenta segura.</p>
+                    <div class="px-4 px-md-5 pb-5">
+                        <h5 class="section-title"><i class="bi bi-person-badge me-2 text-success"></i>Información Personal</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="label-studio">Nombres</label>
+                                <div class="input-group-studio"><i class="bi bi-person"></i>{{ form_usuario.first_name }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-studio">Apellidos</label>
+                                <div class="input-group-studio"><i class="bi bi-person"></i>{{ form_usuario.last_name }}</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="label-studio">Correo para recuperación de contraseña</label>
+                                <div class="input-group-studio"><i class="bi bi-envelope-at"></i>{{ form_usuario.email }}</div>
+                            </div>
+                        </div>
+
+                        <h5 class="section-title mt-4"><i class="bi bi-shield-lock me-2 text-success"></i>Datos del Sistema</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="label-studio">Documento de Identidad (Solo Lectura)</label>
+                                <div class="input-group-studio" style="border-left-color: #adb5bd; background: #f1f3f5;">
+                                    <i class="bi bi-hash" style="color: #adb5bd;"></i>{{ form_perfil.documento }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-studio">Teléfono (Solo Lectura)</label>
+                                <div class="input-group-studio" style="border-left-color: #adb5bd; background: #f1f3f5;">
+                                    <i class="bi bi-telephone" style="color: #adb5bd;"></i>{{ form_perfil.telefono }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-md-4">
+                                <a href="{% url 'aprendices:perfil_aprendiz' %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold border">Cancelar</a>
+                            </div>
+                            <div class="col-md-8">
+                                <button type="submit" class="btn-save">Actualizar Mi Información</button>
+                            </div>
+                        </div>
                     </div>
-                    <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-warning fw-bold shadow-sm rounded-pill px-4">
-                        <i class="bi bi-key-fill me-1"></i> Cambiar Contraseña
-                    </a>
-                </div>
+                </form>
             </div>
         </div>
-
     </div>
 </div>
+
+<script>
+    document.getElementById('{{ form_perfil.foto_perfil.id_for_label }}').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('imgPreview');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                if(document.getElementById('userIcon')) document.getElementById('userIcon').style.display = 'none';
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}
