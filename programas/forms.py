@@ -22,6 +22,6 @@ class ProgramaForm(forms.ModelForm):
         # Labels: Personalizamos las etiquetas si es necesario
         labels = {
             'nombre': 'Nombre del Programa de Formación',
-            'codigo': 'Código de Ficha / Programa',
+            'codigo': 'Código Programa',
             'nivel': 'Nivel de Formación',
         }

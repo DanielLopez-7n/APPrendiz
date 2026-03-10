@@ -1,54 +1,136 @@
 {% extends 'core/panel_admin_base.html' %}
 
-{% block title %}{{ accion }} Ficha{% endblock %}
+{% block title %}{{ accion }} Ficha | APPrendiz{% endblock %}
 {% block page_title %}Gestión de Fichas{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0 text-success">
-                    <i class="bi bi-people-fill me-2"></i>{{ accion }} Ficha de Formación
-                </h5>
-            </div>
-            <div class="card-body p-4">
-                <form method="POST">
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - FORMULARIOS (STUDIO)
+       ========================================== */
+    .card-studio {
+        border: none; border-radius: 30px; background: #fff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04); padding: 40px;
+    }
+
+    /* Icono del Encabezado */
+    .icon-header {
+        width: 70px; height: 70px;
+        background: rgba(57, 169, 0, 0.1);
+        color: #39A900;
+        border-radius: 50%; display: inline-flex;
+        align-items: center; justify-content: center;
+        margin-bottom: 20px; font-size: 2rem;
+    }
+
+    /* Etiquetas e Inputs */
+    .label-studio {
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1px; color: #6c757d; margin-left: 5px; margin-bottom: 8px; display: block;
+    }
+    
+    .input-group-studio {
+        background-color: #f8f9fa; border-radius: 12px; padding: 5px 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900;
+        transition: 0.3s all ease-in-out; display: flex; align-items: center;
+    }
+    .input-group-studio:focus-within {
+        border-color: #39A900; background-color: #fff; box-shadow: 0 0 0 5px rgba(57, 169, 0, 0.1);
+    }
+    .input-group-studio i { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
+    
+    /* Forzamos a que los inputs de Django se adapten al contenedor */
+    .input-group-studio input, .input-group-studio select {
+        flex-grow: 1; border: none !important; background: transparent !important; width: 100%;
+        padding: 12px 0; outline: none !important; box-shadow: none !important; 
+        color: #1a1a1a; font-weight: 700;
+    }
+
+    /* Botón Guardar */
+    .btn-save-studio {
+        background: #39A900; color: white; border: none; padding: 15px 40px; border-radius: 50px;
+        font-weight: 800; transition: 0.3s;
+    }
+    .btn-save-studio:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9 col-lg-7">
+            
+            <div class="card-studio">
+                <div class="text-center mb-5">
+                    <div class="icon-header">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h2 class="fw-black text-dark mb-1">{{ accion }} Ficha de Formación</h2>
+                    <p class="text-muted fw-bold small">Configure los datos de la ficha para vincular aprendices e instructores.</p>
+                </div>
+
+                <form method="POST" novalidate>
                     {% csrf_token %}
                     
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">{{ form.numero.label }} *</label>
-                        {{ form.numero }}
-                        <div class="text-danger small">{{ form.numero.errors }}</div>
+                    <div class="mb-4">
+                        <label class="label-studio">{{ form.numero.label }} *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-hash"></i>
+                            {{ form.numero }}
+                        </div>
+                        {% if form.numero.errors %}
+                            <div class="text-danger small mt-2 fw-bold"><i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.numero.errors|striptags }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold">{{ form.programa.label }} *</label>
-                        {{ form.programa }}
-                        <div class="text-danger small">{{ form.programa.errors }}</div>
+                        <label class="label-studio">{{ form.programa.label }} *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-book-half"></i>
+                            {{ form.programa }}
+                        </div>
+                        {% if form.programa.errors %}
+                            <div class="text-danger small mt-2 fw-bold"><i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.programa.errors|striptags }}</div>
+                        {% endif %}
                     </div>
 
-                    <div class="row mb-4">
+                    <div class="row g-4 mb-5">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ form.fecha_inicio.label }} *</label>
-                            {{ form.fecha_inicio }}
-                            <div class="text-danger small">{{ form.fecha_inicio.errors }}</div>
+                            <label class="label-studio">{{ form.fecha_inicio.label }} *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-calendar-event"></i>
+                                {{ form.fecha_inicio }}
+                            </div>
+                            {% if form.fecha_inicio.errors %}
+                                <div class="text-danger small mt-2 fw-bold"><i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.fecha_inicio.errors|striptags }}</div>
+                            {% endif %}
                         </div>
-                        <div class="col-md-6 mt-3 mt-md-0">
-                            <label class="form-label fw-bold">{{ form.fecha_fin.label }} *</label>
-                            {{ form.fecha_fin }}
-                            <div class="text-danger small">{{ form.fecha_fin.errors }}</div>
+                        <div class="col-md-6">
+                            <label class="label-studio">{{ form.fecha_fin.label }} *</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-calendar-check"></i>
+                                {{ form.fecha_fin }}
+                            </div>
+                            {% if form.fecha_fin.errors %}
+                                <div class="text-danger small mt-2 fw-bold"><i class="bi bi-exclamation-circle-fill me-1"></i> {{ form.fecha_fin.errors|striptags }}</div>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'fichas:listar_fichas' %}" class="btn btn-light me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-4">
-                            <i class="bi bi-save me-1"></i> Guardar Ficha
-                        </button>
+                    <div class="row align-items-center border-top pt-4 mt-2">
+                        <div class="col-md-5 mb-3 mb-md-0">
+                            <a href="{% url 'fichas:listar_fichas' %}" class="btn btn-light rounded-pill w-100 fw-bold border-2 py-3 text-muted shadow-sm">
+                                Cancelar
+                            </a>
+                        </div>
+                        <div class="col-md-7">
+                            <button type="submit" class="btn-save-studio w-100 shadow-sm py-3">
+                                <i class="bi bi-save2-fill me-2"></i> Guardar Ficha
+                            </button>
+                        </div>
                     </div>
+
                 </form>
             </div>
+
         </div>
     </div>
 </div>
