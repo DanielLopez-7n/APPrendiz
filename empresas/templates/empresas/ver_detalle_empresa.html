@@ -1,71 +1,109 @@
 {% extends 'core/panel_admin_base.html' %}
 {% load static %}
 
-{% block title %}Detalle Empresa | {{ empresa.nombre_empresa }}{% endblock %}
-
-{% block extra_css %}
+{% block title %}Detalle Empresa | {{ empresa.nombre }}{% endblock %}
+{% block content %}
 <style>
-    .detail-header {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    /* ==========================================
+       ESTILOS PREMIUM - DETALLE (VERDE SENA)
+       ========================================== */
+    .detail-header-studio {
+        background: linear-gradient(135deg, #39A900 0%, #2a7a00 100%);
         border-radius: 30px;
         padding: 40px;
         color: white;
         margin-bottom: 30px;
+        box-shadow: 0 15px 35px rgba(57, 169, 0, 0.2);
+        position: relative;
+        overflow: hidden;
     }
-    .info-card {
+    
+    /* Decoración de fondo para el header */
+    .detail-header-studio::after {
+        content: "\F1CC"; /* Icono bi-buildings */
+        font-family: "bootstrap-icons";
+        position: absolute;
+        right: -20px;
+        bottom: -40px;
+        font-size: 12rem;
+        opacity: 0.1;
+        transform: rotate(-10deg);
+    }
+
+    .info-card-studio {
         border: none;
-        border-radius: 20px;
+        border-radius: 25px;
         background: #fff;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03);
         height: 100%;
+        padding: 30px;
+        border-top: 4px solid #39A900;
+        transition: 0.3s;
     }
-    .data-label {
-        font-size: 0.7rem;
+    .info-card-studio:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+    
+    .data-label-studio {
+        font-size: 0.75rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #adb5bd;
+        color: #6c757d;
         margin-bottom: 5px;
         display: block;
     }
-    .data-value {
-        font-weight: 600;
-        color: #2d3436;
-        margin-bottom: 20px;
+    
+    .data-value-studio {
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 25px;
+        font-size: 1.1rem;
     }
-    .status-pill {
+    
+    .status-pill-studio {
         background: rgba(255,255,255,0.2);
-        padding: 5px 15px;
+        padding: 6px 18px;
         border-radius: 50px;
         font-size: 0.8rem;
-        font-weight: bold;
+        font-weight: 800;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .icon-box-studio {
+        width: 50px; height: 50px;
+        background: rgba(57, 169, 0, 0.1);
+        color: #39A900;
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin-right: 20px;
     }
 </style>
-{% endblock %}
 
-{% block content %}
 <div class="container-fluid py-4">
     
     <div class="mb-4">
-        <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-light rounded-pill px-4 fw-bold border">
-            <i class="bi bi-arrow-left me-2"></i>Volver al listado
+        <a href="{% url 'empresas:listar_empresas' %}" class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Directorio
         </a>
     </div>
 
-    <div class="detail-header shadow-lg">
-        <div class="row align-items-center">
-            <div class="col-md-2 text-center text-md-start mb-3 mb-md-0">
-                <div class="bg-white text-primary rounded-4 d-inline-flex align-items-center justify-content-center shadow" style="width: 100px; height: 100px;">
-                    <i class="bi bi-building-fill" style="font-size: 3rem;"></i>
+    <div class="detail-header-studio">
+        <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-md-2 text-center text-md-start mb-4 mb-md-0">
+                <div class="bg-white text-success rounded-4 d-inline-flex align-items-center justify-content-center shadow-lg" style="width: 110px; height: 110px;">
+                    <i class="bi bi-building-fill" style="font-size: 3.5rem;"></i>
                 </div>
             </div>
             <div class="col-md-7 text-center text-md-start">
-                <span class="status-pill mb-2 d-inline-block">Empresa Vinculada</span>
-                <h1 class="fw-bold mb-1">{{ empresa.nombre_empresa }}</h1>
-                <p class="mb-0 opacity-75 fs-5">NIT: {{ empresa.nit }} | Sector: {{ empresa.sector_economico }}</p>
+                <span class="status-pill-studio mb-3 d-inline-block"><i class="bi bi-check-circle-fill me-2"></i>Empresa Vinculada</span>
+                <h1 class="fw-black mb-1 display-5">{{ empresa.nombre }}</h1>
+                <p class="mb-0 fs-5 text-white-50 fw-semibold">
+                    <i class="bi bi-hash me-1"></i>NIT: {{ empresa.nit }} <span class="mx-2">|</span> 
+                    <i class="bi bi-briefcase me-1"></i>Sector: {{ empresa.sector_economico }}
+                </p>
             </div>
-            <div class="col-md-3 text-center text-md-end">
-                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 border-0 shadow-sm">
+            <div class="col-md-3 text-center text-md-end mt-4 mt-md-0">
+                <a href="{% url 'empresas:editar_empresa' empresa.id %}" class="btn btn-light text-success fw-bold rounded-pill px-4 py-3 border-0 shadow">
                     <i class="bi bi-pencil-square me-2"></i>Editar Datos
                 </a>
             </div>
@@ -73,63 +111,80 @@
     </div>
 
     <div class="row g-4">
+        
         <div class="col-lg-4">
-            <div class="info-card p-4">
-                <h5 class="fw-bold mb-4 border-bottom pb-2">Datos Legales</h5>
+            <div class="info-card-studio">
+                <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                    <i class="bi bi-file-earmark-text text-success fs-3 me-3"></i>
+                    <h5 class="fw-bold mb-0 text-dark">Datos Legales</h5>
+                </div>
                 
-                <span class="data-label">Razón Social</span>
-                <p class="data-value fs-5">{{ empresa.nombre_empresa }}</p>
+                <span class="data-label-studio">Razón Social</span>
+               <p class="data-value-studio text-success">{{ empresa.nombre }}</p>
 
-                <span class="data-label">NIT</span>
-                <p class="data-value">{{ empresa.nit }}</p>
+                <span class="data-label-studio">NIT</span>
+                <p class="data-value-studio">{{ empresa.nit }}</p>
 
-                <span class="data-label">Representante Legal</span>
-                <p class="data-value">{{ empresa.representante_legal|default:"No registrado" }}</p>
+                <span class="data-label-studio">Representante Legal</span>
+                <p class="data-value-studio">{{ empresa.representante_legal|default:"No registrado" }}</p>
 
-                <span class="data-label">Ciudad / Ubicación</span>
-                <p class="data-value">{{ empresa.ciudad }} - {{ empresa.direccion }}</p>
+                <span class="data-label-studio">Sede Principal</span>
+                <p class="data-value-studio mb-0">{{ empresa.ciudad }} {% if empresa.direccion %}- {{ empresa.direccion }}{% endif %}</p>
             </div>
         </div>
 
         <div class="col-lg-8">
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="info-card p-4">
-                        <h5 class="fw-bold mb-4 border-bottom pb-2">Información de Contacto</h5>
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="bi bi-envelope-at fs-4 text-primary me-3"></i>
+                
+                <div class="col-md-7">
+                    <div class="info-card-studio">
+                        <div class="d-flex align-items-center mb-4 border-bottom pb-3">
+                            <i class="bi bi-headset text-success fs-3 me-3"></i>
+                            <h5 class="fw-bold mb-0 text-dark">Información de Contacto</h5>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="icon-box-studio"><i class="bi bi-envelope-at-fill"></i></div>
                             <div>
-                                <span class="data-label">Correo Electrónico</span>
-                                <div class="fw-bold">{{ empresa.correo_electronico }}</div>
+                                <span class="data-label-studio mb-1">Correo Corporativo</span>
+                                <div class="fw-bold text-dark fs-5">{{ empresa.correo_electronico|default:"No registrado" }}</div>
                             </div>
                         </div>
+                        
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-telephone fs-4 text-primary me-3"></i>
+                            <div class="icon-box-studio"><i class="bi bi-telephone-fill"></i></div>
                             <div>
-                                <span class="data-label">Teléfono de Contacto</span>
-                                <div class="fw-bold">{{ empresa.telefono }}</div>
+                                <span class="data-label-studio mb-1">Línea de Atención</span>
+                                <div class="fw-bold text-dark fs-5">{{ empresa.telefono|default:"No registrado" }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="info-card p-4 text-center d-flex flex-column justify-content-center">
-                        <span class="data-label">Aprendices Vinculados</span>
-                        <h2 class="display-4 fw-bold text-primary mb-0">0</h2>
-                        <p class="text-muted small">Actualmente en etapa productiva</p>
+                <div class="col-md-5">
+                    <div class="info-card-studio text-center d-flex flex-column justify-content-center align-items-center" style="border-top-color: #ffc107;">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-mortarboard-fill fs-2"></i>
+                        </div>
+                        <span class="data-label-studio">Aprendices Vinculados</span>
+                        <h2 class="display-3 fw-black text-dark mb-0">0</h2>
+                        <p class="text-muted fw-bold small mt-2">En etapa productiva</p>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <div class="info-card p-4">
-                        <h5 class="fw-bold mb-3">Descripción / Notas</h5>
-                        <p class="text-muted">
-                            Esta empresa se encuentra registrada bajo el sector de <strong>{{ empresa.sector_economico }}</strong>. 
-                            Participa activamente en la vinculación de aprendices para fortalecer el desarrollo regional.
+                    <div class="info-card-studio" style="border-top-color: #1a1a1a;">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-info-circle-fill text-dark fs-4 me-3"></i>
+                            <h5 class="fw-bold mb-0 text-dark">Perfil Corporativo</h5>
+                        </div>
+                        <p class="text-muted fw-medium" style="line-height: 1.7;">
+                            Esta empresa se encuentra registrada bajo el sector de <strong>{{ empresa.sector_economico }}</strong> en la ciudad de <strong>{{ empresa.ciudad }}</strong>. 
+                            Participa activamente como Ente Co-formador en la vinculación de aprendices SENA, fortaleciendo el desarrollo regional y productivo del país.
                         </p>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
