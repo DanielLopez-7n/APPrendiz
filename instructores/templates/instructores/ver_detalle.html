@@ -1,74 +1,162 @@
-{% extends 'core/panel_admin_base.html' %}
+{% extends 'core/panel_admin_base.html' %} 
 
-{% block title %}Detalle del Instructor{% endblock %}
+{% block title %}Ficha Técnica: {{ instructor.usuario.get_full_name }} | APPrendiz{% endblock %}
 
 {% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'instructores:listar_instructores' %}">Instructores</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'instructores:listar_instructores' %}" class="text-success text-decoration-none">Instructores</a></li>
     <li class="breadcrumb-item active">Ficha Técnica</li>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0">
-            <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-person-vcard me-2"></i>Hoja de Vida Instructor</h5>
-                {% if instructor.usuario.is_active %}
-                    <span class="badge bg-success border border-white">Activo</span>
-                {% else %}
-                    <span class="badge bg-danger border border-white">Inactivo</span>
-                {% endif %}
-            </div>
-            
-            <div class="card-body p-4 p-md-5">
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - FICHA INSTRUCTOR
+       ========================================== */
+    .detail-container-studio { max-width: 900px; margin: 0 auto; }
+    
+    .card-studio {
+        border: none; border-radius: 30px; background: #fff;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05); overflow: hidden;
+    }
 
-                <h6 class="font-weight-bold text-uppercase mb-3" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Personal</h6>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">TIPO DE DOCUMENTO</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.get_tipo_documento_display|default:instructor.tipo_documento }}</p>
+    /* Portada con gradiente institucional */
+    .profile-cover-mini {
+        height: 140px;
+        background: linear-gradient(135deg, #39A900 0%, #2D8600 100%);
+        position: relative;
+    }
+
+    /* Avatar Flotante */
+    .avatar-wrapper { text-align: center; margin-top: -75px; position: relative; z-index: 10; padding-bottom: 20px; }
+    .avatar-view-circle {
+        width: 150px; height: 150px; border-radius: 50%; background-color: #f8f9fa;
+        border: 6px solid #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        display: inline-flex; align-items: center; justify-content: center;
+        overflow: hidden; margin: 0 auto;
+    }
+    .avatar-view-circle img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-view-circle i { font-size: 5.5rem; color: #dee2e6; margin-top: 15px; }
+
+    /* Secciones de Datos */
+    .section-title {
+        color: #1a1a1a; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px;
+        margin-bottom: 25px; margin-top: 15px; display: flex; align-items: center;
+    }
+    .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #f0f0f0; margin-left: 15px; }
+
+    /* Cajas de Info Premium */
+    .info-box-premium {
+        background: #f8f9fa; border: 1px solid #e9ecef; border-left: 5px solid #39A900;
+        border-radius: 18px; padding: 20px; height: 100%; transition: 0.3s;
+    }
+    .info-box-premium:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+
+    .data-label {
+        font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1px; color: #6c757d; margin-bottom: 5px; display: block;
+    }
+    .data-value { font-weight: 700; color: #1a1a1a; font-size: 1rem; }
+
+    /* Badges Studio */
+    .badge-studio {
+        padding: 8px 18px; border-radius: 50px; font-weight: 800; font-size: 0.75rem;
+    }
+
+    /* Botones */
+    .btn-studio { border-radius: 50px; font-weight: 800; padding: 12px 30px; transition: 0.3s; }
+</style>
+
+<div class="container py-4">
+    <div class="detail-container-studio">
+        
+        <div class="card-studio">
+            <div class="profile-cover-mini position-relative" style="height: 140px;">
+                <div style="position: absolute; top: 24px; right: 36px; z-index: 2;">
+                    {% if instructor.usuario.is_active %}
+                        <span class="badge-studio bg-white text-success shadow-sm" style="font-size:1rem;"><i class="bi bi-patch-check-fill me-2"></i>INSTRUCTOR ACTIVO</span>
+                    {% else %}
+                        <span class="badge-studio bg-white text-danger shadow-sm" style="font-size:1rem;"><i class="bi bi-x-octagon-fill me-2"></i>INSTRUCTOR INACTIVO</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="avatar-wrapper">
+                <div class="avatar-view-circle mb-3">
+                    {% if instructor.usuario.perfil.foto_perfil %}
+                        <img src="{{ instructor.usuario.perfil.foto_perfil.url }}" alt="Foto">
+                    {% else %}
+                        <i class="bi bi-person-workspace"></i>
+                    {% endif %}
+                </div>
+                <h2 class="fw-bold text-dark mb-1">{{ instructor.usuario.get_full_name }}</h2>
+                <p class="text-muted fw-bold"><i class="bi bi-envelope-at text-success me-2"></i>{{ instructor.usuario.email }}</p>
+                <span class="badge bg-success bg-opacity-10 text-success px-4 py-2 rounded-pill fw-bolder border border-success border-opacity-25">
+                    {{ instructor.profesion|upper }}
+                </span>
+            </div>
+
+            <div class="px-4 px-md-5 pb-5">
+                
+                <h6 class="section-title text-success">1. Información de Identidad</h6>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="info-box-premium">
+                            <span class="data-label">Documento</span>
+                            <div class="data-value">{{ instructor.get_tipo_documento_display }} {{ instructor.cedula }}</div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">NÚMERO DE IDENTIFICACIÓN</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.cedula }}</p>
+                    <div class="col-md-4">
+                        <div class="info-box-premium">
+                            <span class="data-label">Contacto Móvil</span>
+                            <div class="data-value"><i class="bi bi-phone me-2 text-success"></i>{{ instructor.telefono }}</div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">CELULAR / TELÉFONO</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.telefono }}</p>
+                    <div class="col-md-4">
+                        <div class="info-box-premium" style="border-left-color: #ffb300; background: #fff8e1;">
+                            <span class="data-label" style="color: #b26a00;">Correo Alterno</span>
+                            <div class="data-value" style="color: #b26a00;">{{ instructor.correo_personal|default:"N/A" }}</div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">CORREO ELECTRÓNICO PERSONAL</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.correo_personal|default:"No registrado" }}</p>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">DIRECCIÓN DE RESIDENCIA</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.direccion_residencia|default:"No registrada" }}</p>
+                    <div class="col-12">
+                        <div class="info-box-premium">
+                            <span class="data-label">Residencia Actual</span>
+                            <div class="data-value"><i class="bi bi-geo-alt me-2 text-success"></i>{{ instructor.direccion_residencia|default:"Dirección no registrada" }}</div>
+                        </div>
                     </div>
                 </div>
 
-                <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Contractual</h6>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">PROFESIÓN / ESPECIALIDAD</label>
-                        <p class="text-dark mb-0 fs-6">{{ instructor.profesion }}</p>
+                <h6 class="section-title text-success">2. Perfil y Contratación</h6>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="info-box-premium" style="border-left-color: #0dcaf0;">
+                            <span class="data-label">Especialidad Técnica</span>
+                            <div class="data-value fs-5">{{ instructor.profesion }}</div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">TIPO DE CONTRATO</label>
-                        <p class="text-dark mb-0 fs-6">
-                            <span class="badge bg-info text-dark">{{ instructor.get_tipo_contrato_display|default:instructor.tipo_contrato }}</span>
-                        </p>
+                    <div class="col-md-6">
+                        <div class="info-box-premium" style="border-left-color: #0dcaf0;">
+                            <span class="data-label">Vinculación Laboral</span>
+                            <div class="data-value">
+                                <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill border border-info border-opacity-25">
+                                    {{ instructor.get_tipo_contrato_display|default:instructor.tipo_contrato }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-            </div>
-            
-            <div class="card-footer bg-light py-3 text-end">
-                <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-secondary me-2">Volver</a>
-                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn btn-primary">
-                    <i class="bi bi-pencil-square me-2"></i>Editar Datos
-                </a>
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-end gap-3 mt-5 pt-4 border-top">
+                    <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light btn-studio border-2 text-dark shadow-sm">
+                        <i class="bi bi-arrow-left me-2"></i>Volver
+                    </a>
+                    <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn btn-success btn-studio shadow-sm" style="background-color: #39A900; border: none;">
+                        <i class="bi bi-pencil-square me-2"></i>Actualizar Hoja de Vida
+                    </a>
+                </div>
+
             </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

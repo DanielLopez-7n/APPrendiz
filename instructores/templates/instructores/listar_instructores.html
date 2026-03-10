@@ -1,197 +1,212 @@
 {% extends 'core/panel_admin_base.html' %}
 {% load static %}
 
-{% block title %}Listado de Instructores | APPrendiz{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* 1. Header de la Tabla: Solución al error de visibilidad */
-    .table-studio thead th {
-        background-color: #f8f9fa !important;
-        color: #636e72 !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 1px;
-        padding: 20px 15px;
-        border: none;
-    }
-
-    /* 2. Filas Estilo Studio */
-    .table-studio tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f8f9fa;
-    }
-    .table-studio tbody tr:hover {
-        background-color: rgba(57, 169, 0, 0.02) !important;
-    }
-    .table-studio tbody td {
-        padding: 16px 15px;
-        vertical-align: middle;
-        color: #2d3436;
-        font-size: 0.88rem;
-    }
-
-    /* 3. Avatar Studio con color distintivo (Naranja SENA para Instructores) */
-    .avatar-studio {
-        width: 40px; height: 40px;
-        border-radius: 12px;
-        background-color: rgba(255, 103, 31, 0.1);
-        color: #FF671F;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800;
-    }
-
-    /* 4. Badges de Tipo de Contrato */
-    .badge-contract {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 0.7rem;
-        letter-spacing: 0.5px;
-    }
-
-    /* 5. Botones de Acción Minimalistas */
-    .btn-action-studio {
-        width: 36px; height: 36px;
-        display: inline-flex;
-        align-items: center; justify-content: center;
-        border-radius: 10px;
-        transition: 0.2s;
-        background: #f8f9fa;
-        color: #555;
-        border: 1px solid #eee;
-    }
-    .btn-action-studio:hover {
-        background: var(--sena-green);
-        color: white;
-        border-color: var(--sena-green);
-    }
-</style>
-{% endblock %}
+{% block title %}Gestión de Instructores | APPrendiz{% endblock %}
 
 {% block content %}
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - TABLAS Y BUSCADORES
+       ========================================== */
+    .card-studio {
+        border: none; border-radius: 25px; background: #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 25px; margin-bottom: 30px;
+    }
 
-<div class="card border-0 shadow-sm mb-4" style="border-radius: 20px;">
-    <div class="card-body p-4">
-        <form method="GET" action="{% url 'instructores:listar_instructores' %}" class="row g-3">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text bg-light border-0" style="border-radius: 12px 0 0 12px;">
-                        <i class="bi bi-search text-success"></i>
-                    </span>
-                    <input type="text" name="q" class="form-control bg-light border-0 py-2" 
-                           placeholder="Buscar por cédula, nombre o profesión..." 
-                           value="{{ request.GET.q }}"
-                           style="border-radius: 0 12px 12px 0;">
-                </div>
-            </div>
+    /* Buscador y Filtros Studio */
+    .filter-wrapper {
+        background-color: #f8f9fa; border-radius: 15px; padding: 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #FF671F; /* Acento Naranja */
+        transition: 0.3s;
+    }
+    .filter-wrapper:focus-within { background-color: #fff; border-color: #FF671F; box-shadow: 0 0 0 4px rgba(255, 103, 31, 0.1); }
+    
+    .input-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; }
+    .select-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; color: #6c757d; cursor: pointer; }
 
-            <div class="col-md-3">
-                <select name="tipo_contrato" class="form-select bg-light border-0 py-2" style="border-radius: 12px;">
-                    <option value="">Todos los contratos</option>
-                    <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
-                    <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
-                </select>
-            </div>
+    /* Tabla Premium */
+    .table-premium { border-collapse: separate; border-spacing: 0 8px; margin-bottom: 0; }
+    .table-premium thead th {
+        background: transparent; border: none; color: #a0a5ab;
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 20px;
+    }
+    .table-premium tbody tr { transition: 0.2s; }
+    .table-premium tbody td {
+        background: #fff; padding: 18px 20px; vertical-align: middle;
+        border-top: 1px solid #f1f3f5; border-bottom: 1px solid #f1f3f5;
+    }
+    .table-premium tbody tr:hover td { background: #f8faf9; border-color: rgba(255, 103, 31, 0.1); }
+    
+    .table-premium tbody td:first-child { border-left: 1px solid #f1f3f5; border-radius: 15px 0 0 15px; }
+    .table-premium tbody td:last-child { border-right: 1px solid #f1f3f5; border-radius: 0 15px 15px 0; }
 
-            <div class="col-md-3 d-flex gap-2">
-                <button type="submit" class="btn btn-success w-100 fw-bold rounded-pill shadow-sm" style="background-color: #39A900; border: none;">
-                    Filtrar
-                </button>
-                <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light border rounded-pill fw-bold px-3" title="Limpiar búsqueda">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
+    /* Avatares y Badges */
+    .avatar-studio {
+        width: 45px; height: 45px; border-radius: 12px;
+        background-color: rgba(255, 103, 31, 0.1); color: #FF671F; /* Naranja SENA */
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; overflow: hidden; flex-shrink: 0; font-size: 1.1rem;
+    }
+    .avatar-studio img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge-status { padding: 8px 15px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; }
+    
+    .badge-contract {
+        padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 0.7rem; display: inline-block;
+    }
+
+    /* Acciones y Modales */
+    .action-pill { background: #fff; border: 1px solid #eee; border-radius: 50px; display: inline-flex; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .action-pill .btn { border: none; border-radius: 0; padding: 8px 15px; color: #6c757d; }
+    .action-pill .btn:hover { background: #f8f9fa; color: #FF671F; }
+    .action-pill .btn-delete:hover { color: #dc3545; }
+
+    .modal-studio .modal-content { border-radius: 25px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+</style>
 
 <div class="container-fluid py-4">
-    
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Administración</h6>
-            <h1 class="display-6 fw-bold text-dark mb-0">Gestión de Instructores</h1>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px; font-size: 0.75rem;">Administración</h6>
+            <h2 class="fw-black text-dark mb-0">Gestión de Instructores</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border text-muted shadow-sm d-flex align-items-center">
+                <i class="bi bi-arrow-left me-2"></i> Volver
+            </a>
+            <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center" style="background-color: #1a1a1a;">
+                <i class="bi bi-people-fill me-2 fs-5"></i> Ver Usuarios
+            </a>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
+    <div class="card-studio mb-4">
+        <form method="GET" action="{% url 'instructores:listar_instructores' %}" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <div class="filter-wrapper d-flex align-items-center">
+                    <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
+                    <input type="text" name="q" class="input-studio" placeholder="Buscar por cédula, nombre o profesión..." value="{{ request.GET.q }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="filter-wrapper" style="border-left-color: #adb5bd;">
+                    <select name="tipo_contrato" class="select-studio">
+                        <option value="">Todos los contratos</option>
+                        <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
+                        <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex justify-content-end gap-2">
+                {% if request.GET.q or request.GET.tipo_contrato %}
+                    <a href="{% url 'instructores:listar_instructores' %}" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;" title="Limpiar Filtros">
+                        <i class="bi bi-arrow-clockwise fs-5 text-muted"></i>
+                    </a>
+                {% endif %}
+                <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" style="background-color: #1a1a1a;">
+                    Filtrar Resultados
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-studio p-4">
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-video3 me-2" style="color: #FF671F;"></i> Equipo de Instructores</h5>
+            <span class="badge bg-light text-dark border ms-3 rounded-pill">{{ instructores|length }} Registros</span>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-studio mb-0 align-middle">
+            <table class="table table-premium w-100">
                 <thead>
                     <tr>
-                        <th class="ps-4">Nombre Completo</th>
-                        <th>Profesión / Especialidad</th>
-                        <th>Contacto</th>
-                        <th>Contrato</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center">Acciones</th>
+                        <th width="30%">Nombre Completo</th>
+                        <th width="25%">Profesión / Especialidad</th>
+                        <th width="15%">Contacto</th>
+                        <th width="15%" class="text-center">Contrato / Estado</th>
+                        <th width="15%" class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for instructor in instructores %}
                     <tr>
-                        <td class="ps-4">
+                        <td>
                             <div class="d-flex align-items-center">
                                 <div class="avatar-studio me-3">
-                                    {{ instructor.usuario.first_name|first|upper }}
+                                    {% if instructor.usuario.perfil.foto_perfil %}
+                                        <img src="{{ instructor.usuario.perfil.foto_perfil.url }}" alt="Foto">
+                                    {% else %}
+                                        {{ instructor.usuario.first_name|first|default:instructor.usuario.username|first|upper }}
+                                    {% endif %}
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark mb-0">{{ instructor.usuario.get_full_name }}</div>
-                                    <div class="text-muted small" style="font-size: 0.75rem;">{{ instructor.usuario.email }}</div>
+                                    <div class="fw-bold text-dark fs-6" style="line-height: 1.2;">{{ instructor.usuario.get_full_name|default:instructor.usuario.username }}</div>
+                                    <div class="text-muted small mt-1"><i class="bi bi-hash me-1"></i>{{ instructor.cedula|default:"Sin ID" }}</div>
                                 </div>
                             </div>
                         </td>
+
                         <td>
-                            <div class="fw-semibold text-dark">{{ instructor.profesion }}</div>
-                            <div class="text-muted small">Instructor Técnico</div>
+                            <div class="fw-semibold text-dark" style="font-size: 0.9rem;">{{ instructor.profesion }}</div>
+                            <div class="text-muted small mt-1">Instructor Técnico</div>
                         </td>
+
                         <td>
-                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i> {{ instructor.telefono|default:"N/A" }}</div>
+                            <div class="fw-semibold text-dark" style="font-size: 0.85rem;"><i class="bi bi-telephone text-muted me-1"></i> {{ instructor.telefono|default:"N/A" }}</div>
+                            <div class="text-muted small mt-1" style="font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;" title="{{ instructor.usuario.email }}">
+                                <i class="bi bi-envelope text-muted me-1"></i> {{ instructor.usuario.email }}
+                            </div>
                         </td>
-                        <td>
-                            {% if instructor.tipo_contrato == 'PLANTA' %}
-                                <span class="badge-contract bg-success bg-opacity-10 text-success">PLANTA</span>
-                            {% else %}
-                                <span class="badge-contract bg-info bg-opacity-10 text-info">CONTRATISTA</span>
-                            {% endif %}
-                        </td>
+
                         <td class="text-center">
+                            <div class="mb-2">
+                                {% if instructor.tipo_contrato == 'PLANTA' %}
+                                    <span class="badge-contract bg-success bg-opacity-10 text-success border border-success border-opacity-25 w-100">PLANTA</span>
+                                {% else %}
+                                    <span class="badge-contract bg-info bg-opacity-10 text-info border border-info border-opacity-25 w-100">CONTRATISTA</span>
+                                {% endif %}
+                            </div>
+                            
                             {% if instructor.usuario.is_active %}
-                                <span class="badge bg-success rounded-pill" style="font-size: 0.65rem; padding: 5px 10px;">Activo</span>
+                                <span class="badge-status bg-success bg-opacity-10 text-success w-100 d-inline-block"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> Activo</span>
                             {% else %}
-                                <span class="badge bg-danger rounded-pill" style="font-size: 0.65rem; padding: 5px 10px;">Inactivo</span>
+                                <span class="badge-status bg-danger bg-opacity-10 text-danger w-100 d-inline-block"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> Inactivo</span>
                             {% endif %}
                         </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn-action-studio" title="Hoja de Vida">
+
+                        <td class="text-end">
+                            <div class="action-pill">
+                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn" title="Ver Hoja de Vida">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn-action-studio text-info" title="Editar">
-                                    <i class="bi bi-pencil"></i>
+                                <div class="vr opacity-25"></div>
+                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn" title="Editar Información">
+                                    <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <button type="button" class="btn-action-studio text-danger" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}">
-                                    <i class="bi bi-trash"></i>
+                                <div class="vr opacity-25"></div>
+                                <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}" title="Eliminar Instructor">
+                                    <i class="bi bi-trash3-fill"></i>
                                 </button>
                             </div>
 
-                            <div class="modal fade" id="eliminarInstructorModal{{ instructor.pk }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade modal-studio" id="eliminarInstructorModal{{ instructor.pk }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+                                    <div class="modal-content">
                                         <div class="modal-body p-5 text-center">
                                             <div class="mb-4">
-                                                <i class="bi bi-exclamation-octagon text-danger display-1 opacity-25"></i>
+                                                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle" style="width: 80px; height: 80px;">
+                                                    <i class="bi bi-person-x-fill fs-1"></i>
+                                                </div>
                                             </div>
-                                            <h4 class="fw-bold mb-3 text-dark">Eliminar Instructor</h4>
-                                            <p class="text-muted mb-4">¿Estás seguro de que deseas eliminar a <br><strong>{{ instructor.usuario.get_full_name }}</strong>?</p>
+                                            <h4 class="fw-bold mb-3 text-dark">¿Eliminar Instructor?</h4>
+                                            <p class="text-muted mb-4">Estás a punto de eliminar a <br><strong>{{ instructor.usuario.get_full_name|default:instructor.usuario.username }}</strong>.<br> Esta acción no se puede deshacer.</p>
                                             
                                             <div class="d-flex gap-2 justify-content-center">
-                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
                                                 <form action="{% url 'instructores:eliminar_instructor' instructor.pk %}" method="POST">
                                                     {% csrf_token %}
-                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Sí, Eliminar</button>
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Sí, Eliminar</button>
                                                 </form>
                                             </div>
                                         </div>
@@ -202,9 +217,12 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="bi bi-person-x display-4 text-muted opacity-25 mb-3 d-block"></i>
-                            <p class="text-muted">No hay instructores registrados.</p>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-person-video3 fs-1 d-block mb-3 text-light"></i>
+                                <h6 class="fw-bold">No se encontraron instructores</h6>
+                                <p class="small mb-0">Ajusta los filtros de búsqueda o registra un nuevo instructor en el sistema.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -212,15 +230,13 @@
             </table>
         </div>
     </div>
+
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const modales = document.querySelectorAll('.modal');
-        
-        modales.forEach(modal => {
-            document.body.appendChild(modal);
-        });
+        modales.forEach(modal => { document.body.appendChild(modal); });
     });
 </script>
 {% endblock %}

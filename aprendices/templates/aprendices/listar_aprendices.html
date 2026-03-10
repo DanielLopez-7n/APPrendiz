@@ -1,201 +1,214 @@
 {% extends 'core/panel_admin_base.html' %}
 {% load static %}
 
-{% block title %}Listado de Aprendices | APPrendiz{% endblock %}
-{% block page_title %}Gestión de Aprendices{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* 1. Corrección del Header: Letras visibles y fondo limpio */
-    .table-studio thead th {
-        background-color: #f8f9fa !important;
-        color: #636e72 !important;
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 1px;
-        padding: 20px 15px;
-        border: none;
-    }
-
-    /* 2. Filas con efecto de "Aire" */
-    .table-studio tbody tr {
-        transition: all 0.2s ease;
-        border-bottom: 1px solid #f8f9fa;
-    }
-
-    .table-studio tbody tr:hover {
-        background-color: rgba(57, 169, 0, 0.02) !important;
-    }
-
-    .table-studio tbody td {
-        padding: 16px 15px;
-        vertical-align: middle;
-        color: #2d3436;
-        font-size: 0.88rem;
-    }
-
-    /* 3. Avatares Studio */
-    .avatar-studio {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background-color: rgba(57, 169, 0, 0.1);
-        color: #39A900;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-    }
-
-    /* 4. Filtros Estilizados */
-    .filter-box {
-        background: #ffffff;
-        border-radius: 20px;
-        border: 1px solid rgba(0,0,0,0.05) !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.02) !important;
-    }
-
-    .form-control-studio {
-        border-radius: 12px;
-        border: 1px solid #eee;
-        padding: 10px 15px;
-    }
-
-    /* 5. Botones de Acción */
-    .btn-action-studio {
-        width: 36px;
-        height: 36px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        transition: 0.2s;
-        background: #f8f9fa;
-        color: #555;
-        border: 1px solid #eee;
-    }
-    .btn-action-studio:hover {
-        background: #39A900;
-        color: white;
-        border-color: #39A900;
-    }
-</style>
-{% endblock %}
+{% block title %}Gestión de Aprendices | APPrendiz{% endblock %}
 
 {% block content %}
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - TABLAS Y BUSCADORES
+       ========================================== */
+    .card-studio {
+        border: none; border-radius: 25px; background: #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 25px; margin-bottom: 30px;
+    }
+
+    /* Buscador y Filtros Studio */
+    .filter-wrapper {
+        background-color: #f8f9fa; border-radius: 15px; padding: 15px;
+        border: 1px solid #e0e0e0; border-left: 4px solid #39A900; /* Acento Verde */
+        transition: 0.3s;
+    }
+    .filter-wrapper:focus-within { background-color: #fff; border-color: #39A900; box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.1); }
+    
+    .input-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; }
+    .select-studio { border: none; background: transparent; outline: none; box-shadow: none; font-weight: 600; width: 100%; padding: 8px; color: #6c757d; cursor: pointer; }
+
+    /* Tabla Premium */
+    .table-premium { border-collapse: separate; border-spacing: 0 8px; margin-bottom: 0; }
+    .table-premium thead th {
+        background: transparent; border: none; color: #a0a5ab;
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 20px;
+    }
+    .table-premium tbody tr { transition: 0.2s; }
+    .table-premium tbody td {
+        background: #fff; padding: 18px 20px; vertical-align: middle;
+        border-top: 1px solid #f1f3f5; border-bottom: 1px solid #f1f3f5;
+    }
+    .table-premium tbody tr:hover td { background: #f8faf9; border-color: rgba(57, 169, 0, 0.1); }
+    
+    .table-premium tbody td:first-child { border-left: 1px solid #f1f3f5; border-radius: 15px 0 0 15px; }
+    .table-premium tbody td:last-child { border-right: 1px solid #f1f3f5; border-radius: 0 15px 15px 0; }
+
+    /* Avatares y Badges */
+    .avatar-studio {
+        width: 45px; height: 45px; border-radius: 12px;
+        background-color: rgba(57, 169, 0, 0.1); color: #39A900;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; overflow: hidden; flex-shrink: 0; font-size: 1.1rem;
+    }
+    .avatar-studio img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge-ficha { padding: 6px 15px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; display: inline-block; }
+
+    /* Acciones y Modales */
+    .action-pill { background: #fff; border: 1px solid #eee; border-radius: 50px; display: inline-flex; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+    .action-pill .btn { border: none; border-radius: 0; padding: 8px 15px; color: #6c757d; }
+    .action-pill .btn:hover { background: #f8f9fa; color: #39A900; }
+    .action-pill .btn-delete:hover { color: #dc3545; }
+
+    .modal-studio .modal-content { border-radius: 25px; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+</style>
+
 <div class="container-fluid py-4">
 
-    <!-- CABECERA UNIFORME (igual que listar_usuarios.html) -->
-    <div class="row mb-4 align-items-center">
-        <div class="col-md-6">
-            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px;">Administración</h6>
-            <h1 class="display-6 fw-bold text-dark mb-0">Gestión de Aprendices</h1>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px; font-size: 0.75rem;">Administración</h6>
+            <h2 class="fw-black text-dark mb-0">Gestión de Aprendices</h2>
         </div>
-        <div class="col-md-6 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border ms-2">
-                <i class="bi bi-arrow-left me-2"></i>Volver
+        <div class="d-flex gap-2">
+            <a href="{% url 'core:dashboard' %}" class="btn btn-light rounded-pill px-4 fw-bold border text-muted shadow-sm d-flex align-items-center">
+                <i class="bi bi-arrow-left me-2"></i> Volver
+            </a>
+            <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center" style="background-color: #1a1a1a;">
+                <i class="bi bi-people-fill me-2 fs-5"></i> Ver Usuarios
             </a>
         </div>
     </div>
 
-    <!-- FILTROS -->
-    <form method="GET" action="" class="mb-4">
-        <div class="row g-3 align-items-center filter-box p-3 mx-0">
+    <div class="card-studio mb-4">
+        <form method="GET" action="" class="row g-3 align-items-center">
             <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-0 pe-0">
-                        <i class="bi bi-search text-muted"></i>
-                    </span>
-                    <input type="text" name="q" class="form-control form-control-studio border-0" 
-                           placeholder="Buscar por documento, nombre, ficha..." 
-                           value="{{ request.GET.q }}">
+                <div class="filter-wrapper d-flex align-items-center">
+                    <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
+                    <input type="text" name="q" class="input-studio" placeholder="Buscar por documento, nombre o ficha..." value="{{ request.GET.q }}">
                 </div>
             </div>
-
             <div class="col-md-3">
-                <select name="modalidad" class="form-select form-control-studio">
-                    <option value="">Todas las modalidades</option>
-                    <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
-                    <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
-                </select>
+                <div class="filter-wrapper" style="border-left-color: #adb5bd;">
+                    <select name="modalidad" class="select-studio">
+                        <option value="">Todas las modalidades</option>
+                        <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
+                        <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
+                    </select>
+                </div>
             </div>
-
-            <div class="col-md-4 text-md-end">
-                <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-pill px-3 fw-bold border">Limpiar</a>
-                <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm ms-2" style="background-color: #39A900; border: none;">
-                    Filtrar
+            <div class="col-md-4 d-flex justify-content-end gap-2">
+                {% if request.GET.q or request.GET.modalidad %}
+                    <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;" title="Limpiar Filtros">
+                        <i class="bi bi-arrow-clockwise fs-5 text-muted"></i>
+                    </a>
+                {% endif %}
+                <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm" style="background-color: #1a1a1a;">
+                    Filtrar Resultados
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 
-    <!-- TABLA -->
-    <div class="card border-0 shadow-sm" style="border-radius: 25px; overflow: hidden;">
-        <div class="card-header bg-white py-4 px-4 border-0 d-flex justify-content-between align-items-center">
-            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-mortarboard-fill me-2 text-success"></i>Aprendices Registrados</h5>
+    <div class="card-studio p-4">
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-mortarboard-fill text-success me-2"></i> Aprendices Registrados</h5>
+            <span class="badge bg-light text-dark border ms-3 rounded-pill">{{ aprendices|length }} Registros</span>
         </div>
-        
+
         <div class="table-responsive">
-            <table class="table table-studio mb-0 align-middle">
+            <table class="table table-premium w-100">
                 <thead>
                     <tr>
-                        <th class="ps-4">Aprendiz</th>
-                        <th>Ficha</th>
-                        <th>Programa de Formación</th>
-                        <th>Contacto</th>
-                        <th class="text-center">Acciones</th>
+                        <th width="30%">Aprendiz</th>
+                        <th width="15%" class="text-center">Ficha Asignada</th>
+                        <th width="25%">Programa de Formación</th>
+                        <th width="15%">Contacto</th>
+                        <th width="15%" class="text-end">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for aprendiz in aprendices %}
                     <tr>
-                        <td class="ps-4">
+                        <td>
                             <div class="d-flex align-items-center">
                                 <div class="avatar-studio me-3">
-                                    {{ aprendiz.usuario.first_name|slice:":1"|upper }}
+                                    {% if aprendiz.usuario.perfil.foto_perfil %}
+                                        <img src="{{ aprendiz.usuario.perfil.foto_perfil.url }}" alt="Foto">
+                                    {% else %}
+                                        {{ aprendiz.usuario.first_name|slice:":1"|upper }}
+                                    {% endif %}
                                 </div>
                                 <div>
-                                    <div class="fw-bold text-dark mb-0">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</div>
-                                    <div class="text-muted small" style="font-size: 0.75rem;">{{ aprendiz.usuario.email }}</div>
+                                    <div class="fw-bold text-dark fs-6" style="line-height: 1.2;">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</div>
+                                    <div class="text-muted small mt-1"><i class="bi bi-envelope me-1"></i>{{ aprendiz.usuario.email|default:"Sin correo" }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td>
-                            <span class="badge bg-success bg-opacity-10 text-success px-3 rounded-pill fw-bold">
-                                {{ aprendiz.numero_ficha }}
+
+                        <td class="text-center">
+                            <span class="badge-ficha bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                <i class="bi bi-hash"></i>{{ aprendiz.numero_ficha }}
                             </span>
                         </td>
+
                         <td>
-                            <div class="text-dark fw-medium">{{ aprendiz.programa_formacion }}</div>
+                            <div class="fw-semibold text-dark text-truncate" style="font-size: 0.9rem; max-width: 250px;" title="{{ aprendiz.programa_formacion }}">
+                                {{ aprendiz.programa_formacion }}
+                            </div>
                         </td>
+
                         <td>
-                            <div class="small text-muted"><i class="bi bi-telephone me-1"></i>{{ aprendiz.telefono }}</div>
+                            <div class="fw-semibold text-dark" style="font-size: 0.85rem;">
+                                <i class="bi bi-telephone text-muted me-1"></i> {{ aprendiz.telefono|default:"N/A" }}
+                            </div>
                         </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-2">
-                                <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn-action-studio" title="Ver detalles">
+
+                        <td class="text-end">
+                            <div class="action-pill">
+                                <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn" title="Ver Detalles">
                                     <i class="bi bi-eye"></i>
                                 </a>
-
-                                <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn-action-studio text-info" title="Editar">
-                                    <i class="bi bi-pencil"></i>
+                                <div class="vr opacity-25"></div>
+                                <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn" title="Editar Aprendiz">
+                                    <i class="bi bi-pencil-square"></i>
                                 </a>
+                                <div class="vr opacity-25"></div>
+                                <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarAprendizModal{{ aprendiz.id }}" title="Eliminar Aprendiz">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </div>
 
-                                <a href="{% url 'aprendices:eliminar_aprendiz' aprendiz.id %}" 
-                                   class="btn-action-studio text-danger" 
-                                   title="Eliminar"
-                                   onclick="return confirm('¿Estás seguro de eliminar a este aprendiz?');">
-                                    <i class="bi bi-trash"></i>
-                                </a>
+                            <div class="modal fade modal-studio" id="eliminarAprendizModal{{ aprendiz.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-body p-5 text-center">
+                                            <div class="mb-4">
+                                                <div class="d-inline-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger rounded-circle" style="width: 80px; height: 80px;">
+                                                    <i class="bi bi-person-x-fill fs-1"></i>
+                                                </div>
+                                            </div>
+                                            <h4 class="fw-bold mb-3 text-dark">¿Eliminar Aprendiz?</h4>
+                                            <p class="text-muted mb-4">Estás a punto de eliminar a <br><strong>{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</strong>.<br> Esta acción borrará sus datos asociados.</p>
+                                            
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold border" data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{% url 'aprendices:eliminar_aprendiz' aprendiz.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Sí, Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="5" class="text-center py-5">
-                            <i class="bi bi-clipboard-x display-4 text-muted opacity-25 mb-3 d-block"></i>
-                            <p class="text-muted">No se encontraron aprendices registrados.</p>
+                            <div class="text-muted">
+                                <i class="bi bi-mortarboard fs-1 d-block mb-3 text-light"></i>
+                                <h6 class="fw-bold">No se encontraron aprendices</h6>
+                                <p class="small mb-0">Ajusta los filtros de búsqueda o crea usuarios con rol de aprendiz.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -203,5 +216,13 @@
             </table>
         </div>
     </div>
+
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modales = document.querySelectorAll('.modal');
+        modales.forEach(modal => { document.body.appendChild(modal); });
+    });
+</script>
 {% endblock %}

@@ -154,10 +154,13 @@
                                 {% endif %}
                             </div>
                             
-                            <label class="camera-btn-wrapper" title="Subir foto" style="cursor: pointer;">
-                                <i class="bi bi-camera-fill fs-5"></i>
+                            <div style="position: absolute; width: 0; height: 0; overflow: hidden;">
                                 {{ form.foto }}
-                            </label>
+                            </div>
+
+                            <button type="button" class="camera-btn-wrapper" id="btnFakeCamera" title="Subir foto">
+                                <i class="bi bi-camera-fill fs-5"></i>
+                            </button>
                         </div>
                         
                         <h4 class="fw-bold text-dark mt-3 mb-1">{{ user.get_full_name|default:"Completar Perfil" }}</h4>
@@ -311,17 +314,26 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Buscamos el input real de tipo file en la página
+        // 1. Buscamos el botón de la cámara y el input que genera Django
+        const btnCamera = document.getElementById('btnFakeCamera');
         const fileInput = document.querySelector('input[type="file"]');
         const avatarImg = document.getElementById('avatarImage');
         const avatarIcon = document.getElementById('avatarIcon');
 
+        // 2. Al hacer clic en el botón, forzamos el clic en el input original
+        if (btnCamera && fileInput) {
+            btnCamera.addEventListener('click', function(e) {
+                e.preventDefault(); // Evita que el formulario se envíe por error
+                fileInput.click();
+            });
+        }
+
+        // 3. Vista previa de la imagen al seleccionarla
         if (fileInput) {
             fileInput.addEventListener('change', function(e) {
                 if (e.target.files && e.target.files[0]) {
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        // Mostramos la foto en el círculo al instante
                         avatarImg.src = e.target.result;
                         avatarImg.style.display = 'block';
                         if (avatarIcon) avatarIcon.style.display = 'none';
@@ -332,4 +344,5 @@
         }
     });
 </script>
+
 {% endblock %}

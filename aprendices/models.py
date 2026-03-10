@@ -27,6 +27,7 @@ class Aprendiz(models.Model):
     modalidad_etapa = models.CharField(max_length=50, choices=MODALIDAD_ETAPA_CHOICES, default='Presencial', verbose_name="Modalidad etapa productiva")
     etapa_exterior = models.BooleanField(default=False, verbose_name="¿Realiza etapa en el exterior?")
     pais_etapa = models.CharField(max_length=100, default='Colombia', verbose_name="País donde realiza la etapa")
+
     
     def __str__(self):
         return f"{self.usuario.first_name} {self.usuario.last_name} - Ficha: {self.numero_ficha}"
