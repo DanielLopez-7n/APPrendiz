@@ -258,7 +258,241 @@
             width: 100% !important;
         }
 
-        
+        /* ==========================================
+   SIDEBAR PREMIUM UI 
+========================================== */
+
+/* Fondo con profundidad */
+#sidebar{
+    background: linear-gradient(
+        180deg,
+        rgba(57,169,0,0.98) 0%,
+        rgba(50,150,0,0.98) 50%,
+        rgba(40,135,0,0.98) 100%
+    ) !important;
+
+    box-shadow:
+        8px 0 40px rgba(0,0,0,0.25),
+        inset -1px 0 0 rgba(255,255,255,0.08);
+
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+
+/* Header del usuario más elegante */
+.sidebar-header{
+    padding:28px 15px;
+    border-bottom:1px solid rgba(255,255,255,0.15);
+    background:linear-gradient(
+        180deg,
+        rgba(255,255,255,0.06),
+        rgba(255,255,255,0.02)
+    );
+}
+
+
+/* Avatar con glow premium */
+.user-avatar{
+    background:linear-gradient(
+        135deg,
+        #4ade00,
+        #39a900
+    );
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,0.35),
+        0 0 0 3px rgba(255,255,255,0.2),
+        0 0 25px rgba(57,169,0,0.5);
+
+    transition:all .35s ease;
+}
+
+.user-avatar:hover{
+    transform:scale(1.06);
+}
+
+
+/* Nombre usuario */
+.user-name{
+    font-size:1rem;
+    letter-spacing:.3px;
+}
+
+/* Rol */
+.user-role{
+    font-size:.8rem;
+    opacity:.85;
+}
+
+
+
+/* ==========================================
+   LINKS DEL MENÚ
+========================================== */
+
+#sidebar .nav-link{
+
+    border-radius:14px;
+
+    margin:6px 12px;
+
+    padding:12px 14px;
+
+    font-weight:600;
+
+    letter-spacing:.2px;
+
+    backdrop-filter:blur(8px);
+
+    background:rgba(255,255,255,0.02);
+
+    transition:all .25s cubic-bezier(.4,.2,.2,1);
+}
+
+
+/* Iconos más suaves */
+#sidebar .nav-link i{
+
+    font-size:1.2rem;
+
+    opacity:.95;
+
+    transition:all .25s ease;
+}
+
+
+/* Hover premium */
+#sidebar .nav-link:hover{
+
+    background:rgba(255,255,255,0.95) !important;
+
+    transform:translateX(6px);
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,0.18);
+}
+
+
+/* Icono hover */
+#sidebar .nav-link:hover i{
+
+    transform:scale(1.15);
+
+    color:#2d8600 !important;
+}
+
+
+/* Texto hover */
+#sidebar .nav-link:hover span{
+
+    font-weight:700;
+}
+
+
+
+/* ==========================================
+   LINK ACTIVO (Dashboard)
+========================================== */
+
+#sidebar .nav-link.activo{
+
+    background:#ffffff !important;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.25);
+
+    transform:translateX(8px);
+}
+
+
+/* barra naranja elegante */
+#sidebar .nav-link.activo::before{
+
+    width:6px;
+
+    border-radius:10px;
+
+    box-shadow:
+        0 0 10px rgba(255,103,31,0.6);
+}
+
+
+
+/* ==========================================
+   SEPARADOR DE SECCIONES
+========================================== */
+
+.nav-header{
+
+    margin-top:20px;
+
+    padding-left:22px;
+
+    letter-spacing:1.5px;
+}
+
+.nav-header span{
+
+    font-size:.70rem;
+
+    opacity:.8;
+
+    text-transform:uppercase;
+}
+
+
+
+/* ==========================================
+   BOTÓN CERRAR SESIÓN PREMIUM
+========================================== */
+
+#sidebar button.btn-danger{
+
+    background:linear-gradient(
+        135deg,
+        #ff4d4d,
+        #dc3545
+    ) !important;
+
+    border:none;
+
+    box-shadow:
+        0 6px 15px rgba(0,0,0,0.25);
+
+    transition:all .3s ease;
+}
+
+
+#sidebar button.btn-danger:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.35);
+}
+
+
+
+/* ==========================================
+   SCROLLBAR PREMIUM
+========================================== */
+
+#sidebar::-webkit-scrollbar{
+    width:6px;
+}
+
+#sidebar::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+#sidebar::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,0.25);
+    border-radius:10px;
+}
+
+#sidebar::-webkit-scrollbar-thumb:hover{
+    background:rgba(255,255,255,0.45);
+}
 
     </style>
 
