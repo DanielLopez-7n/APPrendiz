@@ -89,10 +89,12 @@ def ver_detalle_aprendiz(request, pk):
     }
     return render(request, 'aprendices/ver_detalle.html', context)
 
+
+# --- VISTA PARA EL PERFIL DEL APRENDIZ (CON SUS BITÁCORAS) ---
+
 @login_required
 def perfil_aprendiz(request):
     # 1. Seguridad: Verificamos si el usuario logueado es realmente un Aprendiz
-    # Si entra un Admin o Instructor aquí, lo mandamos al home para evitar errores
     if not hasattr(request.user, 'aprendiz'):
         return redirect('core:dashboard')  
 
@@ -100,19 +102,16 @@ def perfil_aprendiz(request):
     aprendiz = request.user.aprendiz
     
     # 3. Buscamos SUS bitácoras
-    # CORRECCIÓN CLAVE: 
-    # - Cambiamos 'numero' por 'numero_bitacora' (el campo nuevo)
-    # - Ordenamos descendente (-) para que la bitácora 2 salga antes que la 1
-    mis_bitacoras = Bitacora.objects.filter(aprendiz=aprendiz).order_by('-numero_bitacora')
+    # ¡CORRECCIÓN APLICADA AQUÍ!: Cambiamos 'aprendiz' por 'aprendiz_rel'
+    mis_bitacoras = Bitacora.objects.filter(aprendiz_rel=aprendiz).order_by('-numero_bitacora')
     
     alerta_password = request.user.check_password(request.user.username)
     context = {
         'aprendiz': aprendiz,
-        'bitacoras': mis_bitacoras, # Pasamos la lista a la plantilla
+        'bitacoras': mis_bitacoras,
         'alerta_password': alerta_password
     }
     return render(request, 'aprendices/perfil_aprendiz.html', context)
-
 
 # --- VISTA PARA EDITAR PERFIL ---
 

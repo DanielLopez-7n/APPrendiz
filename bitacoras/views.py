@@ -63,7 +63,9 @@ def listar_bitacoras(request):
     }
     return render(request, 'bitacoras/listar_bitacoras.html', context)
 
-# --- VISTA: CREAR BITÁCORA (CORREGIDA PARA V5) ---
+
+# --- VISTA: CREAR BITÁCORA ---
+
 @login_required
 def crear_bitacora(request):
     # Validar que sea aprendiz (o instructor admin)
@@ -75,6 +77,7 @@ def crear_bitacora(request):
         aprendiz_usuario = None 
     else:
         try:
+            # Tomamos el perfil correcto del aprendiz logueado
             aprendiz_usuario = request.user.aprendiz
             template_base = 'core/base_simple.html' 
             redirect_url = 'aprendices:perfil_aprendiz'
@@ -83,8 +86,8 @@ def crear_bitacora(request):
             return redirect('core:home') 
 
     if request.method == 'POST':
-        # 1. Recibimos el Formulario Principal
-        form = CrearBitacoraForm(request.POST, request.FILES, user=request.user)
+        # 1. Recibimos el Formulario Principal (CORREGIDO: Pasamos aprendiz_usuario)
+        form = CrearBitacoraForm(request.POST, request.FILES, aprendiz=aprendiz_usuario)
         
         # 2. Recibimos el Formset (Las filas de actividades)
         formset = ActividadFormSet(request.POST, request.FILES, prefix='actividades')
@@ -96,37 +99,45 @@ def crear_bitacora(request):
                     # Guardar Bitácora
                     bitacora = form.save(commit=False)
                     if aprendiz_usuario:
-                        bitacora.aprendiz = aprendiz_usuario
+                        # CORREGIDO: Usamos la nueva columna "aprendiz_rel"
+                        bitacora.aprendiz_rel = aprendiz_usuario
                     bitacora.save()
                     
                     # Guardar Actividades vinculadas
                     formset.instance = bitacora
                     formset.save()
                 
-                messages.success(request, '¡Bitácora guardada exitosamente!')
+                messages.success(request, '¡Formato GFPI-F-147 V5 guardado exitosamente!')
                 return redirect(redirect_url)
             
             except Exception as e:
-                messages.error(request, f'Error al guardar: {e}')
+                messages.error(request, f'Error interno al guardar: {e}')
         else:
-            # 1. Este imprime en la terminal negra (donde corres el servidor)
-            print("--- 🔍 RASTREO DE ERRORES ---")
-            print("Errores del Formulario Principal:", form.errors)
-            print("Errores de las Actividades (Formset):", formset.errors)
+            # --- MAGIA PARA MOSTRAR ERRORES AL USUARIO ---
             
-            # 2. Este muestra el error exacto en la franja roja de la página web
-            error_detalle = form.errors.as_text()
-            messages.error(request, f"No se pudo guardar. Campos faltantes: {error_detalle}")
+            # 1. Mostrar errores del formulario principal
+            for campo, errores in form.errors.items():
+                # Formatear el nombre del campo para que se vea más bonito (ej: nombre_empresa -> Nombre empresa)
+                nombre_campo = campo.replace('_', ' ').capitalize()
+                messages.error(request, f"Error en '{nombre_campo}': {errores[0]}")
+                
+            # 2. Mostrar errores de las actividades (Formset)
+            for index, error_dict in enumerate(formset.errors):
+                if error_dict:
+                    for campo, errores in error_dict.items():
+                        nombre_campo = campo.replace('_', ' ').capitalize()
+                        messages.error(request, f"Error en la Actividad #{index + 1} ({nombre_campo}): {errores[0]}")
             
-            messages.error(request, 'Hay errores en el formulario. Revisa los campos en rojo.')
+            messages.error(request, 'Por favor, revisa y corrige los campos indicados arriba.')
     else:
-        form = CrearBitacoraForm(user=request.user)
+        # CORREGIDO: Usamos aprendiz_usuario para que no falle si entra un instructor a probar
+        form = CrearBitacoraForm(aprendiz=aprendiz_usuario)
         formset = ActividadFormSet(prefix='actividades')
 
     context = {
         'form': form,
         'formset': formset,
-        'titulo': "Nueva Bitácora",
+        'titulo': "Nueva Bitácora V5",
         'template_to_extend': template_base,
         'es_instructor': es_instructor
     }

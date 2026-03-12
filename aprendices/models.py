@@ -17,7 +17,6 @@ class Aprendiz(models.Model):
     
     # 3. Información Académica SENA
     numero_ficha = models.ForeignKey('fichas.Ficha', on_delete=models.RESTRICT, verbose_name="Número de grupo")
-    programa_formacion = models.ForeignKey('programas.Programa', on_delete=models.RESTRICT, verbose_name="Programa de formación")
     
     MODALIDAD_CHOICES = [('Presencial', 'Presencial'), ('Virtual', 'Virtual'), ('A distancia', 'A distancia')]
     modalidad_formacion = models.CharField(max_length=50, choices=MODALIDAD_CHOICES, default='Presencial')

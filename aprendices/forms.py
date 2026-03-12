@@ -4,10 +4,7 @@ from .models import Aprendiz
 class AprendizForm(forms.ModelForm):
     class Meta:
         model = Aprendiz
-        # Excluimos al usuario porque esa conexión ya no se edita aquí
-        exclude = ['usuario']
-        
-        # Le ponemos el traje de Bootstrap (clases CSS) a cada campo para que se vean geniales
+        exclude = ['usuario', 'programa_formacion']        
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'documento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 1002345678'}),
@@ -16,7 +13,6 @@ class AprendizForm(forms.ModelForm):
             'direccion_residencia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Calle 123 # 45-67'}),
             
             'numero_ficha': forms.Select(attrs={'class': 'form-select'}),
-            'programa_formacion': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
             
             'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),

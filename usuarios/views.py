@@ -192,40 +192,53 @@ def ver_detalle_usuario(request, user_id):
 
 @login_required
 def crear_usuario_con_perfil(request):
-    # Verificamos quién está operando
     es_instructor = hasattr(request.user, 'instructor')
     es_admin = request.user.is_superuser or (request.user.is_staff and not es_instructor)
 
     if request.method == 'POST':
+        # OJO AQUÍ: Asegúrate de que tu HTML tenga <select name="rol_seleccionado">
         rol = request.POST.get('rol_seleccionado')
+        print(f"🕵️‍♂️ ROL DETECTADO AL GUARDAR: '{rol}'") # Chismoso 1
+
         form_usuario = UsuarioForm(request.POST)
         
-        # Elegimos el formulario de perfil según el rol
         if rol == 'aprendiz':
-            form_perfil = AprendizForm(request.POST)
+            form_perfil_aprendiz = AprendizForm(request.POST)
+            form_perfil_instructor = InstructorForm() 
+            form_perfil = form_perfil_aprendiz
         else:
-            form_perfil = InstructorForm(request.POST)
+            form_perfil_instructor = InstructorForm(request.POST)
+            form_perfil_aprendiz = AprendizForm() 
+            form_perfil = form_perfil_instructor
 
         if form_usuario.is_valid() and form_perfil.is_valid():
             # 1. Crear el Usuario base
             usuario = form_usuario.save(commit=False)
             documento = form_usuario.cleaned_data['username']
-            usuario.set_password(documento) # Password = Documento
+            usuario.set_password(documento)
             
-            # Si se crea como instructor, le damos is_staff
             if rol == 'instructor':
                 usuario.is_staff = True
             
             usuario.save()
 
-            # 2. Crear el Perfil (Aprendiz o Instructor)
+            # 2. Crear el Perfil
             perfil = form_perfil.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
 
             messages.success(request, f'¡Registro exitoso! Se creó el usuario y el perfil de {rol}.')
             return redirect('usuarios:lista_usuarios')
+            
+        else:
+            # AQUÍ ES DONDE VAN LOS PRINTS (Cuando falla la validación)
+            print("❌ LA VALIDACIÓN FALLÓ, REVISANDO ERRORES...")
+            print("❌ Errores del Usuario:", form_usuario.errors)
+            print("❌ Errores del Perfil:", form_perfil.errors)
+            messages.error(request, "Hay errores en el formulario, revisa los datos.")
+            
     else:
+        # Petición GET: Carga inicial de la página (¡NO BORRAR ESTO!)
         form_usuario = UsuarioForm()
         form_perfil_aprendiz = AprendizForm()
         form_perfil_instructor = InstructorForm()
@@ -238,7 +251,6 @@ def crear_usuario_con_perfil(request):
         'es_instructor': es_instructor,
     }
     return render(request, 'usuarios/crear_usuario_dinamico.html', context)
-
 
 
 # --- VISTA PARA VER PERFIL PROPIO (READ) ---
