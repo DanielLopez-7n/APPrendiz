@@ -54,9 +54,15 @@
 
 <div class="container py-5 bitacora-container">
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">
-            <i class="bi bi-arrow-left me-2"></i>Volver al Historial
-        </a>
+        {% if es_instructor %}
+            <a href="{% url 'bitacoras:listar_bitacoras' %}" class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i>Volver al Historial
+            </a>
+        {% else %}
+            <a href="{% url 'aprendices:perfil_aprendiz' %}" class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">
+                <i class="bi bi-arrow-left me-2"></i>Volver a mi Panel
+            </a>
+        {% endif %}
         <div class="text-end">
             <h6 class="text-success fw-bold mb-0">FORMATO GFPI-F-147 V5</h6>
             <small class="text-muted">Proceso Gestión de Formación Profesional Integral</small>

@@ -387,23 +387,37 @@ def perfil_view(request):
 
 @login_required
 def editar_mi_perfil(request):
+    """
+    Controlador de tráfico: Dirige a cada usuario a su formulario correcto
+    dependiendo de su rol en el sistema para evitar que se mezclen datos.
+    """
     usuario = request.user
-    perfil = usuario.perfil
-    
-    if request.method == 'POST':
-        # Pasamos POST, FILES (para la foto) y la instancia del perfil
-        form = MiPerfilForm(request.POST, request.FILES, instance=usuario, perfil_instance=perfil)
+
+    # 1. Si es APRENDIZ, lo mandamos a la vista que ya blindamos en aprendices/views.py
+    if hasattr(usuario, 'aprendiz'):
+        # Asegúrate de que el 'name' en tu aprendices/urls.py sea este:
+        return redirect('aprendices:editar_perfil_aprendiz') 
         
-        if form.is_valid():
-            form.save()
-            messages.success(request, '¡Tu perfil ha sido actualizado!')
-            return redirect('usuarios:ver_perfil') # Redirige a la vista de "Ver Perfil" (solo lectura)
+    # 2. Si es INSTRUCTOR, lo mandamos a su propia vista (si ya la tienes creada)
+    elif hasattr(usuario, 'instructor'):
+        # Si tienes una url para el instructor, ponla aquí. Si no, déjalo redirigiendo al dashboard por ahora.
+        return redirect('core:dashboard') 
+        
+    # 3. Si es SUPER ADMINISTRADOR, le cargamos el formulario básico de Admin
     else:
-        form = MiPerfilForm(instance=usuario, perfil_instance=perfil)
-    
-    return render(request, 'usuarios/editar_mi_perfil.html', {
-        'form': form
-    })
+        # Los admins usan el MiPerfilForm que ya tiene el chaleco antibalas
+        perfil = usuario.perfil
+        if request.method == 'POST':
+            form = MiPerfilForm(request.POST, request.FILES, instance=usuario, perfil_instance=perfil)
+            
+            if form.is_valid():
+                form.save()
+                messages.success(request, '¡Perfil de Administrador actualizado con éxito!')
+                return redirect('usuarios:perfil') # O la URL a donde quieras que vuelva
+        else:
+            form = MiPerfilForm(instance=usuario, perfil_instance=perfil)
+        
+        return render(request, 'usuarios/editar_mi_perfil.html', {'form': form})
     
     
 # --- VISTA DE CAMBIO DE CONTRASEÑA ---

@@ -15,7 +15,6 @@ from django.core.files.base import ContentFile
 from .models import Bitacora
 from .forms import CrearBitacoraForm, ActividadFormSet
 
-# --- VISTA: LISTAR BITÁCORAS ---
 @login_required
 def listar_bitacoras(request):
     query = request.GET.get('q', '')
@@ -26,27 +25,28 @@ def listar_bitacoras(request):
         bitacoras_base = Bitacora.objects.all()
         
     elif hasattr(request.user, 'instructor'):
-        # Instructor: Acceso restringido estrictamente a las bitácoras donde fue asignado
-        bitacoras_base = Bitacora.objects.filter(instructor_seguimiento=request.user.instructor)
+        # V5: Como el instructor ahora es un campo de texto, filtramos por su correo
+        bitacoras_base = Bitacora.objects.filter(email_instructor_seguimiento=request.user.email)
         
     elif hasattr(request.user, 'aprendiz'):
-        # Aprendiz: Acceso exclusivo a sus propios registros
-        bitacoras_base = Bitacora.objects.filter(aprendiz=request.user.aprendiz)
+        # V5: Corrección del nombre del campo y pasando directamente el ID
+        bitacoras_base = Bitacora.objects.filter(aprendiz_rel_id=request.user.aprendiz.id)
         
     else:
         # Fallback de seguridad por si un usuario no tiene perfil asignado
         bitacoras_base = Bitacora.objects.none()
 
-    # Ordenamiento por defecto
-    bitacoras_list = bitacoras_base.order_by('-fecha_entrega')
+    # V5: Corrección del nombre del campo de fecha
+    bitacoras_list = bitacoras_base.order_by('-fecha_entrega_bitacora')
     
     # --- 2. LÓGICA DE BÚSQUEDA ---
     if query:
+        # V5: Buscamos directamente en las columnas de la nueva tabla (más rápido y sin errores)
         bitacoras_list = bitacoras_list.filter(
-            Q(aprendiz__usuario__first_name__icontains=query) |
-            Q(aprendiz__usuario__last_name__icontains=query) |
-            Q(aprendiz__documento__icontains=query) |
-            Q(ficha__numero_ficha__icontains=query)
+            Q(nombre_completo_aprendiz__icontains=query) |
+            Q(numero_identificacion_aprendiz__icontains=query) |
+            Q(numero_grupo_ficha__icontains=query) |
+            Q(nombre_empresa__icontains=query)
         )
     
     # --- 3. PAGINACIÓN ---

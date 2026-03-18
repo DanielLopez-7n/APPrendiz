@@ -155,7 +155,16 @@
                             {{ form_usuario.email }}
                         </div>
                     </div>
-                </div>
+                    
+                    <div class="col-md-6">
+                        <label class="label-studio">Departamento (Colombia) *</label>
+                        <div class="input-group-studio">
+                            <i class="bi bi-geo-alt"></i> <select id="id_departamento" name="departamento" required>
+                                <option value="">Cargando departamentos...</option>
+                            </select>
+                        </div>
+                    </div>
+                    </div>
 
                 <div id="seccion_aprendiz" style="display: none;">
                     <div class="section-divider"></div>
@@ -224,6 +233,9 @@
         const secInstructor = document.getElementById('seccion_instructor');
         const btnGuardar = document.getElementById('btnGuardar');
 
+        // Ejecutar carga de departamentos de API Colombia
+        cargarDepartamentosColombia();
+
         // Función que evalúa el cambio del select
         selectRol.addEventListener('change', function() {
             const rol = this.value;
@@ -255,6 +267,35 @@
             inputs.forEach(input => {
                 input.disabled = deshabilitar;
             });
+        }
+
+        // NUEVA FUNCIÓN: Carga los departamentos desde API Colombia
+        function cargarDepartamentosColombia() {
+            const url = 'https://api-colombia.com/api/v1/Department';
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar la API de departamentos');
+                    return response.json();
+                })
+                .then(data => {
+                    const selectDepto = document.getElementById('id_departamento');
+                    selectDepto.innerHTML = '<option value="">Seleccione un departamento...</option>';
+                    
+                    // Ordenar alfabéticamente para mejor experiencia
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+
+                    data.forEach(depto => {
+                        const opcion = document.createElement('option');
+                        opcion.value = depto.name; // Guarda el nombre del departamento
+                        opcion.textContent = depto.name;
+                        selectDepto.appendChild(opcion);
+                    });
+                })
+                .catch(error => {
+                    console.error('Problema con Fetch API Colombia:', error);
+                    document.getElementById('id_departamento').innerHTML = '<option value="">Error al cargar departamentos</option>';
+                });
         }
     });
 </script>

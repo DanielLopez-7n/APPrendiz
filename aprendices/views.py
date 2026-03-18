@@ -39,7 +39,7 @@ def listar_aprendices(request):
     }
     return render(request, 'aprendices/listar_aprendices.html', context)
 
-# --- VISTA PARA EDITAR (UPDATE) ---
+# --- VISTA PARA EDITAR (UPDATE ADMINISTRADOR) ---
 @login_required
 def editar_aprendiz(request, pk):
     # 1. Buscamos el aprendiz por su id, si no existe sale error 404.
@@ -47,7 +47,6 @@ def editar_aprendiz(request, pk):
     
     if request.method == 'POST':
         # 2. Cargamos SOLO el formulario del aprendiz con los nuevos datos
-        # y le decimos qué "instance" (objeto) van a modificar
         form = AprendizForm(request.POST, instance=aprendiz)
         
         if form.is_valid():
@@ -59,13 +58,11 @@ def editar_aprendiz(request, pk):
         # 3. Si es GET (apenas entramos a la página) cargamos el formulario lleno
         form = AprendizForm(instance=aprendiz)
     
-    # 4. El contexto ahora es súper limpio y coincide con lo que espera el HTML
     context = {
-        'form': form,      # La variable clave que le faltaba a tu vista
-        'editar': True     # Banderita para cambiar el texto del botón y títulos
+        'form': form,      
+        'editar': True     
     }
     
-    # Reutilizamos la misma plantilla
     return render(request, 'aprendices/crear_aprendiz.html', context)
 
 # --- VISTA PARA ELIMINAR (DELETE) ---

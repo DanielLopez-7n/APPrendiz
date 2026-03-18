@@ -228,15 +228,13 @@ class UsuarioForm(forms.ModelForm):
     # Nuevo formulario para que los usuarios editen su propio perfil
 
 class MiPerfilForm(forms.ModelForm):
-    # Campos del modelo User (Nombre, Apellido, Email)
+    # Campos del modelo User
     first_name = forms.CharField(label='Nombres', widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(label='Apellidos', widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(label='Correo', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     
-    # Campo del modelo Perfil (Foto) - ¡Lo agregamos aquí mismo para facilitar todo!
+    # Campos del modelo Perfil
     foto_perfil = forms.ImageField(label='Foto de Perfil', required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
-    
-    # Campo Teléfono (Opcional, si quieres que lo editen aquí)
     telefono = forms.CharField(label='Teléfono', required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -244,57 +242,52 @@ class MiPerfilForm(forms.ModelForm):
         fields = ['first_name', 'last_name', 'email']
 
     def __init__(self, *args, **kwargs):
-        # Necesitamos recibir la instancia del perfil para cargar la foto/telefono actual
         self.perfil_instance = kwargs.pop('perfil_instance', None)
         super(MiPerfilForm, self).__init__(*args, **kwargs)
         
-        # Si el perfil existe, cargamos los valores iniciales
+        # Solo cargamos el teléfono inicial. La foto la maneja Django automáticamente en el HTML
         if self.perfil_instance:
-            self.fields['foto_perfil'].initial = self.perfil_instance.foto_perfil
             self.fields['telefono'].initial = self.perfil_instance.telefono
 
     def save(self, commit=True):
-        # Guardamos el usuario (User)
-        user = super(MiPerfilForm, self).save(commit=commit)
+        user = super(MiPerfilForm, self).save(commit=False)
         
-        # Guardamos manualmente los datos extra en el Perfil
-        if self.perfil_instance:
-            self.perfil_instance.foto_perfil = self.cleaned_data['foto_perfil']
-            self.perfil_instance.telefono = self.cleaned_data['telefono']
-            if commit:
+        if commit:
+            user.save(update_fields=['first_name', 'last_name', 'email'])
+            
+            if self.perfil_instance:
+                self.perfil_instance.telefono = self.cleaned_data.get('telefono')
+                
+                foto_nueva = self.cleaned_data.get('foto_perfil')
+                if foto_nueva:
+                    self.perfil_instance.foto_perfil = foto_nueva
+                    
                 self.perfil_instance.save()
+                
         return user
-
 
 # ===================================================================
 # FORMULARIO PARA SINCRONIZACIÓN DE PERFIL DEL APRENDIZ COMPLETO
 # ===================================================================
 class AprendizPerfilForm(forms.ModelForm):
-    # 1. Campos del modelo User
+    # 1. Campos del modelo User (Sesión segura)
     first_name = forms.CharField(max_length=150, required=True, label="Nombres *", widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(max_length=150, required=True, label="Apellidos *", widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(required=True, label="Correo Institucional *", widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    
+    # 2. CAMPO PARA LA FOTO (¡Faltaba aquí!)
+    foto_perfil = forms.ImageField(required=False, label="Foto de Perfil", widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Aprendiz
-        # Aquí ponemos TODOS los campos que tienes en tu formulario de creación
-        # (OJO: Asegúrate de que estos nombres coincidan con los de tu models.py)
         fields = [
-            'tipo_documento', 
-            'documento', 
-            'telefono', 
-            'correo_personal', 
-            'direccion_residencia', 
-            'numero_ficha',
-            'modalidad_formacion', 
-            'modalidad_etapa', 
-            'etapa_exterior', 
-            'pais_etapa'
+            'tipo_documento', 'documento', 'telefono', 'correo_personal', 
+            'direccion_residencia', 'numero_ficha', 'modalidad_formacion', 
+            'modalidad_etapa', 'etapa_exterior', 'pais_etapa'
         ]
-        
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
-            'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}), # El documento no debería poder cambiarlo él mismo
+            'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'correo_personal': forms.EmailInput(attrs={'class': 'form-control'}),
             'direccion_residencia': forms.TextInput(attrs={'class': 'form-control'}),
@@ -313,10 +306,15 @@ class AprendizPerfilForm(forms.ModelForm):
             self.fields['first_name'].initial = user.first_name
             self.fields['last_name'].initial = user.last_name
             self.fields['email'].initial = user.email
+            # Cargamos la foto actual si existe en su perfil
+            if hasattr(user, 'perfil') and user.perfil.foto_perfil:
+                self.fields['foto_perfil'].initial = user.perfil.foto_perfil
 
     def save(self, commit=True):
         aprendiz = super(AprendizPerfilForm, self).save(commit=False)
         user = aprendiz.usuario
+        
+        # Actualizamos SOLO los datos de texto (NUNCA el username ni el password)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
@@ -324,5 +322,12 @@ class AprendizPerfilForm(forms.ModelForm):
         if commit:
             user.save()
             aprendiz.save()
+            
+            # Si subió una foto nueva, la guardamos en su perfil
+            if hasattr(user, 'perfil') and 'foto_perfil' in self.cleaned_data:
+                foto = self.cleaned_data['foto_perfil']
+                if foto:
+                    user.perfil.foto_perfil = foto
+                    user.perfil.save()
             
         return aprendiz
