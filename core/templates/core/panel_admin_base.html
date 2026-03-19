@@ -494,6 +494,17 @@
     background:rgba(255,255,255,0.45);
 }
 
+/* ==========================================
+   TRANSICIONES SUAVES PARA BOTONES
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+
+
     </style>
 
     {% load bootstrap5 %}
@@ -613,21 +624,13 @@
                 </li>
                 
                 <div class="mt-auto p-3">
-                    <form action="{% url 'usuarios:logout' %}" method="post" id="formLogoutSidebar" class="m-0">
-                        {% csrf_token %} <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm d-flex align-items-center justify-content-center py-2" 
-                                onclick="confirmarCierreSesion()">
-                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm transition-hover mt-3" data-bs-toggle="modal" data-bs-target="#logoutAdminModal">
+                        <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                    </button>
                 </div>
 
-<script>
-    function confirmarCierreSesion() {
-        if (confirm("¿Seguro que deseas cerrar sesión?")) {
-            document.getElementById('formLogoutSidebar').submit();
-        }
-    }
-</script>
+
+
             </ul>
         </nav>
     </div>
@@ -743,5 +746,40 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+
+ 
+<!-- Modal de confirmación para cerrar sesión -->
+<div class="modal fade" id="logoutAdminModal" tabindex="-1" aria-labelledby="logoutAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow border-0 border-top border-4 border-danger">
+            <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title fw-bolder text-dark" id="logoutAdminModalLabel">
+                    Confirmar Cierre de Sesión
+                </h5>
+            </div>
+            <div class="modal-body text-center p-4">
+                <i class="bi bi-shield-lock text-danger display-1 mb-3 d-block"></i>
+                <p class="mb-0 text-muted fs-6 lh-lg">
+                    ¿Estás seguro de que deseas salir del panel administrativo?
+                    Asegúrate de haber guardado todos los cambios y revisiones pendientes.
+                </p>
+            </div>
+            <div class="modal-footer border-0 pb-4 pt-0 px-4 justify-content-center gap-2">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-medium border shadow-sm transition-hover" data-bs-dismiss="modal">
+                    Volver al Panel
+                </button>
+                
+                <form action="{% url 'usuarios:logout' %}" method="post" class="m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold transition-hover shadow-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i>Sí, Salir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

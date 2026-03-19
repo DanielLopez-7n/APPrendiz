@@ -228,39 +228,43 @@ class UsuarioForm(forms.ModelForm):
     # Nuevo formulario para que los usuarios editen su propio perfil
 
 class MiPerfilForm(forms.ModelForm):
-    # Campos del modelo User
-    first_name = forms.CharField(label='Nombres', widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(label='Apellidos', widget=forms.TextInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(label='Correo', widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    
-    # Campos del modelo Perfil
+    # Solo definimos los campos que NO pertenecen al modelo User (sino al Perfil)
     foto_perfil = forms.ImageField(label='Foto de Perfil', required=False, widget=forms.FileInput(attrs={'class': 'form-control'}))
     telefono = forms.CharField(label='Teléfono', required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
+        # 🛡️ Blindaje: Solo estos campos del User
         fields = ['first_name', 'last_name', 'email']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         self.perfil_instance = kwargs.pop('perfil_instance', None)
         super(MiPerfilForm, self).__init__(*args, **kwargs)
         
-        # Solo cargamos el teléfono inicial. La foto la maneja Django automáticamente en el HTML
+        # Cargamos el teléfono actual si existe
         if self.perfil_instance:
             self.fields['telefono'].initial = self.perfil_instance.telefono
 
     def save(self, commit=True):
+        # Guardamos la instancia base del usuario sin enviarla a la base de datos aún
         user = super(MiPerfilForm, self).save(commit=False)
         
         if commit:
+            # 1. Guardamos SOLAMENTE los campos permitidos del usuario (Nombres y Correo)
             user.save(update_fields=['first_name', 'last_name', 'email'])
             
+            # 2. Guardamos los datos del Perfil adicional (Teléfono y Foto)
             if self.perfil_instance:
                 self.perfil_instance.telefono = self.cleaned_data.get('telefono')
                 
-                foto_nueva = self.cleaned_data.get('foto_perfil')
-                if foto_nueva:
-                    self.perfil_instance.foto_perfil = foto_nueva
+                # 'changed_data' detecta si el usuario realmente subió un archivo nuevo
+                if 'foto_perfil' in self.changed_data:
+                    self.perfil_instance.foto_perfil = self.cleaned_data.get('foto_perfil')
                     
                 self.perfil_instance.save()
                 
@@ -275,7 +279,7 @@ class AprendizPerfilForm(forms.ModelForm):
     last_name = forms.CharField(max_length=150, required=True, label="Apellidos *", widget=forms.TextInput(attrs={'class': 'form-control'}))
     email = forms.EmailField(required=True, label="Correo Institucional *", widget=forms.EmailInput(attrs={'class': 'form-control'}))
     
-    # 2. CAMPO PARA LA FOTO (¡Faltaba aquí!)
+    # 2. CAMPO PARA LA FOTO
     foto_perfil = forms.ImageField(required=False, label="Foto de Perfil", widget=forms.FileInput(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -331,3 +335,19 @@ class AprendizPerfilForm(forms.ModelForm):
                     user.perfil.save()
             
         return aprendiz
+    
+    from django.contrib.auth.models import User
+
+class EditarMiPropioUsuarioForm(forms.ModelForm):
+    """
+    Formulario súper seguro: Solo permite cambiar datos básicos.
+    Ignora por completo el is_active, is_staff, etc.
+    """
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email'] # ¡Cero rastro de is_active!
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+        }

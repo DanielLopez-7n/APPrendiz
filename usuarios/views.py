@@ -356,7 +356,7 @@ def eliminar_usuario_view(request, user_id):
 @login_required
 def perfil_view(request):
     """
-    Vista para que el usuario vea/edite su propio perfil
+    Vista para que el usuario (Admin/Instructor) vea/edite su propio perfil
     """
     usuario = request.user
     
@@ -365,10 +365,17 @@ def perfil_view(request):
         form_perfil = EditarPerfilForm(request.POST, request.FILES, instance=usuario.perfil)
         
         if form_usuario.is_valid() and form_perfil.is_valid():
-            form_usuario.save()
-            form_perfil.save()
-            messages.success(request, 'Perfil actualizado exitosamente.')
             
+            # 🛡️ CHALECO ANTIBALAS ACTIVADO: 
+            # Guardamos la instancia en pausa
+            usuario_seguro = form_usuario.save(commit=False)
+            # Obligamos a guardar SOLO nombre, apellido y correo (IGNORA is_active)
+            usuario_seguro.save(update_fields=['first_name', 'last_name', 'email'])
+            
+            # Guardamos el perfil (foto, teléfono, etc)
+            form_perfil.save()
+            
+            messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
             return redirect('usuarios:perfil') 
     else:
         form_usuario = EditarUsuarioForm(instance=usuario)
@@ -382,42 +389,38 @@ def perfil_view(request):
     return render(request, 'usuarios/perfil.html', context)
 
 
-
-# --- VISTA PARA LISTAR APRENDICES (READ) ---
+#-- VISTA PARA EDITAR SU PROPIO PERFIL DENTRO DEL DASHBOARD (UPDATE, SUPERADMIN O INSTRUCTOR) ---
 
 @login_required
 def editar_mi_perfil(request):
     """
-    Controlador de tráfico: Dirige a cada usuario a su formulario correcto
-    dependiendo de su rol en el sistema para evitar que se mezclen datos.
+    Controlador de tráfico: Dirige a cada usuario a su formulario correcto.
     """
     usuario = request.user
 
-    # 1. Si es APRENDIZ, lo mandamos a la vista que ya blindamos en aprendices/views.py
+    # 1. Si es APRENDIZ, lo mandamos a su vista hiper-blindada
     if hasattr(usuario, 'aprendiz'):
-        # Asegúrate de que el 'name' en tu aprendices/urls.py sea este:
         return redirect('aprendices:editar_perfil_aprendiz') 
         
-    # 2. Si es INSTRUCTOR, lo mandamos a su propia vista (si ya la tienes creada)
-    elif hasattr(usuario, 'instructor'):
-        # Si tienes una url para el instructor, ponla aquí. Si no, déjalo redirigiendo al dashboard por ahora.
-        return redirect('core:dashboard') 
-        
-    # 3. Si es SUPER ADMINISTRADOR, le cargamos el formulario básico de Admin
+    # 2. Si es INSTRUCTOR o SUPER ADMIN, usan la misma lógica base
     else:
-        # Los admins usan el MiPerfilForm que ya tiene el chaleco antibalas
         perfil = usuario.perfil
         if request.method == 'POST':
+            # Usamos el formulario dinámico para Admin/Instructor
             form = MiPerfilForm(request.POST, request.FILES, instance=usuario, perfil_instance=perfil)
             
             if form.is_valid():
                 form.save()
-                messages.success(request, '¡Perfil de Administrador actualizado con éxito!')
-                return redirect('usuarios:perfil') # O la URL a donde quieras que vuelva
+                messages.success(request, '¡Perfil actualizado con éxito!')
+                return redirect('usuarios:perfil') # Vuelve a la pantalla del perfil
         else:
             form = MiPerfilForm(instance=usuario, perfil_instance=perfil)
         
-        return render(request, 'usuarios/editar_mi_perfil.html', {'form': form})
+        context = {
+            'form': form,
+            'titulo': 'Editar Mi Perfil'
+        }
+        return render(request, 'usuarios/editar_mi_perfil.html', context)
     
     
 # --- VISTA DE CAMBIO DE CONTRASEÑA ---
