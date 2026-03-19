@@ -12,4 +12,5 @@ urlpatterns = [
     path('editar/<int:pk>/', views.editar_bitacora, name='editar_bitacora'),
     path('eliminar/<int:pk>/', views.eliminar_bitacora, name='eliminar_bitacora'),
     path('revisar/<int:id>/', views.revisar_bitacora, name='revisar_bitacora'),
+    path('api/instructor/<int:instructor_id>/', views.obtener_datos_instructor, name='obtener_datos_instructor'),
 ]

@@ -30,7 +30,8 @@ def listar_bitacoras(request):
         
     elif hasattr(request.user, 'aprendiz'):
         # V5: Corrección del nombre del campo y pasando directamente el ID
-        bitacoras_base = Bitacora.objects.filter(aprendiz_rel_id=request.user.aprendiz.id)
+       bitacoras_base = Bitacora.objects.filter(aprendiz_rel=request.user.aprendiz)
+
         
     else:
         # Fallback de seguridad por si un usuario no tiene perfil asignado
@@ -146,14 +147,14 @@ def crear_bitacora(request):
 # --- VISTA: EDITAR BITÁCORA (CORREGIDA PARA V5) ---
 @login_required
 def editar_bitacora(request, pk):
-    bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz=request.user.aprendiz)
+    bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz_rel=request.user.aprendiz)
 
     if bitacora.estado != 'Pendiente':
         messages.error(request, "No puedes editar una bitácora evaluada.")
         return redirect('aprendices:perfil_aprendiz')
 
     if request.method == 'POST':
-        form = CrearBitacoraForm(request.POST, request.FILES, instance=bitacora, user=request.user)
+        form = CrearBitacoraForm(request.POST, request.FILES, instance=bitacora, aprendiz=request.user.aprendiz)
         formset = ActividadFormSet(request.POST, request.FILES, instance=bitacora, prefix='actividades')
 
         if form.is_valid() and formset.is_valid():
@@ -163,7 +164,7 @@ def editar_bitacora(request, pk):
             messages.success(request, "Bitácora actualizada correctamente.")
             return redirect('aprendices:perfil_aprendiz')
     else:
-        form = CrearBitacoraForm(instance=bitacora, user=request.user)
+        form = CrearBitacoraForm(instance=bitacora, aprendiz=request.user.aprendiz)
         formset = ActividadFormSet(instance=bitacora, prefix='actividades')
 
     context = {
@@ -190,14 +191,16 @@ def eliminar_bitacora(request, pk):
 # --- VISTA: VER DETALLE (APRENDIZ) ---
 @login_required
 def ver_bitacora_aprendiz(request, pk):
-    bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz__usuario=request.user)
+    bitacora = get_object_or_404(Bitacora, pk=pk, aprendiz_rel__usuario=request.user)
+
     return render(request, 'bitacoras/ver_bitacora_aprendiz.html', {'bitacora': bitacora})
 
 # --- VISTA: VER DETALLE (INSTRUCTOR/ADMIN) ---
 @login_required
 def ver_bitacora(request, pk):
     bitacora = get_object_or_404(Bitacora, pk=pk)
-    if hasattr(request.user, 'aprendiz') and bitacora.aprendiz != request.user.aprendiz:
+    if hasattr(request.user, 'aprendiz') and bitacora.aprendiz_rel != request.user.aprendiz:
+
         messages.error(request, "No tienes permiso para ver esta bitácora.")
         return redirect('bitacoras:listar_bitacoras')
     
@@ -308,3 +311,30 @@ def revisar_bitacora(request, id):
     
     context = {'bitacora': bitacora}
     return render(request, 'bitacoras/revisar_bitacora.html', context)
+
+
+# === API PARA AUTO-LLENADO DEL INSTRUCTOR ===
+@login_required
+def obtener_datos_instructor(request, instructor_id):
+    """
+    Recibe el ID de un instructor y devuelve su correo y teléfono en JSON
+    para que el formulario (frontend) se llene automáticamente.
+    """
+    try:
+        instructor = User.objects.get(id=instructor_id)
+        email = instructor.email
+        
+        # Buscamos el teléfono (dependiendo de si está en su perfil de Instructor o en el Perfil general)
+        telefono = ''
+        if hasattr(instructor, 'instructor'):
+            telefono = instructor.instructor.telefono
+        elif hasattr(instructor, 'perfil'):
+            telefono = instructor.perfil.telefono
+            
+        return JsonResponse({
+            'success': True, 
+            'email': email, 
+            'telefono': telefono
+        })
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Instructor no encontrado'})

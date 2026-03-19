@@ -90,5 +90,5 @@ class ActividadBitacora(models.Model):
     descripcion_actividad = models.TextField()
     competencias_asociadas = models.TextField()
     periodo_mes = models.CharField(max_length=50)
-    evidencia_cumplimiento = models.CharField(max_length=255)
+    evidencia_cumplimiento = models.FileField(max_length=255)
     observaciones = models.TextField(blank=True, null=True)
