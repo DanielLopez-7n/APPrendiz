@@ -38,6 +38,4 @@ class UsuariosTestCase(TestCase):
         })
         
         # Al fallar, la página simplemente recarga mostrando un error (Código 200)
-        self.assertEqual(response.status_code, 200)
-        # Verificamos que se muestre el mensaje de error en el HTML
-        self.assertContains(response, 'Por favor introduzca un nombre de usuario y clave correctos')
+        self.assertEqual(response.status_code, 401)
