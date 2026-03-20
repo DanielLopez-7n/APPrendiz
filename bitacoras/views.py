@@ -9,6 +9,9 @@ from xhtml2pdf import pisa
 from PIL import Image
 import io
 from django.core.files.base import ContentFile
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.template.loader import get_template
 
 
 # Importamos Modelos y Formularios
