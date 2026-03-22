@@ -94,11 +94,10 @@ def dashboard(request):
         # 🟠 LÓGICA PARA EL INSTRUCTOR
         # ==========================================
         try:
-            instructor = user.instructor
-            # Consultamos solo las bitácoras asignadas a ÉL
-            pendientes = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Pendiente').count()
-            evaluadas = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Evaluada').count()
-            rechazadas = Bitacora.objects.filter(instructor_seguimiento=instructor, estado='Rechazada').count()
+            # 🔥 LA SOLUCIÓN: Comparamos el correo que guardó la bitácora con el correo del instructor que inició sesión
+            pendientes = Bitacora.objects.filter(email_instructor_seguimiento=user.email, estado='Pendiente').count()
+            evaluadas = Bitacora.objects.filter(email_instructor_seguimiento=user.email, estado='Evaluada').count()
+            rechazadas = Bitacora.objects.filter(email_instructor_seguimiento=user.email, estado='Rechazada').count()
             
             context.update({
                 'pendientes': pendientes,
@@ -110,8 +109,10 @@ def dashboard(request):
             context['chart_labels'] = json.dumps(['Pendientes', 'Evaluadas', 'Rechazadas'])
             context['chart_data'] = json.dumps([pendientes, evaluadas, rechazadas])
             
-        except Exception:
-            # En caso de que el instructor no tenga datos aún
+        except Exception as e:
+            print(f"👉 ERROR EN DASHBOARD INSTRUCTOR: {e}") 
+            
+            context.update({'pendientes': 0, 'evaluadas': 0, 'total_bitacoras': 0})
             context['chart_labels'] = json.dumps(['Sin datos'])
             context['chart_data'] = json.dumps([0])
 
@@ -137,55 +138,63 @@ def PanelAdmin_base(request):
 def busqueda_global(request):
     query = request.GET.get('q', '').strip()
     
-    # Inicializamos listas vacías
+    # Inicializamos todas las listas
     aprendices = []
     instructores = []
     empresas = []
-    usuarios = [] 
+    bitacoras = []
+    fichas = []
+    programas = []
 
     if query:
-        # 1. Búsqueda Aprendices
+        # 1. Aprendices (Buscamos por nombre, apellido, documento o ficha)
         aprendices = Aprendiz.objects.filter(
             Q(usuario__first_name__icontains=query) | 
             Q(usuario__last_name__icontains=query) |
-            Q(documento__icontains=query)
-            # Descomentaremos estas cuando sepamos el nombre exacto de los campos en Ficha y Programa
-            # | Q(programa_formacion__nombre__icontains=query) 
-            # | Q(numero_ficha__numero_ficha__icontains=query) 
+            Q(documento__icontains=query) |
+            Q(numero_ficha__numero__icontains=query)
         ).distinct()
 
-        # 2. Búsqueda Instructores
+        # 2. Instructores (Nombre, apellido, profesión o documento)
         instructores = Instructor.objects.filter(
             Q(usuario__first_name__icontains=query) | 
             Q(usuario__last_name__icontains=query) |          
+            Q(cedula__icontains=query) |
             Q(profesion__icontains=query)
         ).distinct()
 
-        # 3. Búsqueda Empresas (¡Corregido a 'nombre'!)
+        # 3. Empresas (Nombre o NIT)
         empresas = Empresa.objects.filter(
             Q(nombre__icontains=query) | 
             Q(nit__icontains=query)
         ).distinct()
         
-        # 4. Búsqueda Usuarios (General)
-        usuarios = User.objects.filter(
-            Q(username__icontains=query) |
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(email__icontains=query)
-        ).distinct()
+        # 4. Bitácoras (Por nombre del aprendiz, ID, o estado)
+        bitacoras = Bitacora.objects.filter(
+            Q(nombre_completo_aprendiz__icontains=query) |
+            Q(numero_identificacion_aprendiz__icontains=query) |
+            Q(estado__icontains=query) |
+            Q(email_instructor_seguimiento__icontains=query)
+        ).order_by('-id').distinct()[:15] # Limitamos a las 15 más recientes para no saturar
 
-    # Calculamos el total sumando las 4 listas
-    total = len(aprendices) + len(instructores) + len(empresas) + len(usuarios)
+        # 5. Fichas y Programas
+        fichas = Ficha.objects.filter(Q(numero__icontains=query)).distinct()
+        programas = Programa.objects.filter(Q(nombre__icontains=query)).distinct()
+
+    # Calculamos el total de todo lo encontrado
+    total = (len(aprendices) + len(instructores) + len(empresas) + 
+             len(bitacoras) + len(fichas) + len(programas))
 
     context = {
         'query': query,
         'aprendices': aprendices,
         'instructores': instructores,
         'empresas': empresas,
-        'usuarios': usuarios,  
+        'bitacoras': bitacoras,
+        'fichas': fichas,
+        'programas': programas,
         'total_resultados': total,
-        'titulo': 'Resultados de Búsqueda'
+        'titulo': f'Resultados para: {query}'
     }
     
     return render(request, 'core/resultados_busqueda.html', context)
