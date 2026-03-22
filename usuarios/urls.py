@@ -21,6 +21,6 @@ urlpatterns = [
     path('usuarios/<int:user_id>/eliminar/', views.eliminar_usuario_view, name='eliminar_usuario'),
     path('detalle/<int:user_id>/', views.ver_detalle_usuario, name='ver_detalle_usuario'),
     path('perfil/', views.perfil_view, name='ver_perfil'),
-    path('perfil/editar/', views.editar_mi_perfil, name='editar_mi_perfil'),
+    path('mi-perfil/', views.perfil_view, name='perfil'),
     path('cambiar-password/', views.cambiar_password, name='cambiar_password'),
 ]

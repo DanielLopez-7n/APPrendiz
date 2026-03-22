@@ -24,7 +24,7 @@ class CrearBitacoraForm(forms.ModelForm):
             
             # --- Auto-llenado bloqueado (solo lectura) ---
             'nombre_completo_aprendiz': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'tipo_documento_aprendiz': forms.Select(attrs={'class': 'form-select', 'style': 'pointer-events: none;'}),
+            'tipo_documento_aprendiz': forms.Select(attrs={'class': 'form-select'}),
             'numero_identificacion_aprendiz': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'contacto_telefonico_aprendiz': forms.TextInput(attrs={'class': 'form-control'}),
             'correo_institucional_aprendiz': forms.EmailInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
@@ -33,7 +33,6 @@ class CrearBitacoraForm(forms.ModelForm):
             'numero_grupo_ficha': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
-            'programa_formacion': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'modalidad_ejecucion': forms.Select(attrs={'class': 'form-select'}),
             'exterior': forms.Select(attrs={'class': 'form-select'}),
             'pais_etapa': forms.TextInput(attrs={'class': 'form-control'}),

@@ -174,6 +174,22 @@ class EditarPerfilForm(forms.ModelForm):
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+    def __init__(self, *args, **kwargs):
+    # Sacamos al usuario de los argumentos
+        self.usuario = kwargs.pop('usuario', None)
+        super().__init__(*args, **kwargs)
+
+        # Si el usuario es Admin o Instructor, DESBLOQUEAMOS los campos
+        if self.usuario and self.usuario.is_staff:
+            if 'documento' in self.fields:
+                self.fields['documento'].widget.attrs.pop('readonly', None)
+                self.fields['documento'].widget.attrs['class'] = 'form-control'
+                self.fields['documento'].label = "Documento de Identidad"
+                
+            if 'telefono' in self.fields:
+                self.fields['telefono'].widget.attrs.pop('readonly', None)
+                self.fields['telefono'].widget.attrs['class'] = 'form-control'
+                self.fields['telefono'].label = "Teléfono de Contacto"
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 

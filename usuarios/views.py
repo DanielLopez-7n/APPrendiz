@@ -133,6 +133,7 @@ def es_administrador(user):
 
 @login_required
 @user_passes_test(es_administrador, login_url='usuarios:login')
+@never_cache
 def lista_usuarios_view(request):
     """
     Vista para listar todos los usuarios
@@ -356,73 +357,51 @@ def eliminar_usuario_view(request, user_id):
 @login_required
 def perfil_view(request):
     """
-    Vista para que el usuario (Admin/Instructor) vea/edite su propio perfil
+    Vista para que el usuario vea/edite su propio perfil.
+    Carga dinámicamente el panel correcto y desbloquea campos para los instructores/admins.
     """
     usuario = request.user
+    template_base = 'core/panel_admin_base.html' if usuario.is_staff else 'core/base_simple.html'
     
     if request.method == 'POST':
         form_usuario = EditarUsuarioForm(request.POST, instance=usuario)
-        form_perfil = EditarPerfilForm(request.POST, request.FILES, instance=usuario.perfil)
+        
+        # Le pasamos el 'usuario=usuario' para que el formulario sepa si desbloquear los campos
+        form_perfil = EditarPerfilForm(request.POST, request.FILES, instance=usuario.perfil, usuario=usuario)
         
         if form_usuario.is_valid() and form_perfil.is_valid():
-            
-            # 🛡️ CHALECO ANTIBALAS ACTIVADO: 
-            # Guardamos la instancia en pausa
+            # 1. Guardamos datos del Usuario (Nombre, Apellido, Correo)
             usuario_seguro = form_usuario.save(commit=False)
-            # Obligamos a guardar SOLO nombre, apellido y correo (IGNORA is_active)
             usuario_seguro.save(update_fields=['first_name', 'last_name', 'email'])
             
-            # Guardamos el perfil (foto, teléfono, etc)
-            form_perfil.save()
+            # 2. Guardamos datos del Perfil (Foto, Teléfono, Documento)
+            perfil_guardado = form_perfil.save()
+            
+            # 3. SINCRONIZACIÓN (Premium): Si es Instructor, guardamos el teléfono también en su tabla
+            if hasattr(usuario, 'instructor'):
+                usuario.instructor.telefono = perfil_guardado.telefono
+                # Si tu modelo Instructor también tiene documento, descomenta la siguiente línea:
+                # usuario.instructor.documento = perfil_guardado.documento
+                usuario.instructor.save()
             
             messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
             return redirect('usuarios:perfil') 
+        else:
+            messages.error(request, 'Hubo un error al actualizar tu perfil. Revisa los datos.')
     else:
+        # Modo lectura (Cuando apenas abren la página)
         form_usuario = EditarUsuarioForm(instance=usuario)
-        form_perfil = EditarPerfilForm(instance=usuario.perfil)
+        # Le pasamos el usuario también al cargar el formulario en blanco
+        form_perfil = EditarPerfilForm(instance=usuario.perfil, usuario=usuario)
     
     context = {
         'titulo': 'Mi información personal',
         'form_usuario': form_usuario,
         'form_perfil': form_perfil,
+        'template_to_extend': template_base,
     }
     return render(request, 'usuarios/perfil.html', context)
 
-
-#-- VISTA PARA EDITAR SU PROPIO PERFIL DENTRO DEL DASHBOARD (UPDATE, SUPERADMIN O INSTRUCTOR) ---
-
-@login_required
-def editar_mi_perfil(request):
-    """
-    Controlador de tráfico: Dirige a cada usuario a su formulario correcto.
-    """
-    usuario = request.user
-
-    # 1. Si es APRENDIZ, lo mandamos a su vista hiper-blindada
-    if hasattr(usuario, 'aprendiz'):
-        return redirect('aprendices:editar_perfil_aprendiz') 
-        
-    # 2. Si es INSTRUCTOR o SUPER ADMIN, usan la misma lógica base
-    else:
-        perfil = usuario.perfil
-        if request.method == 'POST':
-            # Usamos el formulario dinámico para Admin/Instructor
-            form = MiPerfilForm(request.POST, request.FILES, instance=usuario, perfil_instance=perfil)
-            
-            if form.is_valid():
-                form.save()
-                messages.success(request, '¡Perfil actualizado con éxito!')
-                return redirect('usuarios:perfil') # Vuelve a la pantalla del perfil
-        else:
-            form = MiPerfilForm(instance=usuario, perfil_instance=perfil)
-        
-        context = {
-            'form': form,
-            'titulo': 'Editar Mi Perfil'
-        }
-        return render(request, 'usuarios/editar_mi_perfil.html', context)
-    
-    
 # --- VISTA DE CAMBIO DE CONTRASEÑA ---
 
 @login_required
