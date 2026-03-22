@@ -512,6 +512,7 @@
     {% bootstrap_javascript %}
 </head>
 <body>
+    <div id="sidebar-overlay" style="display: none;"></div>
     
     <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="12000" data-bs-pause="false">
         <div class="carousel-inner">
@@ -530,17 +531,17 @@
         </div>
     </div>
     
-    <div id="sidebar">
+    <div id="sidebar" class="sidebar-smart">
         <div class="sidebar-header">
-            <div class="user-avatar d-flex justify-content-center align-items-center rounded-circle" style="width: 70px; height: 70px; overflow: hidden;">
+            <div class="user-avatar d-flex justify-content-center align-items-center rounded-circle" style="overflow: hidden; transition: all 0.3s ease;">
                 {% if user.perfil.foto_perfil %}
                     <img src="{{ user.perfil.foto_perfil.url }}" alt="{{ user.get_full_name }}" style="width: 100%; height: 100%; object-fit: cover;">
                 {% else %}
-                    <i class="bi bi-person text-white fs-1"></i>
+                    <i class="bi bi-person text-white fs-1 avatar-icon"></i>
                 {% endif %}
             </div>
             
-            <div class="mt-2 text-container text-center">
+            <div class="mt-2 text-container text-center text-hide-smart">
                 <h6 class="user-name mb-0 text-truncate" style="color: #ffffff !important; font-weight: 700;">
                     {{ user.get_full_name|default:user.username }}
                 </h6>
@@ -554,113 +555,134 @@
         
         <nav class="sidebar-nav mt-2 pb-4">
             <ul class="nav flex-column" id="menu-lateral">
-
                 <li class="nav-item">
                     <a href="{% url 'usuarios:perfil' %}" class="nav-link px-3">
-                        <i class="bi bi-person-circle"></i> <span>Mi Perfil</span>
+                        <i class="bi bi-person-circle fs-5"></i> <span class="text-hide-smart ms-2">Mi Perfil</span>
                     </a>
                 </li>
                 
                 <li class="nav-item">
                     <a href="{% url 'core:dashboard' %}" class="nav-link px-3">
-                        <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+                        <i class="bi bi-speedometer2 fs-5"></i> <span class="text-hide-smart ms-2">Dashboard</span>
                     </a>
                 </li>
                 
                 <li class="nav-item">
                     <a class="nav-link px-3" href="{% url 'bitacoras:listar_bitacoras' %}">
-                        <i class="bi bi-journal-text"></i> <span>Bitácoras</span>
+                        <i class="bi bi-journal-text fs-5"></i> <span class="text-hide-smart ms-2">Bitácoras</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
                     <a href="{% url 'aprendices:listar_aprendices' %}" class="nav-link px-3">
-                        <i class="bi bi-mortarboard-fill"></i> <span>Aprendices</span>
+                        <i class="bi bi-mortarboard-fill fs-5"></i> <span class="text-hide-smart ms-2">Aprendices</span>
                     </a>
                 </li>
 
-                <!-- Enlace 'Actividades' eliminado (app removida) -->
-
                 {% if request.user.is_superuser %}
-                    <li class="nav-header"><span>ADMINISTRACIÓN</span></li>
+                    <li class="nav-header text-hide-smart mt-3 px-3"><small class="text-white-50 fw-bold">ADMINISTRACIÓN</small></li>
 
                     <li class="nav-item">
                         <a href="{% url 'usuarios:lista_usuarios' %}" class="nav-link px-3">
-                            <i class="bi bi-people-fill"></i> <span>Usuarios</span>
+                            <i class="bi bi-people-fill fs-5"></i> <span class="text-hide-smart ms-2">Usuarios</span>
                         </a>
                     </li>
                     
                     <li class="nav-item">
                         <a href="{% url 'instructores:listar_instructores' %}" class="nav-link px-3">
-                            <i class="bi bi-person-badge"></i> <span>Instructores</span>
+                            <i class="bi bi-person-badge fs-5"></i> <span class="text-hide-smart ms-2">Instructores</span>
                         </a>
                     </li>
                     
                     <li class="nav-item">
                         <a href="{% url 'fichas:listar_fichas' %}" class="nav-link px-3">
-                            <i class="bi bi-diagram-3"></i> <span>Fichas</span>
+                            <i class="bi bi-diagram-3 fs-5"></i> <span class="text-hide-smart ms-2">Fichas</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a href="{% url 'programas:listar_programas' %}" class="nav-link px-3">
-                            <i class="bi bi-book"></i> <span>Programas</span>
+                            <i class="bi bi-book fs-5"></i> <span class="text-hide-smart ms-2">Programas</span>
                         </a>
                     </li>
 
                     <li class="nav-item">
                         <a href="{% url 'empresas:listar_empresas' %}" class="nav-link px-3">
-                            <i class="bi bi-buildings"></i> <span>Empresas</span>
+                            <i class="bi bi-buildings fs-5"></i> <span class="text-hide-smart ms-2">Empresas</span>
                         </a>
                     </li>
                 {% endif %}
                 
-                <li class="nav-header mt-3"><span>SISTEMA</span></li>
+                <li class="nav-header text-hide-smart mt-3 px-3"><small class="text-white-50 fw-bold">SISTEMA</small></li>
                 
                 <li class="nav-item">
                     <a href="{% url 'core:index' %}" class="nav-link px-3">
-                        <i class="bi bi-house-door"></i> <span>Ir al Sitio</span>
+                        <i class="bi bi-house-door fs-5"></i> <span class="text-hide-smart ms-2">Ir al Sitio</span>
                     </a>
                 </li>
                 
-                <div class="mt-auto p-3">
-                    <button type="button" class="btn btn-danger w-100 rounded-pill fw-bold shadow-sm transition-hover mt-3" data-bs-toggle="modal" data-bs-target="#logoutAdminModal">
+                <div class="mt-auto p-3 text-hide-smart text-center d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger rounded-pill fw-bold shadow-sm transition-hover mt-3 w-100" data-bs-toggle="modal" data-bs-target="#logoutAdminModal">
                         <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
                     </button>
                 </div>
-
-
-
             </ul>
         </nav>
     </div>
     
-    <div id="main-content">
+    <div id="main-content" class="content-smart">
+
+        <script>
+            if (window.innerWidth > 768 && localStorage.getItem('sidebarPinned') === 'true') {
+                const sb = document.getElementById('sidebar');
+                const mc = document.getElementById('main-content');
+                
+                // 1. Lo anclamos inmediatamente y congelamos la animación
+                sb.classList.add('pinned', 'preload-transition');
+                mc.classList.add('pinned-content', 'preload-transition');
+                
+                // 2. Le devolvemos la fluidez casi al instante para que el botón de hamburguesa siga funcionando suave
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        sb.classList.remove('preload-transition');
+                        mc.classList.remove('preload-transition');
+                    }, 50);
+                });
+            }
+        </script>
         
-        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 shadow-sm">
+        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3 shadow-sm bg-white border-bottom">
             <div class="d-flex align-items-center">
-                <button class="btn btn-toggle border-0 bg-transparent fs-3 p-0 me-3" style="color: var(--sena-green);" id="sidebar-toggle">
-                    <i class="bi bi-list"></i>
+                <button class="btn btn-light rounded-circle shadow-sm border transition-hover d-flex justify-content-center align-items-center me-3" id="sidebar-toggle" style="width: 45px; height: 45px;">
+                    <i class="bi bi-list fs-4" style="color: var(--sena-green);"></i>
                 </button>
-                <h1 class="h4 mb-0 page-title" style="color: var(--sena-green) !important;">
-                    {% block page_title %}Panel Principal{% endblock %}
-                </h1>            
+                <div class="d-none d-md-block">
+                    <h4 class="mb-0 fw-bolder text-dark d-flex align-items-center" style="letter-spacing: -0.5px;">
+                        <i class="bi bi-grid-1x2-fill me-2 opacity-75" style="color: var(--sena-green);"></i>
+                        Panel Administrativo
+                    </h4>
+                    <small class="text-muted fw-semibold">Gestión integral de la plataforma</small>
+                </div>
             </div>
             
-            <div class="d-flex align-items-center">
-                <form class="search-box me-4 position-relative d-none d-md-block" method="GET" action="{% url 'core:busqueda' %}">
-                    <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
-                    <input type="text" name="q" class="form-control rounded-pill ps-5 bg-light border-0 shadow-sm" placeholder="Buscar globalmente..." value="{{ request.GET.q|default:'' }}" style="width: 250px;">
+            <div class="d-flex align-items-center flex-grow-1 justify-content-end">
+                <form class="d-none d-lg-flex mx-auto position-relative" style="max-width: 450px; width: 100%;" method="GET" action="{% url 'core:busqueda' %}">
+                    <div class="input-group shadow-sm rounded-pill overflow-hidden border" style="border-color: rgba(57, 169, 0, 0.3) !important;">
+                        <input type="text" name="q" class="form-control border-0 bg-light ps-4 py-2" placeholder="Buscar fichas, aprendices, bitácoras..." value="{{ request.GET.q|default:'' }}" style="box-shadow: none;">
+                        <button class="btn px-4 fw-bold text-white hover-opacity" type="submit" style="background-color: var(--sena-green);">
+                            <i class="bi bi-search me-1"></i> Buscar
+                        </button>
+                    </div>
                 </form>
 
-                <div class="dropdown">
+                <div class="dropdown ms-3">
                     <button class="btn border-0 d-flex align-items-center bg-transparent" data-bs-toggle="dropdown">
                         {% if user.perfil.foto_perfil %}
-                            <img src="{{ user.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle border border-2" style="border-color: var(--sena-green) !important; width: 40px; height: 40px; object-fit: cover;">
+                            <img src="{{ user.perfil.foto_perfil.url }}" alt="Avatar" class="rounded-circle border border-2 shadow-sm" style="border-color: var(--sena-green) !important; width: 45px; height: 45px; object-fit: cover;">
                         {% else %}
                             <i class="bi bi-person-circle fs-2" style="color: var(--sena-green);"></i>
                         {% endif %}
-                        <span class="d-none d-md-inline ms-2 fw-bold text-dark">{{ user.first_name }}</span>
+                        <span class="d-none d-xl-inline ms-2 fw-bold text-dark">{{ user.first_name }}</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 rounded-3">
                         <div class="dropdown-header">
@@ -697,89 +719,184 @@
         
     </div>
     
+    <style>
+        @media (min-width: 769px) {
+            /* Estado normal (Cerrado por defecto) */
+            .sidebar-smart {
+                width: 85px !important;
+                transition: width 0.3s ease-in-out !important;
+                overflow-x: hidden;
+                z-index: 1040;
+            }
+            .sidebar-smart .user-avatar {
+                width: 45px !important; 
+                height: 45px !important;
+            }
+            .sidebar-smart .text-hide-smart {
+                opacity: 0;
+                white-space: nowrap;
+                transition: opacity 0.2s ease;
+                display: none; /* Escondemos para que no haga scroll */
+            }
+
+            /* Estado Hover (Cuando pasas el mouse) O Fijo (Cuando está Anclado/Pinned) */
+            .sidebar-smart:hover, 
+            .sidebar-smart.pinned {
+                width: 280px !important;
+            }
+            .sidebar-smart:hover .user-avatar, 
+            .sidebar-smart.pinned .user-avatar {
+                width: 80px !important; 
+                height: 80px !important;
+                margin-top: 15px;
+            }
+            .sidebar-smart:hover .text-hide-smart, 
+            .sidebar-smart.pinned .text-hide-smart {
+                opacity: 1;
+                display: block;
+            }
+            .sidebar-smart:hover .nav-item a span, 
+            .sidebar-smart.pinned .nav-item a span {
+                display: inline-block;
+            }
+
+            /* Contenedor Principal (Se adapta al tamaño del menú) */
+            .content-smart {
+                margin-left: 85px !important;
+                width: calc(100% - 85px) !important;
+                transition: all 0.3s ease-in-out !important;
+            }
+            
+            /* Si el menú se ancla, empujamos el contenido para que no lo tape */
+            .content-smart.pinned-content {
+                margin-left: 280px !important;
+                width: calc(100% - 280px) !important;
+            }
+
+            /* Evita que el menú se anime al recargar la página */
+        .preload-transition, .preload-transition * {
+            transition: none !important;
+        }
+        }
+        .hover-opacity:hover {
+            opacity: 0.9;
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // 1. LÓGICA DEL BOTÓN HAMBURGUESA
-            const toggleBtn = document.getElementById('sidebar-toggle');
-            const sidebar = document.getElementById('sidebar');
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn   = document.getElementById('sidebar-toggle');
+            const sidebar     = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
+            const overlay     = document.getElementById('sidebar-overlay');
 
-            toggleBtn.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.toggle('mobile-open');
+            function isMobile() { return window.innerWidth <= 768; }
+
+            // Lógica Móvil (Se mantiene intacta tu lógica original)
+            function openMobile() {
+                sidebar.classList.add('mobile-open');
+                sidebar.style.left = '0px';
+                if (overlay) overlay.style.display = 'block';
+            }
+            function closeMobile() {
+                sidebar.classList.remove('mobile-open');
+                sidebar.style.left = '-280px';
+                if (overlay) overlay.style.display = 'none';
+            }
+            if (overlay) {
+                overlay.addEventListener('click', closeMobile);
+            }
+
+            // 🌟 NUEVA LÓGICA DE ESCRITORIO (Recordar si está fijado)
+            if (!isMobile() && localStorage.getItem('sidebarPinned') === 'true') {
+                sidebar.classList.add('pinned');
+                mainContent.classList.add('pinned-content');
+                // Estilo visual para el botón cuando está fijado
+                toggleBtn.classList.replace('btn-light', 'btn-success');
+                toggleBtn.querySelector('i').classList.replace('text-success', 'text-white');
+                toggleBtn.querySelector('i').style.color = 'white';
+            }
+
+            // Toggle Botón
+            toggleBtn.addEventListener('click', function () {
+                if (isMobile()) {
+                    const isOpen = sidebar.style.left === '0px';
+                    if (isOpen) { closeMobile(); } else { openMobile(); }
                 } else {
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('collapsed');
+                    // PC: Anclar/Desanclar
+                    sidebar.classList.toggle('pinned');
+                    mainContent.classList.toggle('pinned-content');
+                    
+                    // Guardar preferencia
+                    const isPinned = sidebar.classList.contains('pinned');
+                    localStorage.setItem('sidebarPinned', isPinned);
+
+                    // Cambiar el color del botón para dar feedback al usuario
+                    if(isPinned) {
+                        toggleBtn.classList.replace('btn-light', 'btn-success');
+                        toggleBtn.querySelector('i').style.color = 'white';
+                    } else {
+                        toggleBtn.classList.replace('btn-success', 'btn-light');
+                        toggleBtn.querySelector('i').style.color = 'var(--sena-green)';
+                    }
                 }
             });
 
-            // 2. DETECCIÓN DE MÓDULO ACTIVO
+            // Módulo activo (Pintar el botón donde estamos parados)
             const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('#menu-lateral .nav-link');
-            
-            navLinks.forEach(link => {
-                const linkHref = link.getAttribute('href');
-                if (linkHref && linkHref !== '#' && !link.classList.contains('logout-btn')) {
-                    if (currentPath.includes(linkHref) && linkHref !== '/') {
-                        link.classList.add('activo');
-                    } else if (currentPath === linkHref) {
+            document.querySelectorAll('#menu-lateral .nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && !link.classList.contains('logout-btn')) {
+                    if ((currentPath.includes(href) && href !== '/') || currentPath === href) {
                         link.classList.add('activo');
                     }
                 }
             });
 
-            // 3. RETENCIÓN DEL SCROLL DEL MENÚ LATERAL
-            // Guarda la posición del scroll cada vez que se mueve el menú
-            sidebar.addEventListener('scroll', function() {
+            // Scroll del sidebar
+            sidebar.addEventListener('scroll', function () {
                 sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
             });
-            // Restaura la posición del scroll al cargar la página
             const savedScroll = sessionStorage.getItem('sidebarScroll');
-            if (savedScroll) {
-                sidebar.scrollTop = savedScroll;
-            }
+            if (savedScroll) { sidebar.scrollTop = parseInt(savedScroll); }
         });
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 
- 
-<!-- Modal de confirmación para cerrar sesión -->
-<div class="modal fade" id="logoutAdminModal" tabindex="-1" aria-labelledby="logoutAdminModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 shadow border-0 border-top border-4 border-danger">
-            <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center position-relative">
-                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                <h5 class="modal-title fw-bolder text-dark" id="logoutAdminModalLabel">
-                    Confirmar Cierre de Sesión
-                </h5>
-            </div>
-            <div class="modal-body text-center p-4">
-                <i class="bi bi-shield-lock text-danger display-1 mb-3 d-block"></i>
-                <p class="mb-0 text-muted fs-6 lh-lg">
-                    ¿Estás seguro de que deseas salir del panel administrativo?
-                    Asegúrate de haber guardado todos los cambios y revisiones pendientes.
-                </p>
-            </div>
-            <div class="modal-footer border-0 pb-4 pt-0 px-4 justify-content-center gap-2">
-                <button type="button" class="btn btn-light rounded-pill px-4 fw-medium border shadow-sm transition-hover" data-bs-dismiss="modal">
-                    Volver al Panel
-                </button>
-                
-                <form action="{% url 'usuarios:logout' %}" method="post" class="m-0">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold transition-hover shadow-sm">
-                        <i class="bi bi-box-arrow-right me-1"></i>Sí, Salir
+    <div class="modal fade" id="logoutAdminModal" tabindex="-1" aria-labelledby="logoutAdminModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow border-0 border-top border-4 border-danger">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 justify-content-center position-relative">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bolder text-dark" id="logoutAdminModalLabel">
+                        Confirmar Cierre de Sesión
+                    </h5>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-shield-lock text-danger display-1 mb-3 d-block"></i>
+                    <p class="mb-0 text-muted fs-6 lh-lg">
+                        ¿Estás seguro de que deseas salir del panel administrativo?
+                        Asegúrate de haber guardado todos los cambios y revisiones pendientes.
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pb-4 pt-0 px-4 justify-content-center gap-2">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-medium border shadow-sm transition-hover" data-bs-dismiss="modal">
+                        Volver al Panel
                     </button>
-                </form>
+                    
+                    <form action="{% url 'usuarios:logout' %}" method="post" class="m-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold transition-hover shadow-sm">
+                            <i class="bi bi-box-arrow-right me-1"></i>Sí, Salir
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </body>
-</html>
