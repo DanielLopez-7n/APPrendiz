@@ -15,6 +15,9 @@ urlpatterns = [
     path('busqueda/', views.busqueda_global, name='busqueda'),
     path('logout/', auth_views.LogoutView.as_view(next_page='core:index'), name='logout'),
     
+    # --- Notificaciones ---
+    path('notificaciones/marcar-leida/<int:pk>/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
+    path('notificaciones/marcar-todas-leidas/', views.marcar_todas_leidas, name='marcar_todas_leidas'),
+    path('notificaciones/json/', views.obtener_notificaciones, name='obtener_notificaciones'),
 
-
-    ]
+    ]

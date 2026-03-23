@@ -222,3 +222,72 @@ class CustomLoginView(LoginView):
         context = self.get_context_data(form=form)
         # renderizamos la plantilla dedicada donde el usuario puede corregir credenciales
         return render(self.request, 'usuarios/login.html', context, status=401)
+
+
+# --- VISTAS DE NOTIFICACIONES ---
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from .models import Notificacion
+
+
+@login_required
+@require_POST
+def marcar_notificacion_leida(request, pk):
+    """Marca una notificación como leída y redirige a su enlace."""
+    try:
+        notificacion = Notificacion.objects.get(pk=pk, usuario_destino=request.user)
+        notificacion.leida = True
+        notificacion.save()
+        
+        # Si tiene enlace, redirigimos ahí; si no, al dashboard
+        if notificacion.enlace:
+            return redirect(notificacion.enlace)
+        return redirect('core:dashboard')
+    except Notificacion.DoesNotExist:
+        return redirect('core:dashboard')
+
+
+@login_required
+@require_POST
+def marcar_todas_leidas(request):
+    """Marca todas las notificaciones del usuario como leídas (AJAX)."""
+    Notificacion.objects.filter(
+        usuario_destino=request.user,
+        leida=False
+    ).update(leida=True)
+    
+    return JsonResponse({'success': True, 'message': 'Todas las notificaciones marcadas como leídas.'})
+
+
+@login_required
+def obtener_notificaciones(request):
+    """Devuelve las notificaciones no leídas en formato JSON para polling AJAX."""
+    notificaciones = Notificacion.objects.filter(
+        usuario_destino=request.user,
+        leida=False
+    ).order_by('-fecha_creacion')[:10]
+
+    data = []
+    for n in notificaciones:
+        # Calcular tiempo relativo
+        from django.utils.timesince import timesince
+        tiempo = timesince(n.fecha_creacion, timezone.now())
+        # Tomar solo la primera parte (ej: "2 horas" en vez de "2 horas, 3 minutos")
+        tiempo_corto = tiempo.split(',')[0]
+
+        data.append({
+            'id': n.id,
+            'tipo': n.tipo,
+            'titulo': n.titulo,
+            'mensaje': n.mensaje,
+            'enlace': n.enlace or '',
+            'tiempo': f'Hace {tiempo_corto}',
+        })
+
+    total = Notificacion.objects.filter(
+        usuario_destino=request.user,
+        leida=False
+    ).count()
+
+    return JsonResponse({'notificaciones': data, 'total': total})
