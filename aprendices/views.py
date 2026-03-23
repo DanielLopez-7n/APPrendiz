@@ -102,10 +102,14 @@ def perfil_aprendiz(request):
     # ¡CORRECCIÓN APLICADA AQUÍ!: Cambiamos 'aprendiz' por 'aprendiz_rel'
     mis_bitacoras = Bitacora.objects.filter(aprendiz_rel=aprendiz).order_by('-numero_bitacora')
     
+    # 4. Contamos las pendientes
+    bitacoras_pendientes_count = mis_bitacoras.filter(estado='Pendiente').count()
+    
     alerta_password = request.user.check_password(request.user.username)
     context = {
         'aprendiz': aprendiz,
         'bitacoras': mis_bitacoras,
+        'bitacoras_pendientes_count': bitacoras_pendientes_count,
         'alerta_password': alerta_password
     }
     return render(request, 'aprendices/perfil_aprendiz.html', context)

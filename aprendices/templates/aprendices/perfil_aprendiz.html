@@ -95,7 +95,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-muted fw-bold mb-1">Ficha Actual</h6>
-                            <h4 class="fw-bold text-dark mb-0">{{ request.user.aprendiz.ficha.numero|default:"Sin asignar" }}</h4>
+                            <h4 class="fw-bold text-dark mb-0">{{ request.user.aprendiz.numero_ficha.numero|default:"Sin asignar" }}</h4>
                         </div>
                         <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
                             <i class="bi bi-people fs-3"></i>
@@ -131,12 +131,12 @@
                                 <span class="d-block small text-muted">Fin: {{ bitacora.fecha_fin|date:"d M Y" }}</span>
                             </td>
                             <td>
-                                {% if bitacora.instructor_seguimiento %}
+                                {% if bitacora.nombre_instructor_seguimiento %}
                                     <div class="d-flex align-items-center">
                                         <div class="bg-light rounded-circle p-2 me-2 text-secondary">
                                             <i class="bi bi-person-fill"></i>
                                         </div>
-                                        <span class="small">{{ bitacora.instructor_seguimiento.usuario.get_full_name }}</span>
+                                        <span class="small">{{ bitacora.nombre_instructor_seguimiento }}</span>
                                     </div>
                                 {% else %}
                                     <span class="text-muted small">--</span>

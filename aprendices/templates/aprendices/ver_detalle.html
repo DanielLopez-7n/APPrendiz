@@ -1,100 +1,219 @@
 {% extends 'core/panel_admin_base.html' %} 
+{% load static %}
 
-{% block title %}Detalle del Aprendiz{% endblock %}
-
-{% block breadcrumb_items %}
-    <li class="breadcrumb-item"><a href="{% url 'aprendices:listar_aprendices' %}">Aprendices</a></li>
-    <li class="breadcrumb-item active">Ver Detalle</li>
-{% endblock %}
+{% block title %}Detalle del Aprendiz | APPrendiz{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm border-0 text-center h-100">
-            <div class="card-body p-4">
-                <div class="mb-3">
-                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
-                        <i class="bi bi-person-fill text-secondary" style="font-size: 3rem;"></i>
-                    </div>
+<style>
+    /* ==========================================
+       ESTILOS PREMIUM - DETALLE DE USUARIO
+       ========================================== */
+    .card-studio {
+        border: none; border-radius: 25px; background: #fff;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 25px; margin-bottom: 30px;
+        transition: all 0.3s ease;
+    }
+    
+    .avatar-lg-studio {
+        width: 130px; height: 130px;
+        border-radius: 50%;
+        border: 5px solid #fff;
+        box-shadow: 0 10px 25px rgba(57, 169, 0, 0.2);
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 130px; height: 130px;
+        border-radius: 50%;
+        border: 5px solid #fff;
+        box-shadow: 0 10px 25px rgba(57, 169, 0, 0.2);
+        background-color: rgba(57, 169, 0, 0.1);
+        color: #39A900;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+    }
+
+    .section-title-premium {
+        color: #212529;
+        font-weight: 800;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid rgba(57, 169, 0, 0.1);
+    }
+    .section-title-premium i {
+        color: #39A900;
+        margin-right: 10px;
+        font-size: 1.3rem;
+    }
+
+    .info-label {
+        color: #a0a5ab;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.3rem;
+    }
+    
+    .info-value {
+        color: #212529;
+        font-weight: 600;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    .info-value i {
+        color: #6c757d;
+        margin-right: 8px;
+        font-size: 1.1rem;
+    }
+
+    .badge-premium {
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="container-fluid py-2">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+            <h6 class="text-success fw-bold text-uppercase mb-1" style="letter-spacing: 2px; font-size: 0.75rem;">Perfil Completo</h6>
+            <h2 class="fw-black text-dark mb-0">Detalle del Aprendiz</h2>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'aprendices:listar_aprendices' %}" class="btn btn-light rounded-pill px-4 fw-bold border text-muted shadow-sm d-flex align-items-center transition-hover">
+                <i class="bi bi-arrow-left me-2"></i> Volver al Listado
+            </a>
+            {% if request.user.is_superuser %}
+            <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center transition-hover text-dark">
+                <i class="bi bi-pencil-fill me-2"></i> Editar
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-4 col-lg-5 mb-4">
+            <div class="card-studio text-center h-100 d-flex flex-column justify-content-center align-items-center position-relative overflow-hidden">
+                <div class="position-absolute top-0 start-0 w-100" style="height: 120px; background: linear-gradient(135deg, rgba(57,169,0,0.1) 0%, rgba(57,169,0,0) 100%); z-index: 0;"></div>
+                
+                <div class="position-relative mb-4 mt-3" style="z-index: 1;">
+                    {% if aprendiz.usuario.perfil.foto_perfil %}
+                        <img src="{{ aprendiz.usuario.perfil.foto_perfil.url }}" alt="Foto de {{ aprendiz.usuario.first_name }}" class="avatar-lg-studio">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                    {% endif %}
                 </div>
-                <h4 class="font-weight-bold mb-1 text-dark">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h4>
-                <p class="text-dark mb-3">{{ aprendiz.programa_formacion }} ({{ aprendiz.numero_ficha.numero_ficha }})</p>
-                <span class="badge {% if aprendiz.usuario.is_active %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3">
-                    {% if aprendiz.usuario.is_active %}Activo{% else %}Inactivo{% endif %}
-                </span>
-            </div>
-            <div class="card-footer bg-white border-0 pb-4">
-                <div class="d-grid">
-                    <a href="mailto:{{ aprendiz.usuario.email }}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-envelope me-2"></i>Enviar Correo
+                
+                <h3 class="fw-bolder mb-1 text-dark position-relative" style="z-index: 1;">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h3>
+                <p class="text-muted fw-semibold mb-3 px-3 position-relative" style="z-index: 1;">{{ aprendiz.programa_formacion|truncatechars:45 }}</p>
+                
+                <div class="mb-4 position-relative" style="z-index: 1;">
+                    {% if aprendiz.usuario.is_active %}
+                        <span class="badge-premium bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                            <i class="bi bi-check-circle-fill me-1"></i> Usuario Activo
+                        </span>
+                    {% else %}
+                        <span class="badge-premium bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                            <i class="bi bi-x-circle-fill me-1"></i> Usuario Inactivo
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="w-100 mt-auto pt-3 border-top position-relative" style="z-index: 1;">
+                    <a href="mailto:{{ aprendiz.usuario.email }}" class="btn btn-dark rounded-pill w-100 fw-bold shadow-sm py-2 d-flex justify-content-center align-items-center" style="background-color: #1a1a1a;">
+                        <i class="bi bi-envelope-paper-fill me-2 text-success"></i> Enviar Correo
                     </a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="col-md-8 mb-4">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white py-3 border-bottom">
-                <h5 class="mb-0 text-primary"><i class="bi bi-card-list me-2"></i>Información Completa</h5>
-            </div>
-            <div class="card-body p-4 p-md-5">
-
-                <h6 class="font-weight-bold text-uppercase mb-3" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Personal</h6>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">TIPO DE DOCUMENTO</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.get_tipo_documento_display }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">NÚMERO DE IDENTIFICACIÓN</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.documento }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">CONTACTO TELEFÓNICO</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.telefono }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">CORREO ELECTRÓNICO PERSONAL</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.correo_personal|default:"No registrado" }}</p>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">DIRECCIÓN DE RESIDENCIA</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.direccion_residencia|default:"No registrada" }}</p>
+        <div class="col-xl-8 col-lg-7 mb-4">
+            <div class="card-studio h-100 p-md-4">
+                
+                <div class="mb-5">
+                    <h5 class="section-title-premium"><i class="bi bi-person-vcard"></i> Información Personal</h5>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="info-label">Tipo de Documento</div>
+                            <div class="info-value"><i class="bi bi-credit-card-2-front text-muted opacity-50"></i> {{ aprendiz.get_tipo_documento_display }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Número de Identificación</div>
+                            <div class="info-value"><i class="bi bi-123 text-muted opacity-50"></i> {{ aprendiz.documento }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Contacto Telefónico</div>
+                            <div class="info-value"><i class="bi bi-telephone text-muted opacity-50"></i> {{ aprendiz.telefono|default:"No registrado" }}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Correo Electrónico Personal</div>
+                            <div class="info-value"><i class="bi bi-at text-muted opacity-50"></i> {{ aprendiz.correo_personal|default:"No registrado" }}</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-label">Dirección de Residencia</div>
+                            <div class="info-value"><i class="bi bi-geo-alt text-muted opacity-50"></i> {{ aprendiz.direccion_residencia|default:"No registrada" }}</div>
+                        </div>
                     </div>
                 </div>
 
-                <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Información Académica SENA</h6>
-                <div class="row mb-4">
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">NÚMERO DE GRUPO (FICHA)</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.numero_ficha }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">PROGRAMA DE FORMACIÓN</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.programa_formacion }}</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">MODALIDAD FORMACIÓN</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.modalidad_formacion }}</p>
+                <div class="mb-5">
+                    <h5 class="section-title-premium"><i class="bi bi-mortarboard"></i> Información Académica SENA</h5>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="info-label">Número de Ficha (Grupo)</div>
+                            <div class="info-value">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-bold">
+                                    <i class="bi bi-hash"></i>{{ aprendiz.numero_ficha }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-label">Modalidad de Formación</div>
+                            <div class="info-value"><i class="bi bi-pc-display-horizontal text-muted opacity-50"></i> {{ aprendiz.modalidad_formacion }}</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="info-label">Programa de Formación</div>
+                            <div class="info-value"><i class="bi bi-book text-muted opacity-50"></i> {{ aprendiz.programa_formacion }}</div>
+                        </div>
                     </div>
                 </div>
 
-                <h6 class="font-weight-bold text-uppercase mb-3 mt-4" style="color: #39A900 !important; border-bottom: 2px solid #39A900 !important; padding-bottom: 5px;">Etapa Productiva</h6>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">MODALIDAD ETAPA</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.modalidad_etapa }}</p>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">¿EN EL EXTERIOR?</label>
-                        <p class="text-dark mb-0 fs-6">{% if aprendiz.etapa_exterior %}Sí{% else %}No{% endif %}</p>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="text-muted small mb-0 fw-bold">PAÍS</label>
-                        <p class="text-dark mb-0 fs-6">{{ aprendiz.pais_etapa }}</p>
+                <div>
+                    <h5 class="section-title-premium"><i class="bi bi-briefcase"></i> Etapa Productiva</h5>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="info-label">Modalidad de Etapa</div>
+                            <div class="info-value"><i class="bi bi-building-gear text-muted opacity-50"></i> {{ aprendiz.modalidad_etapa }}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">¿En el Exterior?</div>
+                            <div class="info-value">
+                                {% if aprendiz.etapa_exterior %}
+                                    <span class="text-success fw-bold"><i class="bi bi-globe-americas me-1"></i> Sí</span>
+                                {% else %}
+                                    <span class="text-muted fw-bold"><i class="bi bi-house-door me-1"></i> No</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-label">País</div>
+                            <div class="info-value"><i class="bi bi-pin-map text-muted opacity-50"></i> {{ aprendiz.pais_etapa }}</div>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

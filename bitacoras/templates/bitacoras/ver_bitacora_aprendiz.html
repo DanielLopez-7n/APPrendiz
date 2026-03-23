@@ -8,7 +8,7 @@
     :root {
         --sena-green: #39a900;
         --sena-dark-green: #2d8600;
-        --sena-light: rgba(57, 169, 0, 0.1);
+        --sena-light: rgba(57, 169, 0, 0.08);
     }
     
     .text-sena { color: var(--sena-green) !important; }
@@ -24,18 +24,52 @@
         box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
     }
     
-    /* Para mantener los bordes redondeados en la tabla */
+    .section-header {
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #6c757d;
+        font-size: 0.82rem;
+        letter-spacing: 0.5px;
+    }
+    .section-header i { color: var(--sena-green); }
+
+    .data-label-sm {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6c757d;
+        margin-bottom: 3px;
+    }
+    .data-val {
+        font-weight: 700;
+        color: #1a1a1a;
+        font-size: 0.95rem;
+    }
+
     .table-activities thead th {
         background-color: var(--sena-green);
         color: white;
         border: none;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .table-activities th:first-child { border-top-left-radius: 1rem; }
     .table-activities th:last-child { border-top-right-radius: 1rem; }
+
+    .firma-img {
+        max-width: 200px;
+        max-height: 100px;
+        object-fit: contain;
+        margin-bottom: 8px;
+    }
 </style>
 
 <div class="container py-4">
     
+    <!-- Header -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 bg-white p-4 rounded-4 shadow-sm border-0">
         <div class="mb-3 mb-md-0 w-100">
             <a href="{% url 'aprendices:perfil_aprendiz' %}" class="btn btn-light border shadow-sm px-4 rounded-pill transition-hover mb-3 fw-medium">
@@ -45,7 +79,8 @@
                 <i class="bi bi-file-earmark-text text-sena me-2"></i>Bitácora N° {{ bitacora.numero_bitacora }}
             </h3>
             <p class="text-muted mb-0 fw-medium">
-                <i class="bi bi-calendar-check me-1"></i> Fecha de entrega: {{ bitacora.fecha_entrega|date:"d de F, Y" }}
+                <i class="bi bi-calendar-check me-1"></i> Fecha de entrega: {{ bitacora.fecha_entrega_bitacora|date:"d" }} de {{ bitacora.fecha_entrega_bitacora|date:"F, Y" }}
+                <span class="ms-3 badge bg-light text-dark border fw-bold" style="font-size: 0.65rem;">{{ bitacora.clasificacion_informacion }}</span>
             </p>
         </div>
         
@@ -66,70 +101,113 @@
         </div>
     </div>
 
+    <!-- 1. Información del Aprendiz y Período -->
     <div class="card shadow-sm rounded-4 border-0 mb-4 border-start border-4 border-sena">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
-            <h6 class="fw-bolder text-uppercase mb-0 text-muted">
-                <i class="bi bi-calendar-range text-sena fs-5 me-2"></i> 1. Vinculación y Periodo
+            <h6 class="section-header mb-0">
+                <i class="bi bi-person-badge fs-5 me-2"></i> 1. Información del Aprendiz
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
-            <div class="row g-4 bg-light p-3 rounded-4 mx-0">
-                <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Ficha de Caracterización</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.ficha|default:"No asignada" }}</div>
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0 mb-3">
+                <div class="col-md-6">
+                    <label class="data-label-sm">Nombre Completo</label>
+                    <div class="data-val fs-5">{{ bitacora.nombre_completo_aprendiz }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Tipo Documento</label>
+                    <div class="data-val">{{ bitacora.get_tipo_documento_aprendiz_display }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Nº Identificación</label>
+                    <div class="data-val">{{ bitacora.numero_identificacion_aprendiz }}</div>
+                </div>
+            </div>
+            <div class="row g-3 px-2">
+                <div class="col-md-3">
+                    <label class="data-label-sm">Teléfono</label>
+                    <div class="data-val">{{ bitacora.contacto_telefonico_aprendiz }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Instructor de Seguimiento</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.instructor_seguimiento.usuario.get_full_name|default:"Sin asignar" }}</div>
+                    <label class="data-label-sm">Correo Institucional</label>
+                    <div class="data-val small">{{ bitacora.correo_institucional_aprendiz }}</div>
+                </div>
+                <div class="col-md-5">
+                    <label class="data-label-sm">Correo Personal</label>
+                    <div class="data-val small">{{ bitacora.correo_personal_aprendiz }}</div>
+                </div>
+                <div class="col-md-12">
+                    <label class="data-label-sm">Dirección de Residencia</label>
+                    <div class="data-val">{{ bitacora.direccion_residencia_aprendiz }}</div>
+                </div>
+            </div>
+            <hr class="my-3 opacity-15">
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0">
+                <div class="col-md-3">
+                    <label class="data-label-sm">Ficha</label>
+                    <div class="data-val text-sena fs-5">{{ bitacora.numero_grupo_ficha }}</div>
+                </div>
+                <div class="col-md-5">
+                    <label class="data-label-sm">Programa de Formación</label>
+                    <div class="data-val">{{ bitacora.programa_formacion }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Tipo Documento</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.get_tipo_documento_display }}</div>
+                    <label class="data-label-sm">Instructor de Seguimiento</label>
+                    <div class="data-val">{{ bitacora.nombre_instructor_seguimiento }}</div>
                 </div>
-                <div class="col-md-6 mt-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Período Reportado</label>
-                    <div class="fs-5 fw-bolder text-sena">
-                        {{ bitacora.fecha_inicio }} <span class="text-muted fw-normal mx-1">al</span> {{ bitacora.fecha_fin }}
+                <div class="col-md-6 mt-3">
+                    <label class="data-label-sm">Período Reportado</label>
+                    <div class="data-val fs-5 text-sena">
+                        {{ bitacora.fecha_inicio|date:"d M Y" }} <span class="text-muted fw-normal mx-1">al</span> {{ bitacora.fecha_fin|date:"d M Y" }}
                     </div>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <label class="data-label-sm">Modalidad Formación</label>
+                    <div class="data-val">{{ bitacora.get_modalidad_formacion_display }}</div>
+                </div>
+                <div class="col-md-3 mt-3">
+                    <label class="data-label-sm">Modalidad Ejecución</label>
+                    <div class="data-val">{{ bitacora.get_modalidad_ejecucion_display }}</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 2. Ente Co-Formador (Empresa) -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
-            <h6 class="fw-bolder text-uppercase mb-0 text-muted">
-                <i class="bi bi-building text-sena fs-5 me-2"></i> 2. Ente Co-Formador (Empresa)
+            <h6 class="section-header mb-0">
+                <i class="bi bi-building fs-5 me-2"></i> 2. Ente Co-Formador (Empresa)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
-            <div class="row g-4 px-2">
+            <div class="row g-3 px-2">
                 <div class="col-md-8">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Razón Social</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.razon_social_empresa }}</div>
+                    <label class="data-label-sm">Razón Social</label>
+                    <div class="data-val fs-5">{{ bitacora.nombre_empresa }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">NIT</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.nit_empresa }}</div>
+                    <label class="data-label-sm">NIT</label>
+                    <div class="data-val">{{ bitacora.nit_empresa }}</div>
                 </div>
                 <div class="col-md-12">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Dirección</label>
-                    <div class="fs-6 text-dark">{{ bitacora.direccion_empresa|default:"No registrada" }}</div>
+                    <label class="data-label-sm">Dirección</label>
+                    <div class="data-val">{{ bitacora.direccion_empresa|default:"No registrada" }}</div>
                 </div>
                 
                 <div class="col-12"><hr class="text-muted opacity-25"></div>
                 
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Jefe Inmediato</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.nombre_jefe }}</div>
+                    <label class="data-label-sm">Jefe Inmediato</label>
+                    <div class="data-val">{{ bitacora.nombre_jefe }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Cargo</label>
-                    <div class="fs-6 text-dark">{{ bitacora.cargo_jefe }}</div>
+                    <label class="data-label-sm">Cargo</label>
+                    <div class="data-val">{{ bitacora.cargo_jefe }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Contacto</label>
-                    <div class="fs-6 text-dark small fw-medium">
+                    <label class="data-label-sm">Contacto</label>
+                    <div class="data-val small">
                         <i class="bi bi-telephone text-sena me-1"></i> {{ bitacora.telefono_jefe }}<br>
                         <i class="bi bi-envelope text-sena me-1 mt-1"></i> {{ bitacora.email_jefe }}
                     </div>
@@ -138,38 +216,60 @@
         </div>
     </div>
 
+    <!-- 3. Modalidad y Seguridad (SST) -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
-            <h6 class="fw-bolder text-uppercase mb-0 text-muted">
-                <i class="bi bi-shield-check text-sena fs-5 me-2"></i> 3. Modalidad y Seguridad (SST)
+            <h6 class="section-header mb-0">
+                <i class="bi bi-shield-check fs-5 me-2"></i> 3. Modalidad y Seguridad (SST)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
-            <div class="row g-3 bg-light p-3 rounded-4 mx-0 text-center text-md-start">
-                <div class="col-6 col-md-3 border-end border-white">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Modalidad</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.modalidad }}</div>
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0 text-center text-md-start mb-3">
+                <div class="col-md-4">
+                    <label class="data-label-sm">Alternativa Etapa</label>
+                    <div class="data-val">{{ bitacora.alternativa_etapa }}</div>
                 </div>
-                <div class="col-6 col-md-3 border-end border-white">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Afiliado ARL</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.afiliado_arl }}</div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">¿Exterior?</label>
+                    <div class="data-val">{{ bitacora.exterior }}</div>
                 </div>
-                <div class="col-6 col-md-3 border-end border-white">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Nivel de Riesgo</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.get_nivel_riesgo_display }}</div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">País</label>
+                    <div class="data-val">{{ bitacora.pais_etapa }}</div>
+                </div>
+            </div>
+            <div class="row g-3 text-center text-md-start px-2">
+                <div class="col-6 col-md-3">
+                    <label class="data-label-sm">Afiliado ARL</label>
+                    <div class="data-val">
+                        {% if bitacora.arl_afiliado == 'SI' %}
+                            <span class="text-success"><i class="bi bi-check-circle-fill"></i> Sí</span>
+                        {% else %}
+                            <span class="text-danger"><i class="bi bi-x-circle-fill"></i> No</span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <label class="text-muted small fw-bold text-uppercase mb-1">Uso de EPP</label>
-                    <div class="fs-6 fw-bold text-dark">{{ bitacora.uso_epp }}</div>
+                    <label class="data-label-sm">Nivel de Riesgo</label>
+                    <div class="data-val"><span class="badge bg-warning text-dark fw-bold px-3 py-1">{{ bitacora.nivel_riesgo }}</span></div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="data-label-sm">¿Corresponde?</label>
+                    <div class="data-val">{{ bitacora.riesgo_corresponde }}</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="data-label-sm">Cuenta con EPP</label>
+                    <div class="data-val">{{ bitacora.cuenta_epp }}</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 4. Actividades -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
-            <h6 class="fw-bolder text-uppercase mb-0 text-muted">
-                <i class="bi bi-list-task text-sena fs-5 me-2"></i> 4. Descripción de Actividades
+            <h6 class="section-header mb-0">
+                <i class="bi bi-list-task fs-5 me-2"></i> 4. Descripción de Actividades
             </h6>
         </div>
         <div class="card-body p-4 pt-0">
@@ -177,31 +277,35 @@
                 <table class="table table-hover mb-0 table-activities align-middle">
                     <thead class="text-center">
                         <tr>
-                            <th style="width: 15%;" class="py-3">Fecha</th>
-                            <th style="width: 55%;" class="text-start py-3">Descripción de la Actividad</th>
-                            <th style="width: 30%;" class="py-3">Evidencia / Producto</th>
+                            <th style="width: 12%;" class="py-3">Período</th>
+                            <th style="width: 30%;" class="text-start py-3">Descripción</th>
+                            <th style="width: 25%;" class="text-start py-3">Competencias</th>
+                            <th style="width: 15%;" class="py-3">Evidencia</th>
+                            <th style="width: 18%;" class="text-start py-3">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for actividad in bitacora.actividades.all %}
                         <tr>
-                            <td class="text-center fw-bold text-dark">{{ actividad.fecha_ejecucion|date:"d/m/Y" }}</td>
-                            <td class="text-dark" style="font-size: 0.95rem;">{{ actividad.descripcion|linebreaksbr }}</td>
+                            <td class="text-center fw-bold text-dark">{{ actividad.periodo_mes }}</td>
+                            <td class="text-dark" style="font-size: 0.9rem;">{{ actividad.descripcion_actividad|linebreaksbr }}</td>
+                            <td class="text-dark" style="font-size: 0.9rem;">{{ actividad.competencias_asociadas|linebreaksbr }}</td>
                             <td class="text-center">
-                                {% if actividad.evidencia %}
-                                    <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
-                                        <i class="bi bi-paperclip text-sena me-1"></i>{{ actividad.evidencia }}
-                                    </span>
+                                {% if actividad.evidencia_cumplimiento %}
+                                    <a href="{{ actividad.evidencia_cumplimiento.url }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold rounded-pill px-3 border-2">
+                                        <i class="bi bi-paperclip me-1"></i>Ver
+                                    </a>
                                 {% else %}
                                     <span class="badge bg-light text-muted border border-light rounded-pill px-3 py-2 fw-normal">
-                                        Sin evidencia adjunta
+                                        Sin evidencia
                                     </span>
                                 {% endif %}
                             </td>
+                            <td class="small">{{ actividad.observaciones|default:"—"|linebreaksbr }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="3" class="text-center py-5 text-muted">
+                            <td colspan="5" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-2 text-light mb-2 d-block"></i>
                                 <em>No hay actividades registradas en esta bitácora.</em>
                             </td>
@@ -213,14 +317,62 @@
         </div>
     </div>
 
-    {% if bitacora.observaciones_instructor %}
-    <div class="alert bg-sena-light border-0 border-start border-4 border-sena rounded-4 shadow-sm p-4 mt-4 mb-5">
-        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-chat-square-quote text-sena me-2 fs-4"></i>Observaciones del Instructor:</h5>
-        <p class="mb-0 text-dark" style="font-size: 1.05rem;">{{ bitacora.observaciones_instructor|linebreaksbr }}</p>
+    <!-- Anexo Fotográfico -->
+    {% if bitacora.anexo_fotografico %}
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
+            <h6 class="section-header mb-0"><i class="bi bi-camera fs-5 me-2"></i> Anexo Fotográfico</h6>
+        </div>
+        <div class="card-body text-center p-4">
+            <a href="{{ bitacora.anexo_fotografico.url }}" target="_blank">
+                <img src="{{ bitacora.anexo_fotografico.url }}" alt="Anexo" class="img-fluid rounded-4 shadow" style="max-height: 350px; object-fit: contain;">
+            </a>
+        </div>
     </div>
     {% endif %}
 
-    <div class="d-flex flex-wrap justify-content-center gap-3 mt-5 mb-5 pt-3 border-top">
+    <!-- Observaciones del Instructor -->
+    {% if bitacora.observaciones_instructor %}
+    <div class="alert bg-sena-light border-0 border-start border-4 border-sena rounded-4 shadow-sm p-4 mt-4 mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-chat-square-quote text-sena me-2 fs-4"></i>Observaciones del Instructor:</h5>
+        <p class="mb-0 text-dark" style="font-size: 1.02rem;">{{ bitacora.observaciones_instructor|linebreaksbr }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Firmas -->
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-body p-4">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    {% if bitacora.firma_aprendiz %}
+                        <img src="{{ bitacora.firma_aprendiz.url }}" alt="Firma Aprendiz" class="firma-img">
+                    {% endif %}
+                    <hr class="w-75 mx-auto border-2 border-dark opacity-25">
+                    <p class="mt-2 mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.78rem; letter-spacing: 1px;">Firma del Aprendiz</p>
+                    <p class="fw-bold text-muted small">{{ bitacora.nombre_completo_aprendiz }}</p>
+                </div>
+                <div class="col-md-4">
+                    {% if bitacora.firma_jefe %}
+                        <img src="{{ bitacora.firma_jefe.url }}" alt="Firma Jefe" class="firma-img">
+                    {% endif %}
+                    <hr class="w-75 mx-auto border-2 border-dark opacity-25">
+                    <p class="mt-2 mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.78rem; letter-spacing: 1px;">Firma del Jefe</p>
+                    <p class="fw-bold text-muted small">{{ bitacora.nombre_jefe }}</p>
+                </div>
+                <div class="col-md-4">
+                    {% if bitacora.firma_instructor %}
+                        <img src="{{ bitacora.firma_instructor.url }}" alt="Firma Instructor" class="firma-img">
+                    {% endif %}
+                    <hr class="w-75 mx-auto border-2 border-dark opacity-25">
+                    <p class="mt-2 mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.78rem; letter-spacing: 1px;">Firma del Instructor</p>
+                    <p class="fw-bold text-muted small">{{ bitacora.nombre_instructor_seguimiento }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4 mb-5 pt-3 border-top">
         
         {% if bitacora.estado == 'Pendiente' %}
             <a href="{% url 'bitacoras:editar_bitacora' bitacora.id %}" class="btn btn-warning px-5 py-2 fw-bold rounded-pill transition-hover shadow-sm text-dark d-flex align-items-center">

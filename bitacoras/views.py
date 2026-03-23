@@ -17,6 +17,7 @@ from django.template.loader import get_template
 # Importamos Modelos y Formularios
 from .models import Bitacora
 from .forms import CrearBitacoraForm, ActividadFormSet
+from core.models import Notificacion
 
 @login_required
 def listar_bitacoras(request):
@@ -110,6 +111,21 @@ def crear_bitacora(request):
                     # Guardar Actividades vinculadas
                     formset.instance = bitacora
                     formset.save()
+
+                    # --- CREAR NOTIFICACIÓN AL INSTRUCTOR ---
+                    if bitacora.email_instructor_seguimiento:
+                        try:
+                            instructor_user = User.objects.get(email=bitacora.email_instructor_seguimiento)
+                            nombre_aprendiz = bitacora.nombre_completo_aprendiz or request.user.get_full_name()
+                            Notificacion.objects.create(
+                                usuario_destino=instructor_user,
+                                tipo='bitacora_nueva',
+                                titulo='Nueva Bitácora Recibida',
+                                mensaje=f'El aprendiz {nombre_aprendiz} ha subido la bitácora #{bitacora.numero_bitacora}.',
+                                enlace=f'/bitacoras/revisar/{bitacora.id}/',
+                            )
+                        except User.DoesNotExist:
+                            pass  # El instructor no existe en el sistema
                 
                 messages.success(request, '¡Formato GFPI-F-147 V5 guardado exitosamente!')
                 return redirect(redirect_url)
@@ -290,7 +306,7 @@ def revisar_bitacora(request, id):
                     img = Image.open(firma_archivo)
                     img = img.convert('RGBA') if img.mode in ('P','LA','RGBA') else img.convert('RGB')
                     max_w, max_h = 800, 300
-                    img.thumbnail((max_w, max_h), Image.ANTIALIAS)
+                    img.thumbnail((max_w, max_h), Image.LANCZOS)
 
                     buffer = io.BytesIO()
                     # Guardamos en PNG para mantener transparencia si existiera
@@ -308,6 +324,17 @@ def revisar_bitacora(request, id):
         bitacora.estado = nuevo_estado
         bitacora.observaciones_instructor = observaciones
         bitacora.save()
+
+        # --- CREAR NOTIFICACIÓN AL APRENDIZ ---
+        if bitacora.aprendiz_rel and hasattr(bitacora.aprendiz_rel, 'usuario'):
+            estado_msg = 'Aprobada ✅' if nuevo_estado == 'Evaluada' else 'Rechazada ❌'
+            Notificacion.objects.create(
+                usuario_destino=bitacora.aprendiz_rel.usuario,
+                tipo='bitacora_evaluada',
+                titulo=f'Bitácora #{bitacora.numero_bitacora} {estado_msg}',
+                mensaje=f'Tu bitácora #{bitacora.numero_bitacora} ha sido {nuevo_estado.lower()} por el instructor.',
+                enlace=f'/bitacoras/detalle/{bitacora.id}/',
+            )
         
         messages.success(request, f'La Bitácora #{bitacora.numero_bitacora} fue calificada exitosamente.')
         return redirect('bitacoras:revisar_bitacora', id=bitacora.id)
