@@ -290,4 +290,124 @@ def obtener_notificaciones(request):
         leida=False
     ).count()
 
-    return JsonResponse({'notificaciones': data, 'total': total})
+    return JsonResponse({'notificaciones': data, 'total': total})
+
+
+# ==========================================
+# MÓDULO DE COPIAS DE SEGURIDAD (BACKUPS)
+# ==========================================
+import os
+import zipfile
+from django.conf import settings
+from django.http import FileResponse, Http404
+from django.contrib import messages
+from datetime import datetime
+
+# Función auxiliar para comprobar superusuario
+def es_superusuario(user):
+    return user.is_active and user.is_superuser
+
+@login_required
+@user_passes_test(es_superusuario)
+def listar_backups(request):
+    """Muestra el historial de backups generados"""
+    backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+    
+    # Crear directorio si no existe
+    if not os.path.exists(backups_dir):
+        os.makedirs(backups_dir)
+        
+    archivos = []
+    for f in os.listdir(backups_dir):
+        if f.endswith('.zip'):
+            filepath = os.path.join(backups_dir, f)
+            stats = os.stat(filepath)
+            archivos.append({
+                'nombre': f,
+                'tamano_mb': round(stats.st_size / (1024 * 1024), 2),
+                'fecha_creacion': datetime.fromtimestamp(stats.st_ctime)
+            })
+            
+    # Ordenar del más reciente al más antiguo
+    archivos.sort(key=lambda x: x['fecha_creacion'], reverse=True)
+    
+    return render(request, 'core/backups.html', {'archivos': archivos})
+
+
+@login_required
+@user_passes_test(es_superusuario)
+def crear_backup(request):
+    """Genera un archivo ZIP conteniendo la Base de Datos y la carpeta Media"""
+    try:
+        backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+        if not os.path.exists(backups_dir):
+            os.makedirs(backups_dir)
+            
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        zip_filename = f'backup_sena_{timestamp}.zip'
+        zip_filepath = os.path.join(backups_dir, zip_filename)
+        
+        db_path = os.path.join(settings.BASE_DIR, 'db.sqlite3')
+        media_path = settings.MEDIA_ROOT
+        
+        # Comprimir
+        with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # 1. Base de datos
+            if os.path.exists(db_path):
+                zipf.write(db_path, os.path.basename(db_path))
+                
+            # 2. Archivos Multimedia (firmas, fotos, anexos)
+            if os.path.exists(media_path):
+                for root, dirs, files in os.walk(media_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        # Calcula la ruta relativa para no guardar toda la ruta completa C:\ en el zip
+                        arcname = os.path.relpath(file_path, settings.BASE_DIR)
+                        zipf.write(file_path, arcname)
+                        
+        messages.success(request, f'Backup generado exitosamente: {zip_filename}')
+    except Exception as e:
+        messages.error(request, f'Error al generar copias de seguridad: {str(e)}')
+        
+    return redirect('core:listar_backups')
+
+
+@login_required
+@user_passes_test(es_superusuario)
+def descargar_backup(request, nombre_archivo):
+    """Permite al administrador descargar el backup a su PC"""
+    # Seguridad básica para evitar ataques "Directory Traversal"
+    if '..' in nombre_archivo or not nombre_archivo.endswith('.zip'):
+        raise Http404("Archivo no permitido")
+        
+    backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+    filepath = os.path.join(backups_dir, nombre_archivo)
+    
+    if os.path.exists(filepath):
+        response = FileResponse(open(filepath, 'rb'), as_attachment=True, filename=nombre_archivo)
+        return response
+    else:
+        messages.error(request, 'El archivo solicitado ya no existe.')
+        return redirect('core:listar_backups')
+
+
+@login_required
+@user_passes_test(es_superusuario)
+def eliminar_backup(request, nombre_archivo):
+    """Elimina el archivo del historial"""
+    if '..' in nombre_archivo or not nombre_archivo.endswith('.zip'):
+        raise Http404("Archivo no permitido")
+        
+    backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+    filepath = os.path.join(backups_dir, nombre_archivo)
+    
+    if os.path.exists(filepath):
+        try:
+            os.remove(filepath)
+            messages.success(request, f'Archivo devuelto: {nombre_archivo} eliminado.')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar el archivo: {e}')
+    else:
+        messages.warning(request, 'El archivo no fue encontrado.')
+        
+    return redirect('core:listar_backups')
