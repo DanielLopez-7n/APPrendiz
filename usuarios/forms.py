@@ -130,13 +130,29 @@ class RegistroForm(UserCreationForm):
         if PerfilUsuario.objects.filter(documento=documento).exists():
             raise forms.ValidationError('Este documento ya está registrado.')
         return documento
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['maxlength'] = 70
+        self.fields['last_name'].widget.attrs['maxlength'] = 70
+        self.fields['email'].widget.attrs['maxlength'] = 70
     
     def clean_email(self):
         """Valida que el email no exista en la base de datos"""
-        email = self.cleaned_data.get('email')
+        email = (self.cleaned_data.get('email') or '').strip()
+        if len(email) > 70:
+            raise forms.ValidationError('El correo no puede superar 70 caracteres.')
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Este correo electrónico ya está registrado.')
         return email
+
+    def clean_first_name(self):
+        nombre = (self.cleaned_data.get('first_name') or '').strip()
+        return validar_longitud_campo(nombre, 'nombre', minimo=2, maximo=70)
+
+    def clean_last_name(self):
+        apellido = (self.cleaned_data.get('last_name') or '').strip()
+        return validar_longitud_campo(apellido, 'apellido', minimo=2, maximo=70)
     
     def save(self, commit=True):
         """
@@ -258,9 +274,17 @@ class UsuarioForm(forms.ModelForm):
             'last_name': 'Apellidos',
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['maxlength'] = 70
+        self.fields['last_name'].widget.attrs['maxlength'] = 70
+        self.fields['email'].widget.attrs['maxlength'] = 70
+
     def clean_email(self):
         """Validar que el correo no se repita"""
-        email = self.cleaned_data.get('email')
+        email = (self.cleaned_data.get('email') or '').strip()
+        if len(email) > 70:
+            raise forms.ValidationError('El correo no puede superar 70 caracteres.')
         # Si estamos editando (self.instance.pk existe), excluimos al usuario actual de la búsqueda
         if self.instance.pk:
             if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
@@ -281,6 +305,14 @@ class UsuarioForm(forms.ModelForm):
             if User.objects.filter(username=username).exists():
                 raise forms.ValidationError('Este documento ya está registrado.')
         return username
+
+    def clean_first_name(self):
+        nombre = (self.cleaned_data.get('first_name') or '').strip()
+        return validar_longitud_campo(nombre, 'nombre', minimo=2, maximo=70)
+
+    def clean_last_name(self):
+        apellido = (self.cleaned_data.get('last_name') or '').strip()
+        return validar_longitud_campo(apellido, 'apellido', minimo=2, maximo=70)
     
     # Nuevo formulario para que los usuarios editen su propio perfil
 

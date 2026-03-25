@@ -2,6 +2,12 @@ from django import forms
 from .models import Aprendiz
 
 class AprendizForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['correo_personal'].widget.attrs['maxlength'] = 70
+        self.fields['direccion_residencia'].widget.attrs['maxlength'] = 70
+        self.fields['pais_etapa'].widget.attrs['maxlength'] = 70
+
     def clean_documento(self):
         documento = (self.cleaned_data.get('documento') or '').strip()
         if not documento.isdigit():
@@ -15,6 +21,18 @@ class AprendizForm(forms.ModelForm):
         if telefono and (not telefono.isdigit() or len(telefono) < 7 or len(telefono) > 15):
             raise forms.ValidationError('El teléfono debe tener entre 7 y 15 dígitos numéricos.')
         return telefono
+
+    def clean_correo_personal(self):
+        correo = (self.cleaned_data.get('correo_personal') or '').strip()
+        if len(correo) > 70:
+            raise forms.ValidationError('El correo personal no puede superar 70 caracteres.')
+        return correo
+
+    def clean_direccion_residencia(self):
+        direccion = (self.cleaned_data.get('direccion_residencia') or '').strip()
+        if len(direccion) > 70:
+            raise forms.ValidationError('La dirección no puede superar 70 caracteres.')
+        return direccion
 
     class Meta:
         model = Aprendiz
