@@ -122,19 +122,22 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
-            z-index: 980;
+            z-index: 1100;
         }
 
         @media (max-width: 768px) {
             #sidebar {
-                left: 0;
+                left: 0 !important;
+                margin-left: 0 !important;
                 transform: translateX(-100%);
                 width: var(--sidebar-width) !important;
-                z-index: 1000;
+                max-width: 88vw;
+                z-index: 1200;
             }
             #sidebar.mobile-open {
                 transform: translateX(0) !important;
                 width: var(--sidebar-width) !important;
+                margin-left: 0 !important;
             }
             #main-content { margin-left: 0 !important; }
             .content-wrapper { margin: 10px; border-radius: 10px; }
