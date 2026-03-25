@@ -303,7 +303,7 @@ class AprendizPerfilForm(forms.ModelForm):
         fields = [
             'tipo_documento', 'documento', 'telefono', 'correo_personal', 
             'direccion_residencia', 'numero_ficha', 'modalidad_formacion', 
-            'modalidad_etapa', 'etapa_exterior', 'pais_etapa'
+            'modalidad_etapa', 'empresa', 'etapa_exterior', 'pais_etapa'
         ]
         widgets = {
             'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
@@ -314,6 +314,7 @@ class AprendizPerfilForm(forms.ModelForm):
             'ficha': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),
+            'empresa': forms.TextInput(attrs={'class': 'form-control'}),
             'etapa_exterior': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'pais_etapa': forms.TextInput(attrs={'class': 'form-control'}),
         }
