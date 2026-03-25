@@ -118,9 +118,24 @@
         .btn-toggle { cursor: pointer; transition: 0.2s; }
         .btn-toggle:hover { transform: scale(1.1); color: var(--sena-dark-green); }
 
+        #sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 980;
+        }
+
         @media (max-width: 768px) {
-            #sidebar { left: calc(-1 * var(--sidebar-width)); }
-            #sidebar.mobile-open { left: 0; }
+            #sidebar {
+                left: 0;
+                transform: translateX(-100%);
+                width: var(--sidebar-width) !important;
+                z-index: 1000;
+            }
+            #sidebar.mobile-open {
+                transform: translateX(0) !important;
+                width: var(--sidebar-width) !important;
+            }
             #main-content { margin-left: 0 !important; }
             .content-wrapper { margin: 10px; border-radius: 10px; }
         }
@@ -244,18 +259,29 @@
         }
         
         /* ==========================================
-           1. CORRECCIÓN DEL ESPACIO EN BLANCO (MENÚ)
+           1. ESTADO COLAPSADO CONSISTENTE (MENÚ)
            ========================================== */
-        /* Oculta el menú por completo hacia la izquierda */
         #sidebar.collapsed {
-            left: calc(-1 * var(--sidebar-width)) !important;
-            width: 0 !important;
+            left: 0 !important;
+            width: var(--sidebar-collapsed-width) !important;
         }
-        
-        /* Expande el contenido principal para ocupar todo el vacío */
         #main-content.collapsed {
-            margin-left: 0 !important;
-            width: 100% !important;
+            margin-left: var(--sidebar-collapsed-width) !important;
+            width: calc(100% - var(--sidebar-collapsed-width)) !important;
+        }
+        @media (max-width: 768px) {
+            #sidebar.collapsed {
+                transform: translateX(-100%) !important;
+                width: var(--sidebar-width) !important;
+            }
+            #sidebar.mobile-open.collapsed,
+            #sidebar.mobile-open {
+                transform: translateX(0) !important;
+            }
+            #main-content.collapsed {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
         }
 
         /* ==========================================
@@ -939,16 +965,18 @@
 
             function isMobile() { return window.innerWidth <= 768; }
 
-            // Lógica Móvil (Se mantiene intacta tu lógica original)
+            // Lógica Móvil
             function openMobile() {
+                // Evita conflicto con estados legacy.
+                sidebar.classList.remove('collapsed');
                 sidebar.classList.add('mobile-open');
-                sidebar.style.left = '0px';
                 if (overlay) overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
             }
             function closeMobile() {
                 sidebar.classList.remove('mobile-open');
-                sidebar.style.left = '-280px';
                 if (overlay) overlay.style.display = 'none';
+                document.body.style.overflow = '';
             }
             if (overlay) {
                 overlay.addEventListener('click', closeMobile);
@@ -967,7 +995,7 @@
             // Toggle Botón
             toggleBtn.addEventListener('click', function () {
                 if (isMobile()) {
-                    const isOpen = sidebar.style.left === '0px';
+                    const isOpen = sidebar.classList.contains('mobile-open');
                     if (isOpen) { closeMobile(); } else { openMobile(); }
                 } else {
                     // PC: Anclar/Desanclar
@@ -986,6 +1014,13 @@
                         toggleBtn.classList.replace('btn-success', 'btn-light');
                         toggleBtn.querySelector('i').style.color = 'var(--sena-green)';
                     }
+                }
+            });
+
+            // Limpia estados al cambiar tamaño de pantalla.
+            window.addEventListener('resize', function () {
+                if (!isMobile()) {
+                    closeMobile();
                 }
             });
 
