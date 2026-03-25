@@ -152,16 +152,8 @@
                     <div class="data-val">{{ bitacora.programa_formacion }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="data-label-sm">Instructor de Seguimiento</label>
-                    <div class="data-val">{{ bitacora.nombre_instructor_seguimiento }}</div>
-                </div>
-                <div class="col-md-4 mt-3">
-                    <label class="data-label-sm">Correo Instructor</label>
-                    <div class="data-val small">{{ bitacora.email_instructor_seguimiento|default:"No registrado" }}</div>
-                </div>
-                <div class="col-md-4 mt-3">
-                    <label class="data-label-sm">Teléfono Instructor</label>
-                    <div class="data-val">{{ bitacora.telefono_instructor_seguimiento|default:"No registrado" }}</div>
+                    <label class="data-label-sm">Periodo de Etapa</label>
+                    <div class="data-val">{{ bitacora.get_alternativa_etapa_display }}</div>
                 </div>
                 <div class="col-md-6 mt-3">
                     <label class="data-label-sm">Período Reportado</label>
@@ -181,11 +173,36 @@
         </div>
     </div>
 
-    <!-- 2. Ente Co-Formador (Empresa) -->
+    <!-- 2. Instructor de Seguimiento -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-building fs-5 me-2"></i> 2. Ente Co-Formador (Empresa)
+                <i class="bi bi-person-workspace fs-5 me-2"></i> 2. Instructor de Seguimiento
+            </h6>
+        </div>
+        <div class="card-body p-4 pt-2">
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0">
+                <div class="col-md-4">
+                    <label class="data-label-sm">Nombre Instructor</label>
+                    <div class="data-val">{{ bitacora.nombre_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">Correo Instructor</label>
+                    <div class="data-val small">{{ bitacora.email_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">Teléfono Instructor</label>
+                    <div class="data-val">{{ bitacora.telefono_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Ente Co-Formador (Empresa) -->
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
+            <h6 class="section-header mb-0">
+                <i class="bi bi-building fs-5 me-2"></i> 3. Ente Co-Formador (Empresa)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
@@ -224,11 +241,11 @@
         </div>
     </div>
 
-    <!-- 3. Modalidad y Seguridad (SST) -->
+    <!-- 4. Modalidad y Seguridad (SST) -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-shield-check fs-5 me-2"></i> 3. Modalidad y Seguridad (SST)
+                <i class="bi bi-shield-check fs-5 me-2"></i> 4. Modalidad y Seguridad (SST)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
@@ -273,11 +290,11 @@
         </div>
     </div>
 
-    <!-- 4. Resumen General del Formulario -->
+    <!-- 5. Resumen General del Formulario -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-card-checklist fs-5 me-2"></i> 4. Resumen General de la Bitácora
+                <i class="bi bi-card-checklist fs-5 me-2"></i> 5. Resumen General de la Bitácora
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
@@ -302,11 +319,11 @@
         </div>
     </div>
 
-    <!-- 5. Actividades -->
+    <!-- 6. Actividades -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-list-task fs-5 me-2"></i> 4. Descripción de Actividades
+                <i class="bi bi-list-task fs-5 me-2"></i> 6. Descripción de Actividades
             </h6>
         </div>
         <div class="card-body p-4 pt-0">
