@@ -101,6 +101,32 @@
         display: flex; align-items: center; justify-content: center;
         font-weight: 800;
     }
+
+    .chart-summary-item {
+        border: 1px solid #eef1f4;
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        background: #fff;
+    }
+    .chart-summary-label {
+        font-size: .78rem;
+        letter-spacing: .8px;
+        text-transform: uppercase;
+        color: #6b7280;
+        font-weight: 800;
+    }
+    .chart-summary-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1f2937;
+        line-height: 1.2;
+    }
+    .chart-summary-percent {
+        font-size: .85rem;
+        color: #6b7280;
+        font-weight: 700;
+    }
 </style>
 {% endblock %}
 
@@ -247,8 +273,15 @@
         <div class="col-12">
             <div class="studio-card p-4">
                 <h5 class="fw-bold mb-4 text-dark"><i class="bi bi-bar-chart-line-fill text-orange me-2"></i> Rendimiento de Seguimiento</h5>
-                <div style="height:350px;">
-                    <canvas id="miGrafica"></canvas>
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div style="height:320px;">
+                            <canvas id="miGrafica"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div id="chart-summary"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -269,11 +302,11 @@
         const isAdmin = '{{ es_admin }}' === 'True';
         
         const coloresAdmin = ['#39A900', '#FF671F', '#0d6efd'];
-        const coloresInstru = ['#FF671F', '#39A900', '#dc3545'];
+        const coloresInstru = ['#FF9F1A', '#22C55E', '#EF4444'];
 
         const ctx = document.getElementById('miGrafica').getContext('2d');
         new Chart(ctx, {
-            type: isAdmin ? 'doughnut' : 'bar',
+            type: 'doughnut',
             data: {
                 labels: labels,
                 datasets: [{
@@ -281,27 +314,42 @@
                     data: data,
                     backgroundColor: isAdmin ? coloresAdmin : coloresInstru,
                     borderWidth: 0,
-                    borderRadius: isAdmin ? 0 : 15,
-                    hoverOffset: 20
+                    hoverOffset: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: isAdmin ? '75%' : undefined,
+                cutout: isAdmin ? '75%' : '68%',
                 plugins: {
                     legend: {
                         display: isAdmin,
                         position: 'bottom',
-                        labels: { padding: 30, usePointStyle: true, font: { weight: 'bold' } }
+                        labels: { padding: 20, usePointStyle: true, font: { weight: 'bold' } }
                     }
-                },
-                scales: {
-                    y: { display: !isAdmin, beginAtZero: true, grid: { borderDash: [8, 4], color: '#f0f0f0' } },
-                    x: { display: !isAdmin, grid: { display: false } }
                 }
             }
         });
+
+        if (!isAdmin) {
+            const summary = document.getElementById('chart-summary');
+            const total = data.reduce((acc, val) => acc + val, 0);
+            if (summary) {
+                summary.innerHTML = labels.map((label, idx) => {
+                    const value = data[idx] || 0;
+                    const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+                    return `
+                        <div class="chart-summary-item">
+                            <div class="chart-summary-label">${label}</div>
+                            <div class="d-flex justify-content-between align-items-end mt-1">
+                                <span class="chart-summary-value">${value}</span>
+                                <span class="chart-summary-percent">${percent}%</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
 
     });
 </script>
