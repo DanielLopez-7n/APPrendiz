@@ -155,6 +155,14 @@
                     <label class="data-label-sm">Instructor de Seguimiento</label>
                     <div class="data-val">{{ bitacora.nombre_instructor_seguimiento }}</div>
                 </div>
+                <div class="col-md-4 mt-3">
+                    <label class="data-label-sm">Correo Instructor</label>
+                    <div class="data-val small">{{ bitacora.email_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <label class="data-label-sm">Teléfono Instructor</label>
+                    <div class="data-val">{{ bitacora.telefono_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
                 <div class="col-md-6 mt-3">
                     <label class="data-label-sm">Período Reportado</label>
                     <div class="data-val fs-5 text-sena">
@@ -227,15 +235,15 @@
             <div class="row g-3 bg-light p-3 rounded-4 mx-0 text-center text-md-start mb-3">
                 <div class="col-md-4">
                     <label class="data-label-sm">Alternativa Etapa</label>
-                    <div class="data-val">{{ bitacora.alternativa_etapa }}</div>
+                    <div class="data-val">{{ bitacora.get_alternativa_etapa_display }}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="data-label-sm">¿Exterior?</label>
-                    <div class="data-val">{{ bitacora.exterior }}</div>
+                    <div class="data-val">{{ bitacora.get_exterior_display }}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="data-label-sm">País</label>
-                    <div class="data-val">{{ bitacora.pais_etapa }}</div>
+                    <div class="data-val">{{ bitacora.pais_etapa|default:"No aplica" }}</div>
                 </div>
             </div>
             <div class="row g-3 text-center text-md-start px-2">
@@ -255,17 +263,46 @@
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="data-label-sm">¿Corresponde?</label>
-                    <div class="data-val">{{ bitacora.riesgo_corresponde }}</div>
+                    <div class="data-val">{{ bitacora.get_riesgo_corresponde_display }}</div>
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="data-label-sm">Cuenta con EPP</label>
-                    <div class="data-val">{{ bitacora.cuenta_epp }}</div>
+                    <div class="data-val">{{ bitacora.get_cuenta_epp_display }}</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. Actividades -->
+    <!-- 4. Resumen General del Formulario -->
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
+            <h6 class="section-header mb-0">
+                <i class="bi bi-card-checklist fs-5 me-2"></i> 4. Resumen General de la Bitácora
+            </h6>
+        </div>
+        <div class="card-body p-4 pt-2">
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0">
+                <div class="col-md-3">
+                    <label class="data-label-sm">Clasificación</label>
+                    <div class="data-val">{{ bitacora.clasificacion_informacion }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Estado</label>
+                    <div class="data-val">{{ bitacora.estado }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Fecha Inicio</label>
+                    <div class="data-val">{{ bitacora.fecha_inicio|date:"d/m/Y" }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Fecha Fin</label>
+                    <div class="data-val">{{ bitacora.fecha_fin|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Actividades -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
