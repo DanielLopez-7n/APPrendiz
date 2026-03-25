@@ -303,13 +303,6 @@
             }
         });
 
-        {% if alerta_password %}
-        if (!sessionStorage.getItem('alerta_password_mostrada')) {
-            var myModal = new bootstrap.Modal(document.getElementById('modalSeguridadPassword'));
-            myModal.show();
-            sessionStorage.setItem('alerta_password_mostrada', 'true');
-        }
-        {% endif %}
     });
 </script>
 
@@ -351,12 +344,19 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const modalElement = document.getElementById('seguridadModal');
-        document.body.appendChild(modalElement); 
-        var myModal = new bootstrap.Modal(modalElement);
-        myModal.show();
-    });
-</script>
+        if (!modalElement) return;
 
+        // Clave por usuario para no repetir el modal en cada navegación.
+        const storageKey = 'alerta_password_mostrada_user_{{ request.user.id }}';
+        const yaMostrada = sessionStorage.getItem(storageKey) === 'true';
+
+        document.body.appendChild(modalElement);
+        if (!yaMostrada) {
+            const myModal = new bootstrap.Modal(modalElement);
+            myModal.show();
+            sessionStorage.setItem(storageKey, 'true');
+        }
+    });
 </script>
 {% endif %}
 {% endblock %}
