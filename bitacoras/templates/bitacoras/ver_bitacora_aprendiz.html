@@ -65,6 +65,15 @@
         object-fit: contain;
         margin-bottom: 8px;
     }
+    .bitacora-status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: normal !important;
+        line-height: 1.2;
+        text-align: center;
+        max-width: 220px;
+    }
 
     /* =============================
        ESTILO PROFESIONAL PARA IMPRESIÓN / PDF
@@ -205,15 +214,15 @@
         
         <div class="text-md-end w-100 text-start mt-2 mt-md-0">
             {% if bitacora.estado == 'Evaluada' %}
-                <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
+                <span class="badge bitacora-status-badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
                     <i class="bi bi-check-circle-fill me-1"></i>Evaluada
                 </span>
             {% elif bitacora.estado == 'Rechazada' %}
-                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
+                <span class="badge bitacora-status-badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
                     <i class="bi bi-x-circle-fill me-1"></i>Rechazada
                 </span>
             {% else %}
-                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm" style="color: #b08d00 !important;">
+                <span class="badge bitacora-status-badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm" style="color: #b08d00 !important;">
                     <i class="bi bi-clock-history me-1"></i>Pendiente
                 </span>
             {% endif %}
@@ -553,8 +562,8 @@
             </a>
         {% endif %}
         
-        <a href="#" class="btn bg-sena text-white px-5 py-2 fw-bold rounded-pill transition-hover shadow-sm d-flex align-items-center" onclick="window.print()">
-            <i class="bi bi-printer me-2 fs-5"></i>Imprimir / Guardar PDF
+        <a href="{% url 'bitacoras:exportar_pdf' bitacora.id %}" class="btn bg-sena text-white px-5 py-2 fw-bold rounded-pill transition-hover shadow-sm d-flex align-items-center">
+            <i class="bi bi-file-earmark-arrow-down me-2 fs-5"></i>Descargar Reporte PDF
         </a>
     </div>
 

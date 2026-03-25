@@ -261,16 +261,20 @@ def exportar_pdf(request, pk):
     a un archivo binario PDF para su descarga directa.
     """
     bitacora = get_object_or_404(Bitacora, pk=pk)
-    
-    # Se recomienda crear un template simplificado 'revisar_bitacora_pdf.html' 
-    # sin barras de navegación ni botones, exclusivo para el renderizado del PDF.
-    template = get_template('bitacoras/revisar_bitacora.html')
+
+    # Aislamiento por rol: aprendices solo su bitácora; instructor/admin según acceso.
+    if hasattr(request.user, 'aprendiz') and bitacora.aprendiz_rel != request.user.aprendiz:
+        messages.error(request, "No tienes permiso para exportar esta bitácora.")
+        return redirect('bitacoras:listar_bitacoras')
+
+    template = get_template('bitacoras/reporte_bitacora_pdf.html')
     context = {'bitacora': bitacora}
     html = template.render(context)
     
     response = HttpResponse(content_type='application/pdf')
     # attachment; fuerza la descarga del archivo en lugar de abrirlo en el navegador
-    response['Content-Disposition'] = f'attachment; filename="Formato_Bitacora_{bitacora.numero_bitacora}_{bitacora.aprendiz.usuario.last_name}.pdf"'
+    apellido = bitacora.aprendiz_rel.usuario.last_name if bitacora.aprendiz_rel_id else "aprendiz"
+    response['Content-Disposition'] = f'attachment; filename="Reporte_Bitacora_{bitacora.numero_bitacora}_{apellido}.pdf"'
     
     # Creación del PDF
     pisa_status = pisa.CreatePDF(html, dest=response)
