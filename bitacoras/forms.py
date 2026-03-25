@@ -97,6 +97,8 @@ class CrearBitacoraForm(forms.ModelForm):
             raise forms.ValidationError(
                 'El número de identificación del aprendiz solo permite números (sin letras ni símbolos).'
             )
+        if documento and (len(documento) < 6 or len(documento) > 20):
+            raise forms.ValidationError('El número de identificación debe tener entre 6 y 20 dígitos.')
         return documento
 
 

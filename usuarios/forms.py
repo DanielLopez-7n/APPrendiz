@@ -13,6 +13,15 @@ def validar_solo_numeros(valor, etiqueta='documento'):
         )
     return valor
 
+
+def validar_longitud_campo(valor, etiqueta, minimo=1, maximo=20):
+    valor = (valor or '').strip()
+    if len(valor) < minimo or len(valor) > maximo:
+        raise forms.ValidationError(
+            f'El campo "{etiqueta}" debe tener entre {minimo} y {maximo} caracteres.'
+        )
+    return valor
+
 class LoginForm(AuthenticationForm):
     """
     Formulario personalizado para inicio de sesión
@@ -48,7 +57,8 @@ class LoginForm(AuthenticationForm):
     )
 
     def clean_username(self):
-        return validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
+        valor = validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
+        return validar_longitud_campo(valor, 'documento', minimo=6, maximo=20)
 
 
 class RegistroForm(UserCreationForm):
@@ -116,6 +126,7 @@ class RegistroForm(UserCreationForm):
     def clean_documento(self):
         """Valida que el documento no exista en la base de datos"""
         documento = validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
+        documento = validar_longitud_campo(documento, 'documento', minimo=6, maximo=20)
         if PerfilUsuario.objects.filter(documento=documento).exists():
             raise forms.ValidationError('Este documento ya está registrado.')
         return documento
@@ -212,7 +223,8 @@ class EditarPerfilForm(forms.ModelForm):
         # Si está readonly y vacío, dejamos el valor actual.
         if not documento and self.instance:
             return self.instance.documento
-        return validar_solo_numeros(documento, 'documento')
+        documento = validar_solo_numeros(documento, 'documento')
+        return validar_longitud_campo(documento, 'documento', minimo=6, maximo=20)
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 
@@ -261,6 +273,7 @@ class UsuarioForm(forms.ModelForm):
     def clean_username(self):
         """Validar que el documento no se repita"""
         username = validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
+        username = validar_longitud_campo(username, 'documento', minimo=6, maximo=20)
         if self.instance.pk:
             if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
                 raise forms.ValidationError('Este documento ya está registrado.')
@@ -381,7 +394,8 @@ class AprendizPerfilForm(forms.ModelForm):
         return aprendiz
 
     def clean_documento(self):
-        return validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
+        documento = validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
+        return validar_longitud_campo(documento, 'documento', minimo=6, maximo=20)
     
     from django.contrib.auth.models import User
 

@@ -6,7 +6,15 @@ class InstructorForm(forms.ModelForm):
         cedula = (self.cleaned_data.get('cedula') or '').strip()
         if not cedula.isdigit():
             raise forms.ValidationError('La cédula solo permite números (sin letras ni símbolos).')
+        if len(cedula) < 6 or len(cedula) > 20:
+            raise forms.ValidationError('La cédula debe tener entre 6 y 20 dígitos.')
         return cedula
+
+    def clean_telefono(self):
+        telefono = (self.cleaned_data.get('telefono') or '').strip()
+        if telefono and (not telefono.isdigit() or len(telefono) < 7 or len(telefono) > 15):
+            raise forms.ValidationError('El teléfono debe tener entre 7 y 15 dígitos numéricos.')
+        return telefono
 
     class Meta:
         model = Instructor
