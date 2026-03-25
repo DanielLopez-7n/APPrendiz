@@ -4,6 +4,15 @@ from django.contrib.auth.models import User
 from .models import PerfilUsuario
 from aprendices.models import Aprendiz
 
+
+def validar_solo_numeros(valor, etiqueta='documento'):
+    valor = (valor or '').strip()
+    if not valor.isdigit():
+        raise forms.ValidationError(
+            f'El campo "{etiqueta}" solo permite números (sin letras ni símbolos).'
+        )
+    return valor
+
 class LoginForm(AuthenticationForm):
     """
     Formulario personalizado para inicio de sesión
@@ -15,7 +24,9 @@ class LoginForm(AuthenticationForm):
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Ingrese su documento',
-            'autofocus': True
+            'autofocus': True,
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*'
         })
     )
     
@@ -36,6 +47,9 @@ class LoginForm(AuthenticationForm):
         label='Recordarme'
     )
 
+    def clean_username(self):
+        return validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
+
 
 class RegistroForm(UserCreationForm):
     """
@@ -47,7 +61,9 @@ class RegistroForm(UserCreationForm):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Número de documento'
+            'placeholder': 'Número de documento',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*'
         })
     )
     
@@ -99,7 +115,7 @@ class RegistroForm(UserCreationForm):
     
     def clean_documento(self):
         """Valida que el documento no exista en la base de datos"""
-        documento = self.cleaned_data.get('documento')
+        documento = validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
         if PerfilUsuario.objects.filter(documento=documento).exists():
             raise forms.ValidationError('Este documento ya está registrado.')
         return documento
@@ -190,6 +206,13 @@ class EditarPerfilForm(forms.ModelForm):
                 self.fields['telefono'].widget.attrs.pop('readonly', None)
                 self.fields['telefono'].widget.attrs['class'] = 'form-control'
                 self.fields['telefono'].label = "Teléfono de Contacto"
+
+    def clean_documento(self):
+        documento = self.cleaned_data.get('documento')
+        # Si está readonly y vacío, dejamos el valor actual.
+        if not documento and self.instance:
+            return self.instance.documento
+        return validar_solo_numeros(documento, 'documento')
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 
@@ -208,7 +231,12 @@ class UsuarioForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@misena.edu.co'}),
             # Al username le ponemos placeholder más descriptivo
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Documento, nombre...'}),
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Documento',
+                'inputmode': 'numeric',
+                'pattern': '[0-9]*'
+            }),
         }
         
         labels = {
@@ -232,7 +260,7 @@ class UsuarioForm(forms.ModelForm):
 
     def clean_username(self):
         """Validar que el documento no se repita"""
-        username = self.cleaned_data.get('username')
+        username = validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
         if self.instance.pk:
             if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
                 raise forms.ValidationError('Este documento ya está registrado.')
@@ -351,6 +379,9 @@ class AprendizPerfilForm(forms.ModelForm):
                     user.perfil.save()
             
         return aprendiz
+
+    def clean_documento(self):
+        return validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
     
     from django.contrib.auth.models import User
 

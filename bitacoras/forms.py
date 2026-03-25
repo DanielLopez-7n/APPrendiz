@@ -91,6 +91,14 @@ class CrearBitacoraForm(forms.ModelForm):
                 self.fields['modalidad_formacion'].initial = ultima_bitacora.modalidad_formacion
                 self.fields['modalidad_ejecucion'].initial = ultima_bitacora.modalidad_ejecucion
 
+    def clean_numero_identificacion_aprendiz(self):
+        documento = (self.cleaned_data.get('numero_identificacion_aprendiz') or '').strip()
+        if documento and not documento.isdigit():
+            raise forms.ValidationError(
+                'El número de identificación del aprendiz solo permite números (sin letras ni símbolos).'
+            )
+        return documento
+
 
 # --- FORMULARIO PARA LAS ACTIVIDADES ---
 class ActividadForm(forms.ModelForm):
