@@ -74,9 +74,13 @@ class CrearBitacoraForm(forms.ModelForm):
             self.fields['correo_institucional_aprendiz'].initial = self.aprendiz.usuario.email
             
             if hasattr(self.aprendiz, 'numero_ficha'):
-                self.fields['numero_grupo_ficha'].initial = getattr(self.aprendiz, 'numero_ficha', '')
-            if hasattr(self.aprendiz, 'programa_formacion'):
-                self.fields['programa_formacion'].initial = getattr(self.aprendiz, 'programa_formacion', '')
+                ficha = getattr(self.aprendiz, 'numero_ficha', None)
+                if ficha:
+                    # Solo el número en "Número de grupo / ficha"
+                    self.fields['numero_grupo_ficha'].initial = ficha.numero
+                    # El nombre del programa en "Programa de formación"
+                    if getattr(ficha, 'programa', None):
+                        self.fields['programa_formacion'].initial = ficha.programa.nombre
 
             # 2. AUTO-LLENADO DE EMPRESA (Busca la bitácora anterior)
             ultima_bitacora = Bitacora.objects.filter(aprendiz_rel=self.aprendiz).order_by('-id').first()
