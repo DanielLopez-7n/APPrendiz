@@ -401,6 +401,7 @@ def perfil_view(request):
     
     context = {
         'titulo': 'Mi información personal',
+        'usuario': usuario,
         'form_usuario': form_usuario,
         'form_perfil': form_perfil,
         'template_to_extend': template_base,
