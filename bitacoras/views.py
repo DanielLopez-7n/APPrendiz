@@ -12,6 +12,7 @@ from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import get_template
+from django.template import TemplateSyntaxError
 
 
 # Importamos Modelos y Formularios
@@ -267,9 +268,19 @@ def exportar_pdf(request, pk):
         messages.error(request, "No tienes permiso para exportar esta bitácora.")
         return redirect('bitacoras:listar_bitacoras')
 
-    template = get_template('bitacoras/reporte_bitacora_pdf.html')
-    context = {'bitacora': bitacora}
-    html = template.render(context)
+    context = {
+        'bitacora': bitacora,
+        'aprendiz': bitacora.aprendiz_rel,
+        'empresa': {'nombre': bitacora.nombre_empresa},
+        'actividades': bitacora.actividades.all(),
+    }
+    try:
+        template = get_template('bitacoras/reporte_bitacora_pdf.html')
+        html = template.render(context)
+    except TemplateSyntaxError:
+        # Fallback de seguridad si el template principal llega con sintaxis inválida.
+        template = get_template('bitacoras/pdf_template.html')
+        html = template.render(context)
     
     response = HttpResponse(content_type='application/pdf')
     # attachment; fuerza la descarga del archivo en lugar de abrirlo en el navegador
