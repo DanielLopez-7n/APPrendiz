@@ -81,8 +81,10 @@ def eliminar_aprendiz(request, pk):
 @login_required
 def ver_detalle_aprendiz(request, pk):
     aprendiz = get_object_or_404(Aprendiz, pk=pk)
+    bitacoras_entregadas = Bitacora.objects.filter(aprendiz_rel=aprendiz).count()
     context = {
-        'aprendiz': aprendiz
+        'aprendiz': aprendiz,
+        'bitacoras_entregadas': bitacoras_entregadas,
     }
     return render(request, 'aprendices/ver_detalle.html', context)
 

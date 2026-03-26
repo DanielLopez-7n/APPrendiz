@@ -14,34 +14,29 @@
 
     {% if total_resultados > 0 %}
 
-        {% if bitacoras %}
+        {% if bitacoras_por_aprendiz %}
         <div class="mb-5">
             <h4 class="fw-bold mb-4 text-dark border-bottom pb-2">
-                <i class="bi bi-journal-check text-success me-2"></i> Bitácoras Relacionadas
+                <i class="bi bi-journal-check text-success me-2"></i> Bitácoras Entregadas
             </h4>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                {% for b in bitacoras %}
+                {% for aprendiz in bitacoras_por_aprendiz %}
                 <div class="col">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 hover-up border-top border-4 {% if b.estado == 'Evaluada' %}border-success{% elif b.estado == 'Pendiente' %}border-warning{% else %}border-danger{% endif %}">
+                    <a href="{% url 'bitacoras:listar_bitacoras' %}?q={{ aprendiz.documento }}" class="text-decoration-none">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 hover-up border-start border-4 border-success">
                         <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                {% if b.estado == 'Evaluada' %}
-                                    <span class="badge bg-success rounded-pill px-3 py-2"><i class="bi bi-check-circle me-1"></i> Evaluada</span>
-                                {% elif b.estado == 'Pendiente' %}
-                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="bi bi-clock-history me-1"></i> Pendiente</span>
-                                {% else %}
-                                    <span class="badge bg-danger rounded-pill px-3 py-2"><i class="bi bi-x-circle me-1"></i> Rechazada</span>
-                                {% endif %}
-                                <span class="text-muted fw-bold small">ID: #{{ b.id }}</span>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">
+                                    <i class="bi bi-journal-text me-1"></i> Total entregadas
+                                </span>
+                                <span class="text-success fw-bold small">Ver listado <i class="bi bi-arrow-right ms-1"></i></span>
                             </div>
-                            <h5 class="fw-bold text-dark mb-1">{{ b.nombre_completo_aprendiz }}</h5>
-                            <p class="text-muted small mb-3"><i class="bi bi-person-badge me-1"></i> Inst: {{ b.email_instructor_seguimiento|truncatechars:25 }}</p>
-                            <a href="{% url 'bitacoras:ver_bitacora' b.id %}">
-
-                            Ver Detalles <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
+                            <h5 class="fw-bold text-dark mb-1">{{ aprendiz.usuario.get_full_name|default:aprendiz.usuario.username }}</h5>
+                            <p class="text-muted small mb-2"><i class="bi bi-person-vcard me-1"></i> Doc: {{ aprendiz.documento }}</p>
+                            <h3 class="fw-black text-success mb-0">{{ aprendiz.total_bitacoras }}</h3>
                         </div>
                     </div>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -57,6 +52,7 @@
                 
                 {% for a in aprendices %}
                 <div class="col">
+                    <a href="{% url 'aprendices:ver_detalle_aprendiz' a.id %}" class="text-decoration-none">
                     <div class="card border-0 shadow-sm rounded-4 h-100 hover-up">
                         <div class="card-body d-flex align-items-center p-3">
                             <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3 text-success d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
@@ -69,11 +65,13 @@
                             <span class="badge bg-light text-success border border-success ms-2">Aprendiz</span>
                         </div>
                     </div>
+                    </a>
                 </div>
                 {% endfor %}
 
                 {% for i in instructores %}
                 <div class="col">
+                    <a href="{% url 'instructores:ver_detalle_instructor' i.id %}" class="text-decoration-none">
                     <div class="card border-0 shadow-sm rounded-4 h-100 hover-up">
                         <div class="card-body d-flex align-items-center p-3">
                             <div class="bg-info bg-opacity-10 p-3 rounded-circle me-3 text-info d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
@@ -86,6 +84,7 @@
                             <span class="badge bg-light text-info border border-info ms-2">Instructor</span>
                         </div>
                     </div>
+                    </a>
                 </div>
                 {% endfor %}
                 
