@@ -65,9 +65,137 @@
         object-fit: contain;
         margin-bottom: 8px;
     }
+    .bitacora-status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: normal !important;
+        line-height: 1.2;
+        text-align: center;
+        max-width: 220px;
+    }
+
+    /* =============================
+       ESTILO PROFESIONAL PARA IMPRESIÓN / PDF
+       ============================= */
+    @media print {
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+
+        html, body {
+            background: #fff !important;
+            color: #111 !important;
+            font-size: 11pt !important;
+            line-height: 1.35 !important;
+        }
+
+        /* Ocultar elementos no útiles en impresión */
+        nav, .navbar, .topbar, footer, .simple-header,
+        #sidebar, #sidebar-overlay,
+        .btn, .transition-hover,
+        [onclick*="window.print"],
+        .accessibility-widget, #a11y-btn, #a11y-menu {
+            display: none !important;
+        }
+
+        .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .print-sheet {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+
+        .card, .alert {
+            box-shadow: none !important;
+            border: 1px solid #d6d6d6 !important;
+            border-radius: 8px !important;
+            break-inside: avoid-page;
+            page-break-inside: avoid;
+            margin-bottom: 10px !important;
+        }
+
+        .card-header {
+            background: #f5f5f5 !important;
+            border-bottom: 1px solid #d9d9d9 !important;
+            padding: 8px 10px !important;
+        }
+
+        .card-body {
+            padding: 10px 12px !important;
+        }
+
+        .row.g-3 > [class*="col-"] {
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+        }
+
+        .section-header {
+            font-size: 10pt !important;
+            color: #222 !important;
+        }
+
+        .data-label-sm {
+            font-size: 8.5pt !important;
+            color: #555 !important;
+        }
+
+        .data-val {
+            font-size: 10.5pt !important;
+            color: #111 !important;
+            word-break: break-word !important;
+        }
+
+        /* Evita que la tabla quede dentro de contenedor con scroll */
+        .table-responsive {
+            overflow: visible !important;
+            border: 0 !important;
+        }
+
+        .table-activities {
+            width: 100% !important;
+            table-layout: fixed !important;
+            font-size: 9.5pt !important;
+        }
+
+        .table-activities thead th {
+            background: #f0f0f0 !important;
+            color: #111 !important;
+            border: 1px solid #d9d9d9 !important;
+            white-space: normal !important;
+        }
+
+        .table-activities td {
+            border: 1px solid #e4e4e4 !important;
+            vertical-align: top !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+
+        .firma-img {
+            max-height: 70px !important;
+        }
+
+        .badge {
+            border: 1px solid #c8c8c8 !important;
+            background: #f2f2f2 !important;
+            color: #111 !important;
+        }
+
+        hr {
+            border-color: #cfcfcf !important;
+            opacity: 1 !important;
+        }
+    }
 </style>
 
-<div class="container py-4">
+<div class="container py-4 print-sheet">
     
     <!-- Header -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 bg-white p-4 rounded-4 shadow-sm border-0">
@@ -86,15 +214,15 @@
         
         <div class="text-md-end w-100 text-start mt-2 mt-md-0">
             {% if bitacora.estado == 'Evaluada' %}
-                <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
+                <span class="badge bitacora-status-badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
                     <i class="bi bi-check-circle-fill me-1"></i>Evaluada
                 </span>
             {% elif bitacora.estado == 'Rechazada' %}
-                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
+                <span class="badge bitacora-status-badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm">
                     <i class="bi bi-x-circle-fill me-1"></i>Rechazada
                 </span>
             {% else %}
-                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm" style="color: #b08d00 !important;">
+                <span class="badge bitacora-status-badge bg-warning bg-opacity-10 text-warning border border-warning rounded-pill px-4 py-2 fs-6 fw-bold shadow-sm" style="color: #b08d00 !important;">
                     <i class="bi bi-clock-history me-1"></i>Pendiente
                 </span>
             {% endif %}
@@ -152,8 +280,8 @@
                     <div class="data-val">{{ bitacora.programa_formacion }}</div>
                 </div>
                 <div class="col-md-4">
-                    <label class="data-label-sm">Instructor de Seguimiento</label>
-                    <div class="data-val">{{ bitacora.nombre_instructor_seguimiento }}</div>
+                    <label class="data-label-sm">Periodo de Etapa</label>
+                    <div class="data-val">{{ bitacora.get_alternativa_etapa_display }}</div>
                 </div>
                 <div class="col-md-6 mt-3">
                     <label class="data-label-sm">Período Reportado</label>
@@ -173,11 +301,36 @@
         </div>
     </div>
 
-    <!-- 2. Ente Co-Formador (Empresa) -->
+    <!-- 2. Instructor de Seguimiento -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-building fs-5 me-2"></i> 2. Ente Co-Formador (Empresa)
+                <i class="bi bi-person-workspace fs-5 me-2"></i> 2. Instructor de Seguimiento
+            </h6>
+        </div>
+        <div class="card-body p-4 pt-2">
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0">
+                <div class="col-md-4">
+                    <label class="data-label-sm">Nombre Instructor</label>
+                    <div class="data-val">{{ bitacora.nombre_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">Correo Instructor</label>
+                    <div class="data-val small">{{ bitacora.email_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="data-label-sm">Teléfono Instructor</label>
+                    <div class="data-val">{{ bitacora.telefono_instructor_seguimiento|default:"No registrado" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Ente Co-Formador (Empresa) -->
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
+            <h6 class="section-header mb-0">
+                <i class="bi bi-building fs-5 me-2"></i> 3. Ente Co-Formador (Empresa)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
@@ -216,26 +369,26 @@
         </div>
     </div>
 
-    <!-- 3. Modalidad y Seguridad (SST) -->
+    <!-- 4. Modalidad y Seguridad (SST) -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-shield-check fs-5 me-2"></i> 3. Modalidad y Seguridad (SST)
+                <i class="bi bi-shield-check fs-5 me-2"></i> 4. Modalidad y Seguridad (SST)
             </h6>
         </div>
         <div class="card-body p-4 pt-2">
             <div class="row g-3 bg-light p-3 rounded-4 mx-0 text-center text-md-start mb-3">
                 <div class="col-md-4">
                     <label class="data-label-sm">Alternativa Etapa</label>
-                    <div class="data-val">{{ bitacora.alternativa_etapa }}</div>
+                    <div class="data-val">{{ bitacora.get_alternativa_etapa_display }}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="data-label-sm">¿Exterior?</label>
-                    <div class="data-val">{{ bitacora.exterior }}</div>
+                    <div class="data-val">{{ bitacora.get_exterior_display }}</div>
                 </div>
                 <div class="col-md-4">
                     <label class="data-label-sm">País</label>
-                    <div class="data-val">{{ bitacora.pais_etapa }}</div>
+                    <div class="data-val">{{ bitacora.pais_etapa|default:"No aplica" }}</div>
                 </div>
             </div>
             <div class="row g-3 text-center text-md-start px-2">
@@ -255,21 +408,50 @@
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="data-label-sm">¿Corresponde?</label>
-                    <div class="data-val">{{ bitacora.riesgo_corresponde }}</div>
+                    <div class="data-val">{{ bitacora.get_riesgo_corresponde_display }}</div>
                 </div>
                 <div class="col-6 col-md-3">
                     <label class="data-label-sm">Cuenta con EPP</label>
-                    <div class="data-val">{{ bitacora.cuenta_epp }}</div>
+                    <div class="data-val">{{ bitacora.get_cuenta_epp_display }}</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 4. Actividades -->
+    <!-- 5. Resumen General del Formulario -->
     <div class="card shadow-sm rounded-4 border-0 mb-4">
         <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
             <h6 class="section-header mb-0">
-                <i class="bi bi-list-task fs-5 me-2"></i> 4. Descripción de Actividades
+                <i class="bi bi-card-checklist fs-5 me-2"></i> 5. Resumen General de la Bitácora
+            </h6>
+        </div>
+        <div class="card-body p-4 pt-2">
+            <div class="row g-3 bg-light p-3 rounded-4 mx-0">
+                <div class="col-md-3">
+                    <label class="data-label-sm">Clasificación</label>
+                    <div class="data-val">{{ bitacora.clasificacion_informacion }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Estado</label>
+                    <div class="data-val">{{ bitacora.estado }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Fecha Inicio</label>
+                    <div class="data-val">{{ bitacora.fecha_inicio|date:"d/m/Y" }}</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="data-label-sm">Fecha Fin</label>
+                    <div class="data-val">{{ bitacora.fecha_fin|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Actividades -->
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 border-bottom-0 rounded-top-4 mt-2 mx-2">
+            <h6 class="section-header mb-0">
+                <i class="bi bi-list-task fs-5 me-2"></i> 6. Descripción de Actividades
             </h6>
         </div>
         <div class="card-body p-4 pt-0">
@@ -380,8 +562,8 @@
             </a>
         {% endif %}
         
-        <a href="#" class="btn bg-sena text-white px-5 py-2 fw-bold rounded-pill transition-hover shadow-sm d-flex align-items-center" onclick="window.print()">
-            <i class="bi bi-printer me-2 fs-5"></i>Imprimir / Guardar PDF
+        <a href="{% url 'bitacoras:exportar_pdf' bitacora.id %}" class="btn bg-sena text-white px-5 py-2 fw-bold rounded-pill transition-hover shadow-sm d-flex align-items-center">
+            <i class="bi bi-file-earmark-arrow-down me-2 fs-5"></i>Descargar Reporte PDF
         </a>
     </div>
 
