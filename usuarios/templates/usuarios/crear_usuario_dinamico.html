@@ -204,14 +204,6 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <label class="label-studio">Departamento (Colombia) *</label>
-                        <div class="input-group-studio">
-                            <i class="bi bi-geo-alt"></i> <select id="id_departamento" name="departamento" required>
-                                <option value="">Cargando departamentos...</option>
-                            </select>
-                        </div>
-                    </div>
                     </div>
 
                 <div id="seccion_aprendiz" style="display: none;">
@@ -319,6 +311,12 @@
 
         // NUEVA FUNCIÓN: Carga los departamentos desde API Colombia
         function cargarDepartamentosColombia() {
+            const selectDepto = document.getElementById('id_departamento');
+            const selectCiudad = document.getElementById('id_ciudad_municipio');
+            if (!selectDepto || !selectCiudad) return;
+            const departamentoGuardado = selectDepto.value || '';
+            const ciudadGuardada = selectCiudad.value || '';
+
             const url = 'https://api-colombia.com/api/v1/Department';
 
             fetch(url)
@@ -327,22 +325,67 @@
                     return response.json();
                 })
                 .then(data => {
-                    const selectDepto = document.getElementById('id_departamento');
                     selectDepto.innerHTML = '<option value="">Seleccione un departamento...</option>';
+                    selectCiudad.innerHTML = '<option value="">Seleccione primero un departamento...</option>';
                     
                     // Ordenar alfabéticamente para mejor experiencia
                     data.sort((a, b) => a.name.localeCompare(b.name));
 
                     data.forEach(depto => {
                         const opcion = document.createElement('option');
-                        opcion.value = depto.name; // Guarda el nombre del departamento
+                        opcion.value = depto.name;
                         opcion.textContent = depto.name;
+                        opcion.dataset.id = depto.id;
+                        if (departamentoGuardado && depto.name === departamentoGuardado) {
+                            opcion.selected = true;
+                        }
                         selectDepto.appendChild(opcion);
+                    });
+
+                    const cargarCiudades = (departmentId, ciudadPreseleccionada = '') => {
+                        selectCiudad.innerHTML = '<option value="">Cargando ciudades...</option>';
+                        if (!departmentId) {
+                            selectCiudad.innerHTML = '<option value="">Seleccione primero un departamento...</option>';
+                            return;
+                        }
+
+                        fetch(`https://api-colombia.com/api/v1/Department/${departmentId}/cities`)
+                            .then(resp => {
+                                if (!resp.ok) throw new Error('No se pudieron cargar las ciudades');
+                                return resp.json();
+                            })
+                            .then(ciudades => {
+                                selectCiudad.innerHTML = '<option value="">Seleccione una ciudad o municipio...</option>';
+                                ciudades.sort((a, b) => a.name.localeCompare(b.name));
+                                ciudades.forEach(ciudad => {
+                                    const opcionCiudad = document.createElement('option');
+                                    opcionCiudad.value = ciudad.name;
+                                    opcionCiudad.textContent = ciudad.name;
+                                    if (ciudadPreseleccionada && ciudad.name === ciudadPreseleccionada) {
+                                        opcionCiudad.selected = true;
+                                    }
+                                    selectCiudad.appendChild(opcionCiudad);
+                                });
+                            })
+                            .catch(() => {
+                                selectCiudad.innerHTML = '<option value="">Error al cargar ciudades</option>';
+                            });
+                    };
+
+                    const selectedOption = selectDepto.options[selectDepto.selectedIndex];
+                    if (selectedOption?.dataset?.id) {
+                        cargarCiudades(selectedOption.dataset.id, ciudadGuardada);
+                    }
+
+                    selectDepto.addEventListener('change', function() {
+                        const opcionSeleccionada = this.options[this.selectedIndex];
+                        const departmentId = opcionSeleccionada?.dataset?.id;
+                        cargarCiudades(departmentId);
                     });
                 })
                 .catch(error => {
                     console.error('Problema con Fetch API Colombia:', error);
-                    document.getElementById('id_departamento').innerHTML = '<option value="">Error al cargar departamentos</option>';
+                    selectDepto.innerHTML = '<option value="">Error al cargar departamentos</option>';
                 });
         }
     });

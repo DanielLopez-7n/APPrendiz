@@ -374,7 +374,8 @@ class AprendizPerfilForm(forms.ModelForm):
     class Meta:
         model = Aprendiz
         fields = [
-            'tipo_documento', 'documento', 'telefono', 'correo_personal', 
+            'tipo_documento', 'documento', 'telefono', 'correo_personal',
+            'departamento', 'ciudad_municipio',
             'direccion_residencia', 'numero_ficha', 'modalidad_formacion', 
             'modalidad_etapa', 'etapa_exterior', 'pais_etapa'
         ]
@@ -383,6 +384,8 @@ class AprendizPerfilForm(forms.ModelForm):
             'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': True}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'correo_personal': forms.EmailInput(attrs={'class': 'form-control'}),
+            'departamento': forms.Select(attrs={'class': 'form-select'}),
+            'ciudad_municipio': forms.Select(attrs={'class': 'form-select'}),
             'direccion_residencia': forms.TextInput(attrs={'class': 'form-control'}),
             'ficha': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
@@ -394,6 +397,8 @@ class AprendizPerfilForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(AprendizPerfilForm, self).__init__(*args, **kwargs)
+        self.fields['departamento'].choices = [('', 'Seleccione un departamento...')]
+        self.fields['ciudad_municipio'].choices = [('', 'Seleccione primero un departamento...')]
         
         if user:
             self.fields['first_name'].initial = user.first_name
@@ -428,6 +433,18 @@ class AprendizPerfilForm(forms.ModelForm):
     def clean_documento(self):
         documento = validar_solo_numeros(self.cleaned_data.get('documento'), 'documento')
         return validar_longitud_campo(documento, 'documento', minimo=6, maximo=20)
+
+    def clean_departamento(self):
+        departamento = (self.cleaned_data.get('departamento') or '').strip()
+        if len(departamento) > 70:
+            raise forms.ValidationError('El departamento no puede superar 70 caracteres.')
+        return departamento
+
+    def clean_ciudad_municipio(self):
+        ciudad = (self.cleaned_data.get('ciudad_municipio') or '').strip()
+        if len(ciudad) > 70:
+            raise forms.ValidationError('La ciudad o municipio no puede superar 70 caracteres.')
+        return ciudad
     
     from django.contrib.auth.models import User
 

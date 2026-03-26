@@ -9,6 +9,8 @@ class AprendizForm(forms.ModelForm):
         self.fields['correo_personal'].widget.attrs['maxlength'] = 70
         self.fields['direccion_residencia'].widget.attrs['maxlength'] = 70
         self.fields['pais_etapa'].widget.attrs['maxlength'] = 70
+        self.fields['departamento'].choices = [('', 'Seleccione un departamento...')]
+        self.fields['ciudad_municipio'].choices = [('', 'Seleccione primero un departamento...')]
 
     def clean_documento(self):
         documento = (self.cleaned_data.get('documento') or '').strip()
@@ -43,6 +45,18 @@ class AprendizForm(forms.ModelForm):
             raise forms.ValidationError('La dirección no puede superar 70 caracteres.')
         return direccion
 
+    def clean_departamento(self):
+        departamento = (self.cleaned_data.get('departamento') or '').strip()
+        if len(departamento) > 70:
+            raise forms.ValidationError('El departamento no puede superar 70 caracteres.')
+        return departamento
+
+    def clean_ciudad_municipio(self):
+        ciudad = (self.cleaned_data.get('ciudad_municipio') or '').strip()
+        if len(ciudad) > 70:
+            raise forms.ValidationError('La ciudad o municipio no puede superar 70 caracteres.')
+        return ciudad
+
     class Meta:
         model = Aprendiz
         exclude = ['usuario', 'programa_formacion']        
@@ -57,6 +71,8 @@ class AprendizForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. 3001234567'}),
             'correo_personal': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
             'direccion_residencia': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Calle 123 # 45-67'}),
+            'departamento': forms.Select(attrs={'class': 'form-select'}),
+            'ciudad_municipio': forms.Select(attrs={'class': 'form-select'}),
             
             'numero_ficha': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),

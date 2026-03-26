@@ -256,6 +256,20 @@
                                 {{ form.direccion_residencia }}
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Departamento</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-map icon-left"></i>
+                                {{ form.departamento }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="label-studio">Ciudad / Municipio</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-geo icon-left"></i>
+                                {{ form.ciudad_municipio }}
+                            </div>
+                        </div>
                     </div>
 
                     <h5 class="form-section-title"><i class="bi bi-mortarboard"></i> Perfil SENA</h5>
@@ -341,6 +355,92 @@
                     reader.readAsDataURL(e.target.files[0]);
                 }
             });
+        }
+
+        const selectDepto = document.getElementById('id_departamento');
+        const selectCiudad = document.getElementById('id_ciudad_municipio');
+
+        function cargarCiudadesPorDepartamento(departmentId, ciudadSeleccionada = '') {
+            if (!departmentId || !selectCiudad) return;
+
+            selectCiudad.innerHTML = '<option value="">Cargando ciudades...</option>';
+            fetch(`https://api-colombia.com/api/v1/Department/${departmentId}/cities`)
+                .then(resp => {
+                    if (!resp.ok) throw new Error('No se pudieron cargar las ciudades');
+                    return resp.json();
+                })
+                .then(ciudades => {
+                    selectCiudad.innerHTML = '<option value="">Seleccione una ciudad o municipio...</option>';
+                    ciudades.sort((a, b) => a.name.localeCompare(b.name));
+                    ciudades.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad.name;
+                        option.textContent = ciudad.name;
+                        if (ciudadSeleccionada && ciudad.name === ciudadSeleccionada) {
+                            option.selected = true;
+                        }
+                        selectCiudad.appendChild(option);
+                    });
+                })
+                .catch(() => {
+                    selectCiudad.innerHTML = '<option value="">Error al cargar ciudades</option>';
+                });
+        }
+
+        function cargarUbicacionesColombia() {
+            if (!selectDepto || !selectCiudad) return;
+
+            const departamentoGuardado = selectDepto.getAttribute('data-initial') || selectDepto.value || '';
+            const ciudadGuardada = selectCiudad.getAttribute('data-initial') || selectCiudad.value || '';
+
+            fetch('https://api-colombia.com/api/v1/Department')
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar departamentos');
+                    return response.json();
+                })
+                .then(data => {
+                    selectDepto.innerHTML = '<option value="">Seleccione un departamento...</option>';
+                    data.sort((a, b) => a.name.localeCompare(b.name));
+
+                    let idSeleccionado = null;
+                    data.forEach(depto => {
+                        const option = document.createElement('option');
+                        option.value = depto.name;
+                        option.textContent = depto.name;
+                        option.dataset.id = depto.id;
+                        if (departamentoGuardado && depto.name === departamentoGuardado) {
+                            option.selected = true;
+                            idSeleccionado = depto.id;
+                        }
+                        selectDepto.appendChild(option);
+                    });
+
+                    if (idSeleccionado) {
+                        cargarCiudadesPorDepartamento(idSeleccionado, ciudadGuardada);
+                    } else {
+                        selectCiudad.innerHTML = '<option value="">Seleccione primero un departamento...</option>';
+                    }
+
+                    selectDepto.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        const departmentId = selectedOption?.dataset?.id;
+                        if (!departmentId) {
+                            selectCiudad.innerHTML = '<option value="">Seleccione primero un departamento...</option>';
+                            return;
+                        }
+                        cargarCiudadesPorDepartamento(departmentId);
+                    });
+                })
+                .catch(() => {
+                    selectDepto.innerHTML = '<option value="">Error al cargar departamentos</option>';
+                    selectCiudad.innerHTML = '<option value="">Error al cargar ciudades</option>';
+                });
+        }
+
+        if (selectDepto && selectCiudad) {
+            selectDepto.setAttribute('data-initial', selectDepto.value || '');
+            selectCiudad.setAttribute('data-initial', selectCiudad.value || '');
+            cargarUbicacionesColombia();
         }
     });
 </script>
