@@ -255,19 +255,82 @@ def revisar_bitacora(request, pk):
     return render(request, 'bitacoras/revisar_bitacora.html', context)
 
 # --- VISTA: EXPORTAR PDF ---
+# ==============================================================================
+# FUNCIÓN AUXILIAR: link_callback
+# ==============================================================================
+def link_callback(uri, rel):
+    """
+    Función crucial para xhtml2pdf. Convierte las URIs de Django (static, media)
+    en rutas de archivo absolutas del sistema para que puedan ser incrustadas 
+    correctamente en el PDF sin depender del servidor web.
+    """
+    # Usamos las configuraciones de Django para encontrar los directorios
+    sUrl = settings.STATIC_URL      # Ejemplo: /static/
+    sRoot = settings.STATIC_ROOT    # Ejemplo: /home/user/project/static/
+    mUrl = settings.MEDIA_URL       # Ejemplo: /media/
+    mRoot = settings.MEDIA_ROOT     # Ejemplo: /home/user/project/media/
+
+    # Si la URI empieza con MEDIA_URL, buscamos en MEDIA_ROOT
+    if uri.startswith(mUrl):
+        path = os.path.join(mRoot, uri.replace(mUrl, ""))
+    # Si la URI empieza con STATIC_URL, buscamos en STATIC_ROOT
+    elif uri.startswith(sUrl):
+        path = os.path.join(sRoot, uri.replace(sUrl, ""))
+    # Si no es ninguna de las anteriores, devolvemos la URI tal cual
+    else:
+        return uri
+
+    # Verificamos que el archivo realmente exista en el disco
+    if not os.path.isfile(path):
+        # Si no existe, xhtml2pdf intentará descargarla (puede fallar)
+        return uri
+        
+    return path
+
+
+# ==============================================================================
+# VISTA PRINCIPAL: exportar_pdf (Versión Profesional Limpia)
+# ==============================================================================
 @login_required
 def exportar_pdf(request, pk):
     """
-    Vista encargada de compilar el template HTML y convertirlo 
-    a un archivo binario PDF para su descarga directa.
+    Vista Senior: Genera un reporte PDF formal, aislado de la interfaz web,
+    y soluciona el error 403 de permisos para aprendices.
     """
     bitacora = get_object_or_404(Bitacora, pk=pk)
 
-    # Aislamiento por rol: aprendices solo su bitácora; instructor/admin según acceso.
-    if hasattr(request.user, 'aprendiz') and bitacora.aprendiz_rel != request.user.aprendiz:
-        messages.error(request, "No tienes permiso para exportar esta bitácora.")
+    # --------------------------------------------------------------------------
+    # CORRECCIÓN DE SEGURIDAD (Solución al error 403 Forbidden)
+    # --------------------------------------------------------------------------
+    # Obtenemos el usuario dueño de la bitácora de forma segura
+    dueno_bitacora = bitacora.aprendiz_rel.usuario if bitacora.aprendiz_rel else None
+
+    # Verificamos permisos:
+    # 1. Si es superusuario o staff (instructor/admin), tiene acceso total.
+    # 2. Si es el aprendiz dueño de la bitácora, tiene acceso.
+    # 3. De lo contrario, se deniega el acceso.
+    if not (request.user.is_superuser or request.user.is_staff or request.user == dueno_bitacora):
+        # Esta es la alerta que le saldrá si intenta descargar algo que no es suyo
+        messages.error(request, "Acceso denegado: No tienes permiso para exportar este documento.")
         return redirect('bitacoras:listar_bitacoras')
 
+<<<<<<< HEAD
+    # --------------------------------------------------------------------------
+    # PREPARACIÓN DEL DOCUMENTO
+    # --------------------------------------------------------------------------
+    # Definimos el nombre dinámico del archivo PDF
+    apellido = bitacora.aprendiz_rel.usuario.last_name if bitacora.aprendiz_rel else "Aprendiz"
+    numero = getattr(bitacora, 'numero_bitacora', pk) # Usamos número si existe, sino el PK
+    nombre_archivo = f"Reporte_Oficial_Bitacora_{numero}_{apellido}.pdf"
+
+    # Ruta del template aislado (asegúrate de que este nombre coincida con el paso 2)
+    template_path = 'bitacoras/reporte_bitacora_pdf.html'
+    context = {'bitacora': bitacora}
+    
+    # Renderizamos el HTML de la plantilla con el contexto
+    template = get_template(template_path)
+    html = template.render(context)
+=======
     context = {
         'bitacora': bitacora,
         'aprendiz': bitacora.aprendiz_rel,
@@ -281,17 +344,24 @@ def exportar_pdf(request, pk):
         # Fallback de seguridad si el template principal llega con sintaxis inválida.
         template = get_template('bitacoras/pdf_template.html')
         html = template.render(context)
+>>>>>>> 0abf1269e6bce43aae41ca15be7b026e858fa4cd
     
+    # Preparamos la respuesta HTTP para forzar la descarga
     response = HttpResponse(content_type='application/pdf')
-    # attachment; fuerza la descarga del archivo en lugar de abrirlo en el navegador
-    apellido = bitacora.aprendiz_rel.usuario.last_name if bitacora.aprendiz_rel_id else "aprendiz"
-    response['Content-Disposition'] = f'attachment; filename="Reporte_Bitacora_{bitacora.numero_bitacora}_{apellido}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
     
-    # Creación del PDF
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    # --------------------------------------------------------------------------
+    # GENERACIÓN DEL PDF (Inyectando link_callback)
+    # --------------------------------------------------------------------------
+    pisa_status = pisa.CreatePDF(
+        html, 
+        dest=response, 
+        link_callback=link_callback # Crucial para logos e imágenes
+    )
     
+    # Verificamos si hubo errores durante la conversión
     if pisa_status.err:
-        return HttpResponse('Error interno al generar el documento PDF.', status=500)
+        return HttpResponse('Error interno al renderizar el documento PDF.', status=500)
     
     return response
 

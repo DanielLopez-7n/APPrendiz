@@ -53,6 +53,7 @@ class AprendizForm(forms.ModelForm):
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
             
             'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),
+            'empresa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. SENA, Microsoft...'}),
             'pais_etapa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Colombia'}),
             # Al checkbox le ponemos la clase especial form-check-input
             'etapa_exterior': forms.CheckboxInput(attrs={'class': 'form-check-input'}), 

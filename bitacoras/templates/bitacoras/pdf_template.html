@@ -1,132 +1,175 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Bitácora {{ bitacora.numero }}</title>
-    <style type="text/css">
-        body {
-            font-family: Helvetica, sans-serif;
-            font-size: 12px;
-            color: #333;
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Reporte de Bitácora</title>
+    <style>
+        /* Estilos compatibles con xhtml2pdf */
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+            @frame footer {
+                -pdf-frame-content: footerContent;
+                bottom: 1cm;
+                margin-left: 2cm;
+                margin-right: 2cm;
+                height: 1cm;
+            }
         }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #39A900; /* Verde SENA */
-            padding-bottom: 10px;
-        }
-        h1 { color: #39A900; font-size: 18px; text-transform: uppercase; }
-        h2 { font-size: 14px; margin-top: 0; }
         
-        .info-box {
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #333333;
+        }
+
+        /* Encabezado Principal */
+        .header-table {
             width: 100%;
+            border-bottom: 2px solid #39a900; /* Verde SENA */
+            padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        .info-box td { padding: 4px; }
-        .label { font-weight: bold; color: #555; }
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #39a900;
+        }
 
-        /* Estilos de la tabla de actividades */
-        .table-actividades {
+        /* Estilos de Tablas para organizar la información */
+        .info-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
-        .table-actividades th {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            padding: 8px;
+        .info-table th {
+            background-color: #f2f2f2;
+            color: #333;
             text-align: left;
-        }
-        .table-actividades td {
-            border: 1px solid #ccc;
             padding: 8px;
-            vertical-align: top;
+            border: 1px solid #dddddd;
+            width: 30%;
+            font-weight: bold;
+        }
+        .info-table td {
+            padding: 8px;
+            border: 1px solid #dddddd;
+            width: 70%;
+        }
+
+        /* Sección de Actividades */
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #39a900;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #dddddd;
+            padding-bottom: 5px;
+        }
+        .content-box {
+            border: 1px solid #dddddd;
+            background-color: #fafafa;
+            padding: 10px;
+            min-height: 100px;
+            text-align: justify;
+        }
+
+        /* El secreto para los Estados (Aprobado/Rechazado) en PDF */
+        .estado-box {
+            display: block;
+            width: 80px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 5px 0;
+            /* Bordes cuadrados, el border-radius no funciona bien en PDF */
+        }
+        .estado-aprobada {
+            background-color: #39a900; /* Verde */
+        }
+        .estado-pendiente {
+            background-color: #ffc107; /* Amarillo */
+            color: #000000;
+        }
+        .estado-rechazada {
+            background-color: #dc3545; /* Rojo */
         }
         
         .footer {
-            position: fixed;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
             text-align: center;
             font-size: 10px;
-            color: #aaa;
-            border-top: 1px solid #eee;
+            color: #777;
+            border-top: 1px solid #ddd;
             padding-top: 5px;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Bitácora de Seguimiento - Etapa Productiva</h1>
-        <h2>SENA - Gestión de Aprendices</h2>
-    </div>
-
-    <table class="info-box">
+    <table class="header-table">
         <tr>
-            <td class="label" width="15%">Aprendiz:</td>
-            <td width="35%">{{ aprendiz.usuario.get_full_name }}</td>
-            <td class="label" width="15%">Documento:</td>
-            <td width="35%">{{ aprendiz.documento }}</td>
-        </tr>
-        <tr>
-            <td class="label">Programa:</td>
-            <td>{{ aprendiz.programa_formacion }}</td>
-            <td class="label">Bitácora N°:</td>
-            <td><strong>{{ bitacora.numero }}</strong></td>
-        </tr>
-        <tr>
-            <td class="label">Empresa:</td>
-            <td>{{ empresa.nombre }}</td>
-            <td class="label">Periodo:</td>
-            <td>{{ bitacora.fecha_inicio }} al {{ bitacora.fecha_fin }}</td>
+            <td width="70%">
+                <div class="header-title">Reporte de Bitácora</div>
+                <div style="font-size: 14px; color: #555;">Sistema de Gestión APPrendiz</div>
+            </td>
+            <td width="30%" style="text-align: right;">
+                <strong>Fecha de Emisión:</strong> <br>
+                {% now "d \d\e F \d\e Y" %}
+            </td>
         </tr>
     </table>
 
-    <h3>Detalle de Actividades</h3>
-    <table class="table-actividades">
-        <thead>
-            <tr>
-                <th width="20%">Fecha</th>
-                <th width="80%">Descripción de la Actividad</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for act in actividades %}
-            <tr>
-                <td>{{ act.fecha_ejecucion }}</td>
-                <td>
-                    {{ act.descripcion|linebreaksbr }}
-                    {% if act.evidencia %}
-                    <br><br>
-                    <small style="color: #666;">
-                        * Evidencia adjunta en plataforma: {{ act.evidencia.name }}
-                    </small>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
+    <div class="section-title">Información General</div>
+    <table class="info-table">
+        <tr>
+            <th>Título de la Bitácora:</th>
+            <td><strong>{{ bitacora.titulo }}</strong></td>
+        </tr>
+        <tr>
+            <th>Aprendiz:</th>
+            <td>{{ bitacora.aprendiz.usuario.get_full_name|default:bitacora.aprendiz.usuario.username }}</td>
+        </tr>
+        <tr>
+            <th>Fecha de Creación:</th>
+            <td>{{ bitacora.fecha_creacion|date:"d/m/Y H:i" }}</td>
+        </tr>
+        <tr>
+            <th>Estado de Evaluación:</th>
+            <td>
+                {% if bitacora.estado == 'Aprobada' or bitacora.estado == 'aprobada' %}
+                    <div class="estado-box estado-aprobada">APROBADA</div>
+                {% elif bitacora.estado == 'Rechazada' or bitacora.estado == 'rechazada' %}
+                    <div class="estado-box estado-rechazada">RECHAZADA</div>
+                {% else %}
+                    <div class="estado-box estado-pendiente">PENDIENTE</div>
+                {% endif %}
+            </td>
+        </tr>
     </table>
 
-    <br><br>
-    <div style="border: 1px solid #ddd; padding: 10px; background-color: #fafafa;">
-        <strong>Estado de Evaluación:</strong>
-        {% if bitacora.evaluado_instructor %}
-            <span style="color: green;">APROBADA POR INSTRUCTOR</span>
-        {% else %}
-            <span style="color: red;">PENDIENTE DE REVISIÓN</span>
-        {% endif %}
-        
-        {% if bitacora.observaciones_instructor %}
-        <br><br>
-        <strong>Observaciones del Instructor:</strong><br>
-        {{ bitacora.observaciones_instructor }}
-        {% endif %}
+    <div class="section-title">Descripción de Actividades</div>
+    <div class="content-box">
+        {{ bitacora.descripcion|linebreaks }}
     </div>
 
-    <div class="footer">
-        Generado automáticamente por el sistema APPrendiz - {{ bitacora.fecha_creacion }}
+    {% if bitacora.observaciones %}
+    <div class="section-title">Observaciones del Instructor</div>
+    <table class="info-table">
+        <tr>
+            <th style="background-color: #fff3cd; color: #856404;">Instructor Evaluador:</th>
+            <td>{{ bitacora.instructor.usuario.get_full_name|default:"No asignado" }}</td>
+        </tr>
+    </table>
+    <div class="content-box" style="border-color: #ffeeba; background-color: #fffdf5;">
+        {{ bitacora.observaciones|linebreaks }}
+    </div>
+    {% endif %}
+
+    <div id="footerContent">
+        <div class="footer">
+            Generado por APPrendiz SENA - Página <pdf:pagenumber> de <pdf:pagecount>
+        </div>
     </div>
 
 </body>

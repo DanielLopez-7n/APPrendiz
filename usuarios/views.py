@@ -153,8 +153,10 @@ def lista_usuarios_view(request):
             Q(first_name__icontains=busqueda) |
             Q(last_name__icontains=busqueda) |
             Q(email__icontains=busqueda) |
-            Q(perfil__documento__icontains=busqueda)
-        )
+            Q(perfil__documento__icontains=busqueda) |
+            Q(aprendiz__documento__icontains=busqueda) |
+            Q(instructor__cedula__icontains=busqueda)
+        ).distinct()
     
     if filtro_activo:
         usuarios = usuarios.filter(is_active=filtro_activo == 'true')
