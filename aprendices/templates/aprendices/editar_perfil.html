@@ -146,8 +146,8 @@
                     <div class="avatar-upload-wrapper px-3">
                         <div class="position-relative d-inline-block">
                             <div class="avatar-circle">
-                                {% if user.aprendiz.foto %}
-                                    <img id="avatarImage" src="{{ user.aprendiz.foto.url }}" alt="Mi Foto">
+                                {% if user.perfil.foto_perfil %}
+                                    <img id="avatarImage" src="{{ user.perfil.foto_perfil.url }}" alt="Mi Foto">
                                 {% else %}
                                     <i id="avatarIcon" class="bi bi-person-fill placeholder-icon"></i>
                                     <img id="avatarImage" src="" style="display:none;" alt="Mi Foto">
@@ -155,7 +155,7 @@
                             </div>
                             
                             <div style="position: absolute; width: 0; height: 0; overflow: hidden;">
-                                {{ form.foto }}
+                                {{ form.foto_perfil }}
                             </div>
 
                             <button type="button" class="camera-btn-wrapper" id="btnFakeCamera" title="Subir foto">
@@ -296,18 +296,17 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="label-studio">País de la Etapa</label>
+                            <label class="label-studio">¿Realiza etapa en el exterior?</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-airplane icon-left"></i>
+                                {{ form.etapa_exterior }}
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="wrapper_pais_etapa">
+                            <label class="label-studio">País donde realiza la etapa</label>
                             <div class="input-group-studio">
                                 <i class="bi bi-globe-americas icon-left"></i>
                                 {{ form.pais_etapa }}
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="form-check-studio">
-                                {{ form.etapa_exterior }}
-                                <label class="form-check-label fw-bold text-dark ms-2" for="{{ form.etapa_exterior.id_for_label }}">
-                                    Marcar si la etapa productiva se realiza fuera de Colombia
-                                </label>
                             </div>
                         </div>
                     </div>
@@ -359,6 +358,24 @@
 
         const selectDepto = document.getElementById('id_departamento');
         const selectCiudad = document.getElementById('id_ciudad_municipio');
+        const etapaExteriorSelect = document.getElementById('id_etapa_exterior');
+        const wrapperPaisEtapa = document.getElementById('wrapper_pais_etapa');
+        const paisEtapaSelect = document.getElementById('id_pais_etapa');
+
+        function togglePaisEtapa() {
+            if (!etapaExteriorSelect || !wrapperPaisEtapa || !paisEtapaSelect) return;
+            const realizaExterior = etapaExteriorSelect.value === 'True' || etapaExteriorSelect.value === 'true';
+            wrapperPaisEtapa.style.display = realizaExterior ? 'block' : 'none';
+            paisEtapaSelect.disabled = !realizaExterior;
+            if (!realizaExterior) {
+                paisEtapaSelect.value = 'Colombia';
+            }
+        }
+
+        if (etapaExteriorSelect) {
+            etapaExteriorSelect.addEventListener('change', togglePaisEtapa);
+            togglePaisEtapa();
+        }
 
         function cargarCiudadesPorDepartamento(departmentId, ciudadSeleccionada = '') {
             if (!departmentId || !selectCiudad) return;

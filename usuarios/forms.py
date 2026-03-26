@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from .models import PerfilUsuario
 from aprendices.models import Aprendiz
+from aprendices.forms import PAIS_CHOICES
 
 
 def validar_solo_numeros(valor, etiqueta='documento'):
@@ -370,6 +371,18 @@ class AprendizPerfilForm(forms.ModelForm):
     
     # 2. CAMPO PARA LA FOTO
     foto_perfil = forms.ImageField(required=False, label="Foto de Perfil", widget=forms.FileInput(attrs={'class': 'form-control'}))
+    etapa_exterior = forms.TypedChoiceField(
+        choices=((False, 'No'), (True, 'Sí')),
+        coerce=lambda x: str(x).lower() == 'true',
+        empty_value=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='¿Realiza etapa en el exterior?'
+    )
+    pais_etapa = forms.ChoiceField(
+        choices=PAIS_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        label='País donde realiza la etapa'
+    )
 
     class Meta:
         model = Aprendiz
@@ -390,8 +403,8 @@ class AprendizPerfilForm(forms.ModelForm):
             'ficha': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
             'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),
-            'etapa_exterior': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'pais_etapa': forms.TextInput(attrs={'class': 'form-control'}),
+            'etapa_exterior': forms.Select(attrs={'class': 'form-select'}),
+            'pais_etapa': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -445,6 +458,17 @@ class AprendizPerfilForm(forms.ModelForm):
         if len(ciudad) > 70:
             raise forms.ValidationError('La ciudad o municipio no puede superar 70 caracteres.')
         return ciudad
+
+    def clean(self):
+        cleaned_data = super().clean()
+        etapa_exterior = cleaned_data.get('etapa_exterior')
+        pais_etapa = cleaned_data.get('pais_etapa')
+
+        if etapa_exterior and not pais_etapa:
+            self.add_error('pais_etapa', 'Debes seleccionar el país donde realiza la etapa.')
+        if not etapa_exterior:
+            cleaned_data['pais_etapa'] = 'Colombia'
+        return cleaned_data
     
     from django.contrib.auth.models import User
 

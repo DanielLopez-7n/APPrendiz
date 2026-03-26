@@ -152,10 +152,11 @@
             </div>
             <div class="col-md-3">
                 <div class="filter-wrapper" style="border-left-color: #adb5bd;">
-                    <select name="staff" class="select-studio">
+                    <select name="rol" class="select-studio">
                         <option value="">Rol: Todos</option>
-                        <option value="true" {% if filtro_staff == 'true' %}selected{% endif %}>Administradores</option>
-                        <option value="false" {% if filtro_staff == 'false' %}selected{% endif %}>Aprendices / Instructores</option>
+                        <option value="administrador" {% if filtro_rol == 'administrador' %}selected{% endif %}>Administradores</option>
+                        <option value="aprendiz" {% if filtro_rol == 'aprendiz' %}selected{% endif %}>Aprendices</option>
+                        <option value="instructor" {% if filtro_rol == 'instructor' %}selected{% endif %}>Instructores</option>
                     </select>
                 </div>
             </div>
@@ -221,7 +222,7 @@
                             <div class="fw-semibold text-dark" style="font-size: 0.85rem;"><i class="bi bi-envelope-at text-muted me-1"></i> {{ usuario.email|default:"Sin correo" }}</div>
                             <div class="text-muted mt-1" style="font-size: 0.8rem;">
                                 <i class="bi bi-telephone text-muted me-1"></i> 
-                                {{ usuario.perfil.telefono|default:"--" }}
+                                {{ usuario.telefono_contacto|default:"--" }}
                             </div>
                         </td>
 
