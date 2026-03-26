@@ -101,10 +101,8 @@
                         <span class="badge-studio bg-danger bg-opacity-10 text-danger border border-danger">Superadmin</span>
                     {% elif usuario.is_staff %}
                         <span class="badge-studio bg-warning bg-opacity-10 text-warning border border-warning" style="color: #d39e00 !important;">Instructor / Staff</span>
-                    {% elif usuario.aprendiz %}
-                        <span class="badge-studio bg-info bg-opacity-10 text-info border border-info" style="color: #0dcaf0 !important;">Aprendiz SENA</span>
                     {% else %}
-                        <span class="badge-studio bg-secondary bg-opacity-10 text-secondary border border-secondary">Usuario Estándar</span>
+                        <span class="badge-studio bg-info bg-opacity-10 text-info border border-info" style="color: #0dcaf0 !important;">Aprendiz / Usuario Estándar</span>
                     {% endif %}
                 </div>
             </div>
