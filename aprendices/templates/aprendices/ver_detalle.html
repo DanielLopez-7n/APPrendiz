@@ -117,7 +117,7 @@
                 </div>
                 
                 <h3 class="fw-bolder mb-1 text-dark position-relative" style="z-index: 1;">{{ aprendiz.usuario.first_name }} {{ aprendiz.usuario.last_name }}</h3>
-                <p class="text-muted fw-semibold mb-3 px-3 position-relative" style="z-index: 1;">{{ aprendiz.numero_ficha.programa.nombre|truncatechars:45 }}</p>
+                <p class="text-muted fw-semibold mb-3 px-3 position-relative" style="z-index: 1;">{{ aprendiz.programa_formacion|truncatechars:45 }}</p>
                 
                 <div class="mb-4 position-relative" style="z-index: 1;">
                     {% if aprendiz.usuario.is_active %}
@@ -185,7 +185,7 @@
                         </div>
                         <div class="col-12">
                             <div class="info-label">Programa de Formación</div>
-                            <div class="info-value"><i class="bi bi-book text-muted opacity-50"></i> {{ aprendiz.numero_ficha.programa.nombre }}</div>
+                            <div class="info-value"><i class="bi bi-book text-muted opacity-50"></i> {{ aprendiz.programa_formacion }}</div>
                         </div>
                     </div>
                 </div>
@@ -196,10 +196,6 @@
                         <div class="col-md-4">
                             <div class="info-label">Modalidad de Etapa</div>
                             <div class="info-value"><i class="bi bi-building-gear text-muted opacity-50"></i> {{ aprendiz.modalidad_etapa }}</div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-label">Empresa</div>
-                            <div class="info-value"><i class="bi bi-building text-muted opacity-50"></i> {{ aprendiz.empresa|default:"No registrada" }}</div>
                         </div>
                         <div class="col-md-4">
                             <div class="info-label">¿En el Exterior?</div>

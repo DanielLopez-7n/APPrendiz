@@ -2,201 +2,169 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Bitácora - APPrendiz SENA</title>
+    <title>Bitácora {{ bitacora.numero_bitacora }}</title>
     <style>
-        /* ======================================================================
-           AVISO IMPORTANTE PARA DESARROLLADORES:
-           JAMÁS agregues {% extends ... %} en este archivo.
-           Este HTML debe estar 100% AISLADO de la interfaz web para evitar
-           filtraciones de menús, fotos de perfil o botones.
-           ======================================================================
-        */
-
-        /* Configuración de página Carta (Letter) con márgenes profesionales */
-        @page {
-            size: letter portrait;
-            margin: 2cm 2cm 2.5cm 2cm;
-            
-            /* Definición del pie de página automático */
-            @frame footer_frame {
-                -pdf-frame-content: footer_content;
-                left: 2cm; width: 17.5cm; top: 25cm; height: 1.5cm;
-            }
-        }
-
-        /* Estilos Globales optimizados para impresión PDF */
-        body {
-            font-family: Helvetica, Arial, sans-serif;
-            font-size: 11px;
-            color: #2b2b2b;
-            line-height: 1.4;
-        }
-
-        /* Encabezado Corporativo Oficial */
-        .header-table {
-            width: 100%;
-            border-bottom: 2px solid #39a900; /* Verde SENA */
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        .header-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #39a900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .header-subtitle {
-            font-size: 13px;
-            color: #555555;
-            margin-top: 3px;
-        }
-
-        /* Tabla de Datos del Aprendiz / Bitácora (Estructura Rígida) */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
-        }
-        .data-table th {
-            background-color: #f4f6f4;
-            color: #333333;
-            text-align: left;
-            padding: 9px 12px;
-            border-bottom: 1px solid #e0e0e0;
-            border-right: 1px solid #e0e0e0;
-            width: 30%;
-            font-weight: bold;
-            font-size: 11px;
-        }
-        .data-table td {
-            padding: 9px 12px;
-            border-bottom: 1px solid #e0e0e0;
-            width: 70%;
-            font-size: 11px;
-        }
-        .data-table tr:last-child th, .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Secciones de Título y Contenido Largo */
+        @page { size: A4; margin: 24pt; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #1f2937; }
+        .title { font-size: 16pt; font-weight: bold; color: #166534; margin-bottom: 4pt; }
+        .subtitle { font-size: 9pt; color: #4b5563; margin-bottom: 10pt; }
+        .meta { width: 100%; border-collapse: collapse; margin-bottom: 12pt; }
+        .meta td { border: 1px solid #d1d5db; padding: 6pt; vertical-align: top; }
+        .meta .label { background: #f3f4f6; font-weight: bold; width: 24%; }
         .section-title {
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
-            background-color: #39a900;
-            padding: 7px 12px;
-            margin-top: 20px;
-            margin-bottom: 0;
-            border-radius: 3px 3px 0 0;
-            text-transform: uppercase;
+            font-size: 11pt; font-weight: bold; color: #111827;
+            margin: 14pt 0 6pt 0; padding: 5pt 7pt;
+            background: #f9fafb; border-left: 4pt solid #16a34a;
         }
-        .content-box {
-            border: 1px solid #e0e0e0;
-            border-top: none;
-            padding: 18px;
-            text-align: justify;
-            min-height: 100px;
-            background-color: #fdfdfd;
-            margin-bottom: 25px;
+        .grid { width: 100%; border-collapse: collapse; margin-bottom: 8pt; }
+        .grid td { border: 1px solid #d1d5db; padding: 6pt; vertical-align: top; }
+        .grid .label { font-size: 8pt; color: #6b7280; font-weight: bold; text-transform: uppercase; margin-bottom: 2pt; }
+        .status-pill {
+            display: inline-block; padding: 3pt 8pt; border-radius: 10pt; font-weight: bold;
+            border: 1px solid #9ca3af; background: #f3f4f6;
         }
-
-        /* Bloque de Estado Especial (Sólido y Centrado) */
-        .badge-estado {
-            display: block;
-            width: 90px;
-            text-align: center;
-            font-weight: bold;
-            color: #ffffff;
-            padding: 4px 0;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 3px;
-        }
-        .bg-aprobada { background-color: #28a745; }
-        .bg-rechazada { background-color: #dc3545; }
-        .bg-pendiente { background-color: #ffc107; color: #000000; border: 1px solid #e0a800; }
-
-        /* Pie de Página Estático */
-        #footer_content {
-            text-align: right;
-            font-size: 9px;
-            color: #888888;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 6px;
-        }
-        .left-footer { float: left; text-align: left; }
+        .estado-evaluada { color: #166534; border-color: #16a34a; background: #dcfce7; }
+        .estado-rechazada { color: #991b1b; border-color: #ef4444; background: #fee2e2; }
+        .estado-pendiente { color: #92400e; border-color: #f59e0b; background: #fef3c7; }
+        .activities { width: 100%; border-collapse: collapse; margin-top: 6pt; }
+        .activities th, .activities td { border: 1px solid #d1d5db; padding: 6pt; vertical-align: top; }
+        .activities th { background: #f3f4f6; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .3pt; }
+        .center { text-align: center; }
+        .small { font-size: 8.5pt; color: #4b5563; }
+        .signature { width: 100%; border-collapse: collapse; margin-top: 8pt; }
+        .signature td { width: 33.33%; text-align: center; padding-top: 12pt; }
+        .line { border-top: 1px solid #9ca3af; margin: 4pt 18pt 4pt 18pt; }
     </style>
 </head>
 <body>
+    <div class="title">Bitácora N° {{ bitacora.numero_bitacora }} - Seguimiento Etapa Productiva</div>
+    <div class="subtitle">Fecha de entrega: {{ bitacora.fecha_entrega_bitacora|date:"d/m/Y" }} · Clasificación: {{ bitacora.clasificacion_informacion }}</div>
 
-    <table class="header-table">
+    <table class="meta">
         <tr>
-            <td style="width: 75%; vertical-align: middle;">
-                <div class="header-title">Reporte Oficial de Bitácora</div>
-                <div class="header-subtitle">Sistema de Gestión de Etapa Productiva - APPrendiz SENA</div>
-            </td>
-            <td style="width: 25%; text-align: right; vertical-align: middle;">
-                <div style="font-size: 10px; color: #666; margin-top: 8px;">
-                    <strong>Emisión:</strong> {% now "d/m/Y H:i" %}
-                </div>
-            </td>
-        </tr>
-    </table>
-
-    <table class="data-table">
-        <tr>
-            <th>Título de la Bitácora</th>
-            <td><strong>{{ bitacora.titulo|default:"Sin título registrado" }}</strong></td>
-        </tr>
-        <tr>
-            <th>Aprendiz Responsable</th>
-            <td>{{ bitacora.aprendiz_rel.usuario.get_full_name|default:bitacora.aprendiz_rel.usuario.username|upper }}</td>
-        </tr>
-        <tr>
-            <th>Fecha de Registro</th>
-            <td>{{ bitacora.fecha_creacion|date:"l, d \d\e F \d\e Y"|title }}</td>
-        </tr>
-        <tr>
-            <th>Estado de Evaluación</th>
+            <td class="label">Estado</td>
             <td>
-                {% if bitacora.estado == 'Aprobada' or bitacora.estado == 'aprobada' %}
-                    <div class="badge-estado bg-aprobada">APROBADA</div>
-                {% elif bitacora.estado == 'Rechazada' or bitacora.estado == 'rechazada' %}
-                    <div class="badge-estado bg-rechazada">RECHAZADA</div>
+                {% if bitacora.estado == 'Evaluada' %}
+                    <span class="status-pill estado-evaluada">Aprobada / Evaluada</span>
+                {% elif bitacora.estado == 'Rechazada' %}
+                    <span class="status-pill estado-rechazada">Rechazada</span>
                 {% else %}
-                    <div class="badge-estado bg-pendiente">PENDIENTE</div>
+                    <span class="status-pill estado-pendiente">Pendiente</span>
                 {% endif %}
             </td>
+            <td class="label">Período reportado</td>
+            <td>{{ bitacora.fecha_inicio|date:"d/m/Y" }} al {{ bitacora.fecha_fin|date:"d/m/Y" }}</td>
         </tr>
     </table>
 
-    <div class="section-title">DESCRIPCIÓN DE ACTIVIDADES</div>
-    <div class="content-box">
-        {{ bitacora.descripcion|linebreaksbr|default:"El aprendiz no registró detalles para esta bitácora." }}
-    </div>
-
-    {% if bitacora.observaciones %}
-    <div class="section-title" style="background-color: #6c757d;">OBSERVACIONES DEL INSTRUCTOR</div>
-    <table class="data-table" style="margin-bottom: 0; border-top: none;">
+    <div class="section-title">1. Información del aprendiz</div>
+    <table class="grid">
         <tr>
-            <th style="background-color: #f8f9fa; border-top: none; border-right: 1px solid #e0e0e0;">Instructor Evaluador</th>
-            <td style="border-top: none;">{{ bitacora.instructor.usuario.get_full_name|default:"No registrado" }}</td>
+            <td><div class="label">Nombre completo</div>{{ bitacora.nombre_completo_aprendiz }}</td>
+            <td><div class="label">Tipo documento</div>{{ bitacora.get_tipo_documento_aprendiz_display }}</td>
+            <td><div class="label">Identificación</div>{{ bitacora.numero_identificacion_aprendiz }}</td>
+        </tr>
+        <tr>
+            <td><div class="label">Teléfono</div>{{ bitacora.contacto_telefonico_aprendiz }}</td>
+            <td><div class="label">Correo institucional</div>{{ bitacora.correo_institucional_aprendiz }}</td>
+            <td><div class="label">Correo personal</div>{{ bitacora.correo_personal_aprendiz }}</td>
+        </tr>
+        <tr>
+            <td><div class="label">Dirección</div>{{ bitacora.direccion_residencia_aprendiz }}</td>
+            <td><div class="label">Ficha</div>{{ bitacora.numero_grupo_ficha }}</td>
+            <td><div class="label">Programa</div>{{ bitacora.programa_formacion }}</td>
+        </tr>
+        <tr>
+            <td><div class="label">Modalidad formación</div>{{ bitacora.get_modalidad_formacion_display }}</td>
+            <td><div class="label">Modalidad ejecución</div>{{ bitacora.get_modalidad_ejecucion_display }}</td>
+            <td><div class="label">Alternativa etapa</div>{{ bitacora.get_alternativa_etapa_display }}</td>
         </tr>
     </table>
-    <div class="content-box" style="border-top: none; border-color: #e0e0e0;">
-        {{ bitacora.observaciones|linebreaksbr }}
-    </div>
+
+    <div class="section-title">2. Instructor de seguimiento</div>
+    <table class="grid">
+        <tr>
+            <td><div class="label">Nombre</div>{{ bitacora.nombre_instructor_seguimiento|default:"No registrado" }}</td>
+            <td><div class="label">Correo</div>{{ bitacora.email_instructor_seguimiento|default:"No registrado" }}</td>
+            <td><div class="label">Teléfono</div>{{ bitacora.telefono_instructor_seguimiento|default:"No registrado" }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">3. Empresa y supervisor</div>
+    <table class="grid">
+        <tr>
+            <td><div class="label">Empresa</div>{{ bitacora.nombre_empresa }}</td>
+            <td><div class="label">NIT</div>{{ bitacora.nit_empresa }}</td>
+            <td><div class="label">Dirección empresa</div>{{ bitacora.direccion_empresa }}</td>
+        </tr>
+        <tr>
+            <td><div class="label">Jefe inmediato</div>{{ bitacora.nombre_jefe }}</td>
+            <td><div class="label">Cargo</div>{{ bitacora.cargo_jefe }}</td>
+            <td><div class="label">Contacto</div>{{ bitacora.telefono_jefe }} / {{ bitacora.email_jefe }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">4. Seguridad y salud en el trabajo (SST)</div>
+    <table class="grid">
+        <tr>
+            <td><div class="label">Afiliado ARL</div>{{ bitacora.get_arl_afiliado_display }}</td>
+            <td><div class="label">Nivel de riesgo</div>{{ bitacora.nivel_riesgo }}</td>
+            <td><div class="label">¿Riesgo corresponde?</div>{{ bitacora.get_riesgo_corresponde_display }}</td>
+            <td><div class="label">Cuenta con EPP</div>{{ bitacora.get_cuenta_epp_display }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">5. Actividades registradas</div>
+    <table class="activities">
+        <thead>
+            <tr>
+                <th>Período</th>
+                <th>Descripción de la actividad</th>
+                <th>Competencias asociadas</th>
+                <th class="center">Evidencia</th>
+                <th>Observaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for actividad in bitacora.actividades.all %}
+            <tr>
+                <td>{{ actividad.periodo_mes }}</td>
+                <td>{{ actividad.descripcion_actividad|linebreaksbr }}</td>
+                <td>{{ actividad.competencias_asociadas|linebreaksbr }}</td>
+                <td class="center">{% if actividad.evidencia_cumplimiento %}Adjunta{% else %}—{% endif %}</td>
+                <td>{{ actividad.observaciones|default:"—"|linebreaksbr }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="center small">No hay actividades registradas en esta bitácora.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if bitacora.observaciones_instructor %}
+    <div class="section-title">6. Observaciones del instructor</div>
+    <table class="grid">
+        <tr><td>{{ bitacora.observaciones_instructor|linebreaksbr }}</td></tr>
+    </table>
     {% endif %}
 
-    <div id="footer_content">
-        <div class="left-footer">
-            Documento generado por la plataforma <strong>APPrendiz</strong>
-        </div>
-        Página <pdf:pagenumber> de <pdf:pagecount>
-    </div>
-
+    <div class="section-title">7. Firmas</div>
+    <table class="signature">
+        <tr>
+            <td>
+                <div class="line"></div>
+                <strong>Firma del aprendiz</strong><br>{{ bitacora.nombre_completo_aprendiz }}
+            </td>
+            <td>
+                <div class="line"></div>
+                <strong>Firma del jefe</strong><br>{{ bitacora.nombre_jefe }}
+            </td>
+            <td>
+                <div class="line"></div>
+                <strong>Firma del instructor</strong><br>{{ bitacora.nombre_instructor_seguimiento }}
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

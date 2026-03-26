@@ -24,7 +24,6 @@ class Aprendiz(models.Model):
     # 4. Etapa Productiva
     MODALIDAD_ETAPA_CHOICES = [('Presencial', 'Presencial'), ('Virtual', 'Virtual')]
     modalidad_etapa = models.CharField(max_length=50, choices=MODALIDAD_ETAPA_CHOICES, default='Presencial', verbose_name="Modalidad etapa productiva")
-    empresa = models.CharField(max_length=150, blank=True, null=True, verbose_name="Empresa donde realiza la etapa")
     etapa_exterior = models.BooleanField(default=False, verbose_name="¿Realiza etapa en el exterior?")
     pais_etapa = models.CharField(max_length=100, default='Colombia', verbose_name="País donde realiza la etapa")
 
