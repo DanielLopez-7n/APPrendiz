@@ -226,6 +226,10 @@ def crear_usuario_con_perfil(request):
             # 2. Crear el Perfil
             perfil = form_perfil.save(commit=False)
             perfil.usuario = usuario
+            if rol == 'aprendiz':
+                perfil.documento = documento
+            else:
+                perfil.cedula = documento
             perfil.save()
 
             messages.success(request, f'¡Registro exitoso! Se creó el usuario y el perfil de {rol}.')

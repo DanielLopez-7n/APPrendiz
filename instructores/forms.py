@@ -1,5 +1,7 @@
 from django import forms
 from .models import Instructor
+from aprendices.models import Aprendiz
+from django.contrib.auth.models import User
 
 class InstructorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -14,6 +16,13 @@ class InstructorForm(forms.ModelForm):
             raise forms.ValidationError('La cédula solo permite números (sin letras ni símbolos).')
         if len(cedula) < 6 or len(cedula) > 20:
             raise forms.ValidationError('La cédula debe tener entre 6 y 20 dígitos.')
+        if Instructor.objects.filter(cedula=cedula).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Este documento ya está registrado en instructores.')
+        if Aprendiz.objects.filter(documento=cedula).exists():
+            raise forms.ValidationError('Este documento ya está registrado en aprendices.')
+        usuario_actual_id = self.instance.usuario_id if self.instance and self.instance.pk else None
+        if User.objects.filter(username=cedula).exclude(pk=usuario_actual_id).exists():
+            raise forms.ValidationError('Este documento ya está registrado por otro usuario.')
         return cedula
 
     def clean_telefono(self):
