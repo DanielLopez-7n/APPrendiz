@@ -366,6 +366,7 @@ def perfil_view(request):
     """
     usuario = request.user
     template_base = 'core/panel_admin_base.html' if usuario.is_staff else 'core/base_simple.html'
+    cancel_url = 'core:dashboard' if usuario.is_staff else 'aprendices:perfil_aprendiz'
     
     if request.method == 'POST':
         form_usuario = EditarUsuarioForm(request.POST, instance=usuario)
@@ -400,10 +401,55 @@ def perfil_view(request):
     
     context = {
         'titulo': 'Mi información personal',
+        'usuario': usuario,
         'form_usuario': form_usuario,
         'form_perfil': form_perfil,
         'template_to_extend': template_base,
+        'cancel_url': cancel_url,
+        'rol_usuario': (
+            'Administrador'
+            if usuario.is_superuser
+            else 'Instructor' if hasattr(usuario, 'instructor')
+            else 'Aprendiz' if hasattr(usuario, 'aprendiz')
+            else 'Usuario'
+        ),
+        'fecha_registro': usuario.date_joined,
+        'ultimo_acceso': usuario.last_login,
     }
+
+    # Datos extendidos para pintar una ficha completa del perfil según tipo de usuario
+    documento_sistema = usuario.perfil.documento or usuario.username
+    telefono_sistema = usuario.perfil.telefono or 'No registrado'
+    direccion_sistema = usuario.perfil.direccion or 'No registrada'
+    correo_personal = 'No registrado'
+    tipo_documento = 'No definido'
+
+    if hasattr(usuario, 'instructor'):
+        instructor = usuario.instructor
+        documento_sistema = instructor.cedula or documento_sistema
+        telefono_sistema = instructor.telefono or telefono_sistema
+        direccion_sistema = instructor.direccion_residencia or direccion_sistema
+        correo_personal = instructor.correo_personal or correo_personal
+        tipo_documento = instructor.get_tipo_documento_display()
+        context['profesion'] = instructor.profesion
+        context['tipo_contrato'] = instructor.get_tipo_contrato_display()
+    elif hasattr(usuario, 'aprendiz'):
+        aprendiz = usuario.aprendiz
+        documento_sistema = aprendiz.documento or documento_sistema
+        telefono_sistema = aprendiz.telefono or telefono_sistema
+        direccion_sistema = aprendiz.direccion_residencia or direccion_sistema
+        correo_personal = aprendiz.correo_personal or correo_personal
+        tipo_documento = aprendiz.get_tipo_documento_display()
+        context['ficha_actual'] = getattr(aprendiz.numero_ficha, 'numero', 'No asignada')
+        context['programa_formacion'] = getattr(getattr(aprendiz.numero_ficha, 'programa', None), 'nombre', 'No asignado')
+
+    context.update({
+        'documento_sistema': documento_sistema,
+        'telefono_sistema': telefono_sistema,
+        'direccion_sistema': direccion_sistema,
+        'correo_personal': correo_personal,
+        'tipo_documento': tipo_documento,
+    })
     return render(request, 'usuarios/perfil.html', context)
 
 # --- VISTA DE CAMBIO DE CONTRASEÑA ---

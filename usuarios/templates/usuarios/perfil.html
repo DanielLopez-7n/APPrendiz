@@ -40,6 +40,41 @@
 
     .btn-save { background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px; font-weight: 800; width: 100%; transition: 0.3s; }
     .btn-save:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
+
+    .profile-meta-card {
+        background: linear-gradient(135deg, #f8fff3 0%, #f4f7f6 100%);
+        border: 1px solid #eaf2e4;
+        border-left: 4px solid #39A900;
+        border-radius: 14px;
+        padding: 14px 16px;
+        height: 100%;
+    }
+    .profile-meta-label {
+        font-size: .72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #7d8790;
+        letter-spacing: .8px;
+        margin-bottom: 4px;
+    }
+    .profile-meta-value {
+        font-size: .95rem;
+        font-weight: 700;
+        color: #23272b;
+        line-height: 1.3;
+    }
+    .role-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: .8rem;
+        font-weight: 800;
+        background: rgba(57,169,0,.12);
+        color: #2d8600;
+        border: 1px solid rgba(57,169,0,.2);
+    }
 </style>
 
 <div class="container py-5">
@@ -67,6 +102,104 @@
                     </div>
 
                     <div class="px-4 px-md-5 pb-5">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+                            <div>
+                                <h4 class="fw-black text-dark mb-1">{{ usuario.get_full_name|default:usuario.username }}</h4>
+                                <small class="text-muted fw-semibold">@{{ usuario.username }}</small>
+                            </div>
+                            <span class="role-pill"><i class="bi bi-patch-check-fill"></i> {{ rol_usuario }}</span>
+                        </div>
+
+                        <h5 class="section-title"><i class="bi bi-card-list me-2 text-success"></i>Resumen del Perfil</h5>
+                        <div class="row g-3 mb-2">
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Documento</div>
+                                    <div class="profile-meta-value"><i class="bi bi-person-vcard me-2 text-success"></i>{{ documento_sistema }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Tipo de documento</div>
+                                    <div class="profile-meta-value"><i class="bi bi-card-heading me-2 text-success"></i>{{ tipo_documento }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Teléfono</div>
+                                    <div class="profile-meta-value"><i class="bi bi-telephone me-2 text-success"></i>{{ telefono_sistema }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Dirección</div>
+                                    <div class="profile-meta-value"><i class="bi bi-geo-alt me-2 text-success"></i>{{ direccion_sistema }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Correo personal</div>
+                                    <div class="profile-meta-value"><i class="bi bi-envelope-paper me-2 text-success"></i>{{ correo_personal }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Fecha de registro</div>
+                                    <div class="profile-meta-value"><i class="bi bi-calendar3 me-2 text-success"></i>{{ fecha_registro|date:"d M, Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Último acceso</div>
+                                    <div class="profile-meta-value"><i class="bi bi-clock-history me-2 text-success"></i>{{ ultimo_acceso|date:"d M, Y h:i A"|default:"Sin acceso reciente" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Estado de la cuenta</div>
+                                    <div class="profile-meta-value">
+                                        {% if usuario.is_active %}
+                                            <i class="bi bi-check-circle-fill me-2 text-success"></i>Activa
+                                        {% else %}
+                                            <i class="bi bi-x-circle-fill me-2 text-danger"></i>Inactiva
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if profesion %}
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Profesión / especialidad</div>
+                                    <div class="profile-meta-value"><i class="bi bi-briefcase me-2 text-success"></i>{{ profesion }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if tipo_contrato %}
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Tipo de contrato</div>
+                                    <div class="profile-meta-value"><i class="bi bi-file-earmark-text me-2 text-success"></i>{{ tipo_contrato }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if ficha_actual %}
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Ficha actual</div>
+                                    <div class="profile-meta-value"><i class="bi bi-hash me-2 text-success"></i>{{ ficha_actual }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if programa_formacion %}
+                            <div class="col-md-6">
+                                <div class="profile-meta-card">
+                                    <div class="profile-meta-label">Programa de formación</div>
+                                    <div class="profile-meta-value"><i class="bi bi-book me-2 text-success"></i>{{ programa_formacion }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
                         <h5 class="section-title"><i class="bi bi-person-badge me-2 text-success"></i>Información Personal</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -86,22 +219,22 @@
                         <h5 class="section-title mt-4"><i class="bi bi-shield-lock me-2 text-success"></i>Datos del Sistema</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="label-studio">Documento de Identidad (Solo Lectura)</label>
-                                <div class="input-group-studio" style="border-left-color: #adb5bd; background: #f1f3f5;">
-                                    <i class="bi bi-hash" style="color: #adb5bd;"></i>{{ form_perfil.documento }}
+                                <label class="label-studio">Documento de Identidad</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-hash"></i>{{ form_perfil.documento }}
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <label class="label-studio">Teléfono (Solo Lectura)</label>
-                                <div class="input-group-studio" style="border-left-color: #adb5bd; background: #f1f3f5;">
-                                    <i class="bi bi-telephone" style="color: #adb5bd;"></i>{{ form_perfil.telefono }}
+                                <label class="label-studio">Teléfono</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-telephone"></i>{{ form_perfil.telefono }}
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mt-5">
                             <div class="col-md-4">
-                                <a href="{% url 'aprendices:perfil_aprendiz' %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold border">Cancelar</a>
+                                <a href="{% url cancel_url %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold border">Cancelar</a>
                             </div>
                             <div class="col-md-8">
                                 <button type="submit" class="btn-save">Actualizar Mi Información</button>
