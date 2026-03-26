@@ -459,17 +459,19 @@
                 <table class="table table-hover mb-0 table-activities align-middle">
                     <thead class="text-center">
                         <tr>
-                            <th style="width: 12%;" class="py-3">Período</th>
-                            <th style="width: 30%;" class="text-start py-3">Descripción</th>
-                            <th style="width: 25%;" class="text-start py-3">Competencias</th>
-                            <th style="width: 15%;" class="py-3">Evidencia</th>
-                            <th style="width: 18%;" class="text-start py-3">Observaciones</th>
+                            <th style="width: 12%;" class="py-3">Fecha inicio</th>
+                            <th style="width: 12%;" class="py-3">Fecha fin</th>
+                            <th style="width: 24%;" class="text-start py-3">Descripción</th>
+                            <th style="width: 22%;" class="text-start py-3">Competencias</th>
+                            <th style="width: 14%;" class="py-3">Evidencia</th>
+                            <th style="width: 16%;" class="text-start py-3">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for actividad in bitacora.actividades.all %}
                         <tr>
-                            <td class="text-center fw-bold text-dark">{{ actividad.periodo_mes }}</td>
+                            <td class="text-center fw-bold text-dark">{{ actividad.fecha_inicio_actividad|date:"d/m/Y"|default:"—" }}</td>
+                            <td class="text-center fw-bold text-dark">{{ actividad.fecha_fin_actividad|date:"d/m/Y"|default:"—" }}</td>
                             <td class="text-dark" style="font-size: 0.9rem;">{{ actividad.descripcion_actividad|linebreaksbr }}</td>
                             <td class="text-dark" style="font-size: 0.9rem;">{{ actividad.competencias_asociadas|linebreaksbr }}</td>
                             <td class="text-center">
@@ -487,7 +489,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="6" class="text-center py-5 text-muted">
                                 <i class="bi bi-inbox fs-2 text-light mb-2 d-block"></i>
                                 <em>No hay actividades registradas en esta bitácora.</em>
                             </td>
