@@ -143,6 +143,7 @@ def busqueda_global(request):
     instructores = []
     empresas = []
     bitacoras = []
+    bitacoras_por_aprendiz = []
     fichas = []
     programas = []
 
@@ -177,13 +178,29 @@ def busqueda_global(request):
             Q(email_instructor_seguimiento__icontains=query)
         ).order_by('-id').distinct()[:15] # Limitamos a las 15 más recientes para no saturar
 
+        # 4.1 Resumen por aprendiz: cuántas bitácoras ha entregado
+        aprendices_ids = list(aprendices.values_list('id', flat=True))
+        if aprendices_ids:
+            conteos = (
+                Bitacora.objects
+                .filter(aprendiz_rel_id__in=aprendices_ids)
+                .values('aprendiz_rel_id')
+                .annotate(total=Count('id'))
+            )
+            conteos_map = {item['aprendiz_rel_id']: item['total'] for item in conteos}
+
+            for aprendiz in aprendices:
+                aprendiz.total_bitacoras = conteos_map.get(aprendiz.id, 0)
+                if aprendiz.total_bitacoras > 0:
+                    bitacoras_por_aprendiz.append(aprendiz)
+
         # 5. Fichas y Programas
         fichas = Ficha.objects.filter(Q(numero__icontains=query)).distinct()
         programas = Programa.objects.filter(Q(nombre__icontains=query)).distinct()
 
     # Calculamos el total de todo lo encontrado
     total = (len(aprendices) + len(instructores) + len(empresas) + 
-             len(bitacoras) + len(fichas) + len(programas))
+             len(bitacoras_por_aprendiz) + len(fichas) + len(programas))
 
     context = {
         'query': query,
@@ -191,6 +208,7 @@ def busqueda_global(request):
         'instructores': instructores,
         'empresas': empresas,
         'bitacoras': bitacoras,
+        'bitacoras_por_aprendiz': bitacoras_por_aprendiz,
         'fichas': fichas,
         'programas': programas,
         'total_resultados': total,
@@ -410,4 +428,4 @@ def eliminar_backup(request, nombre_archivo):
     else:
         messages.warning(request, 'El archivo no fue encontrado.')
         
-    return redirect('core:listar_backups')
+    return redirect('core:listar_backups')

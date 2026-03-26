@@ -12,7 +12,7 @@ from usuarios.forms import AprendizPerfilForm
 # Vista para Listar todos los Aprendices
 @login_required
 def listar_aprendices(request):
-    aprendices = Aprendiz.objects.all()
+    aprendices = Aprendiz.objects.select_related('usuario', 'numero_ficha')
     
     # 1. Capturamos lo que el usuario escribió en la barra
     query = request.GET.get('q', '')
@@ -30,6 +30,9 @@ def listar_aprendices(request):
     # 3. Si seleccionó un filtro del desplegable
     if modalidad:
         aprendices = aprendices.filter(modalidad_formacion=modalidad)
+
+    # Mostrar primero los registros más recientes
+    aprendices = aprendices.order_by('-usuario__date_joined', '-id')
 
     context = {
         'aprendices': aprendices,
@@ -81,8 +84,10 @@ def eliminar_aprendiz(request, pk):
 @login_required
 def ver_detalle_aprendiz(request, pk):
     aprendiz = get_object_or_404(Aprendiz, pk=pk)
+    bitacoras_entregadas = Bitacora.objects.filter(aprendiz_rel=aprendiz).count()
     context = {
-        'aprendiz': aprendiz
+        'aprendiz': aprendiz,
+        'bitacoras_entregadas': bitacoras_entregadas,
     }
     return render(request, 'aprendices/ver_detalle.html', context)
 
