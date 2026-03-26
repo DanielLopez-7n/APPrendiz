@@ -3,7 +3,38 @@ from .models import Aprendiz
 from instructores.models import Instructor
 from django.contrib.auth.models import User
 
+PAIS_CHOICES = [
+    ('Colombia', 'Colombia'),
+    ('Argentina', 'Argentina'),
+    ('Bolivia', 'Bolivia'),
+    ('Brasil', 'Brasil'),
+    ('Canadá', 'Canadá'),
+    ('Chile', 'Chile'),
+    ('Costa Rica', 'Costa Rica'),
+    ('Ecuador', 'Ecuador'),
+    ('España', 'España'),
+    ('Estados Unidos', 'Estados Unidos'),
+    ('Guatemala', 'Guatemala'),
+    ('Honduras', 'Honduras'),
+    ('México', 'México'),
+    ('Panamá', 'Panamá'),
+    ('Paraguay', 'Paraguay'),
+    ('Perú', 'Perú'),
+    ('República Dominicana', 'República Dominicana'),
+    ('Uruguay', 'Uruguay'),
+    ('Venezuela', 'Venezuela'),
+    ('Otro', 'Otro'),
+]
+
 class AprendizForm(forms.ModelForm):
+    etapa_exterior = forms.TypedChoiceField(
+        choices=((False, 'No'), (True, 'Sí')),
+        coerce=lambda x: str(x).lower() == 'true',
+        empty_value=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    pais_etapa = forms.ChoiceField(choices=PAIS_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['correo_personal'].widget.attrs['maxlength'] = 70
@@ -78,7 +109,17 @@ class AprendizForm(forms.ModelForm):
             'modalidad_formacion': forms.Select(attrs={'class': 'form-select'}),
             
             'modalidad_etapa': forms.Select(attrs={'class': 'form-select'}),
-            'pais_etapa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej. Colombia'}),
-            # Al checkbox le ponemos la clase especial form-check-input
-            'etapa_exterior': forms.CheckboxInput(attrs={'class': 'form-check-input'}), 
+            'pais_etapa': forms.Select(attrs={'class': 'form-select'}),
+            'etapa_exterior': forms.Select(attrs={'class': 'form-select'}), 
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        etapa_exterior = cleaned_data.get('etapa_exterior')
+        pais_etapa = cleaned_data.get('pais_etapa')
+
+        if etapa_exterior and not pais_etapa:
+            self.add_error('pais_etapa', 'Debes seleccionar el país donde realiza la etapa.')
+        if not etapa_exterior:
+            cleaned_data['pais_etapa'] = 'Colombia'
+        return cleaned_data
