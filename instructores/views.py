@@ -14,7 +14,7 @@ def es_admin(user):
 @login_required
 @user_passes_test(es_admin)
 def listar_instructores(request):
-    instructores = Instructor.objects.all()
+    instructores = Instructor.objects.select_related('usuario')
     
     query = request.GET.get('q', '')
     tipo_contrato = request.GET.get('tipo_contrato', '')
@@ -29,6 +29,9 @@ def listar_instructores(request):
         
     if tipo_contrato:
         instructores = instructores.filter(tipo_contrato=tipo_contrato)
+
+    # Mostrar primero los registros más recientes
+    instructores = instructores.order_by('-usuario__date_joined', '-id')
 
     context = {
         'instructores': instructores,

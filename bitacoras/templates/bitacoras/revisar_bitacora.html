@@ -193,9 +193,9 @@
         </a>
 
         <div class="d-flex gap-2">
-            <button onclick="window.print()" class="btn btn-white rounded-pill px-4 fw-bold border-2 border-info text-info shadow-sm hover-shadow">
+            <a href="{% url 'bitacoras:exportar_pdf' bitacora.id %}" class="btn btn-white rounded-pill px-4 fw-bold border-2 border-info text-info shadow-sm hover-shadow">
                 <i class="bi bi-printer-fill me-2"></i> Descargar PDF
-            </button>
+            </a>
             {% if request.user.is_staff %}
             <button type="button" class="btn text-white rounded-pill px-4 fw-bold shadow-sm" style="background-color: #39A900;" data-bs-toggle="modal" data-bs-target="#modalCalificar">
                 <i class="bi bi-check-circle-fill me-2"></i> Calificar Bitácora
