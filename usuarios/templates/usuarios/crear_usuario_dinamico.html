@@ -212,7 +212,7 @@
                     <div class="row">
                         {% for field in form_aprendiz %}
                             {% if field.name != 'programa_formacion' %}
-                                <div class="col-md-6">
+                                <div class="col-md-6" {% if field.name == 'pais_etapa' %}id="wrapper_pais_etapa"{% endif %}>
                                     <label class="label-studio">
                                         {% if field.name == 'numero_ficha' %}Número de ficha y programa{% else %}{{ field.label }}{% endif %}
                                     </label>
@@ -272,9 +272,13 @@
         const secAprendiz = document.getElementById('seccion_aprendiz');
         const secInstructor = document.getElementById('seccion_instructor');
         const btnGuardar = document.getElementById('btnGuardar');
+        const etapaExteriorSelect = document.getElementById('id_etapa_exterior');
+        const wrapperPaisEtapa = document.getElementById('wrapper_pais_etapa');
+        const paisEtapaSelect = document.getElementById('id_pais_etapa');
 
         // Ejecutar carga de departamentos de API Colombia
         cargarDepartamentosColombia();
+        togglePaisEtapa();
 
         // Función que evalúa el cambio del select
         selectRol.addEventListener('change', function() {
@@ -291,6 +295,7 @@
             if (rol === 'aprendiz') {
                 secAprendiz.style.display = 'block';
                 deshabilitarCampos(secAprendiz, false);
+                togglePaisEtapa();
                 btnGuardar.disabled = false;
             } else if (rol === 'instructor') {
                 secInstructor.style.display = 'block';
@@ -307,6 +312,22 @@
             inputs.forEach(input => {
                 input.disabled = deshabilitar;
             });
+        }
+
+        function togglePaisEtapa() {
+            if (!etapaExteriorSelect || !wrapperPaisEtapa || !paisEtapaSelect) return;
+            const realizaExterior = etapaExteriorSelect.value === 'True' || etapaExteriorSelect.value === 'true';
+
+            wrapperPaisEtapa.style.display = realizaExterior ? 'block' : 'none';
+            paisEtapaSelect.disabled = !realizaExterior;
+
+            if (!realizaExterior) {
+                paisEtapaSelect.value = 'Colombia';
+            }
+        }
+
+        if (etapaExteriorSelect) {
+            etapaExteriorSelect.addEventListener('change', togglePaisEtapa);
         }
 
         // NUEVA FUNCIÓN: Carga los departamentos desde API Colombia

@@ -296,18 +296,17 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="label-studio">País de la Etapa</label>
+                            <label class="label-studio">¿Realiza etapa en el exterior?</label>
+                            <div class="input-group-studio">
+                                <i class="bi bi-airplane icon-left"></i>
+                                {{ form.etapa_exterior }}
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="wrapper_pais_etapa">
+                            <label class="label-studio">País donde realiza la etapa</label>
                             <div class="input-group-studio">
                                 <i class="bi bi-globe-americas icon-left"></i>
                                 {{ form.pais_etapa }}
-                            </div>
-                        </div>
-                        <div class="col-md-12 mt-2">
-                            <div class="form-check-studio">
-                                {{ form.etapa_exterior }}
-                                <label class="form-check-label fw-bold text-dark ms-2" for="{{ form.etapa_exterior.id_for_label }}">
-                                    Marcar si la etapa productiva se realiza fuera de Colombia
-                                </label>
                             </div>
                         </div>
                     </div>
@@ -359,6 +358,24 @@
 
         const selectDepto = document.getElementById('id_departamento');
         const selectCiudad = document.getElementById('id_ciudad_municipio');
+        const etapaExteriorSelect = document.getElementById('id_etapa_exterior');
+        const wrapperPaisEtapa = document.getElementById('wrapper_pais_etapa');
+        const paisEtapaSelect = document.getElementById('id_pais_etapa');
+
+        function togglePaisEtapa() {
+            if (!etapaExteriorSelect || !wrapperPaisEtapa || !paisEtapaSelect) return;
+            const realizaExterior = etapaExteriorSelect.value === 'True' || etapaExteriorSelect.value === 'true';
+            wrapperPaisEtapa.style.display = realizaExterior ? 'block' : 'none';
+            paisEtapaSelect.disabled = !realizaExterior;
+            if (!realizaExterior) {
+                paisEtapaSelect.value = 'Colombia';
+            }
+        }
+
+        if (etapaExteriorSelect) {
+            etapaExteriorSelect.addEventListener('change', togglePaisEtapa);
+            togglePaisEtapa();
+        }
 
         function cargarCiudadesPorDepartamento(departmentId, ciudadSeleccionada = '') {
             if (!departmentId || !selectCiudad) return;
