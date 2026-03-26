@@ -12,7 +12,7 @@ from usuarios.forms import AprendizPerfilForm
 # Vista para Listar todos los Aprendices
 @login_required
 def listar_aprendices(request):
-    aprendices = Aprendiz.objects.all()
+    aprendices = Aprendiz.objects.select_related('usuario', 'numero_ficha')
     
     # 1. Capturamos lo que el usuario escribió en la barra
     query = request.GET.get('q', '')
@@ -30,6 +30,9 @@ def listar_aprendices(request):
     # 3. Si seleccionó un filtro del desplegable
     if modalidad:
         aprendices = aprendices.filter(modalidad_formacion=modalidad)
+
+    # Mostrar primero los registros más recientes
+    aprendices = aprendices.order_by('-usuario__date_joined', '-id')
 
     context = {
         'aprendices': aprendices,
