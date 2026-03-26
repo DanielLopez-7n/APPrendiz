@@ -14,6 +14,8 @@ class Aprendiz(models.Model):
     telefono = models.CharField(max_length=20, verbose_name="Contacto telefónico")
     correo_personal = models.EmailField(blank=True, null=True, verbose_name="Correo electrónico personal")
     direccion_residencia = models.CharField(max_length=200, blank=True, null=True)
+    departamento = models.CharField(max_length=100, blank=True, default='', verbose_name="Departamento")
+    ciudad_municipio = models.CharField(max_length=100, blank=True, default='', verbose_name="Ciudad / Municipio")
     
     # 3. Información Académica SENA
     numero_ficha = models.ForeignKey('fichas.Ficha', on_delete=models.RESTRICT, verbose_name="Número de grupo")
