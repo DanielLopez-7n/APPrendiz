@@ -141,10 +141,10 @@ def lista_usuarios_view(request):
     # Obtener parámetros de búsqueda y filtrado
     busqueda = request.GET.get('buscar', '')
     filtro_activo = request.GET.get('activo', '')
-    filtro_staff = request.GET.get('staff', '')
+    filtro_rol = request.GET.get('rol', '')
     
     # Query base
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.select_related('perfil', 'aprendiz', 'instructor').all()
     
     # Aplicar filtros
     if busqueda:
@@ -159,18 +159,30 @@ def lista_usuarios_view(request):
     if filtro_activo:
         usuarios = usuarios.filter(is_active=filtro_activo == 'true')
     
-    if filtro_staff:
-        usuarios = usuarios.filter(is_staff=filtro_staff == 'true')
+    if filtro_rol == 'administrador':
+        usuarios = usuarios.filter(is_staff=True).exclude(instructor__isnull=False)
+    elif filtro_rol == 'instructor':
+        usuarios = usuarios.filter(instructor__isnull=False)
+    elif filtro_rol == 'aprendiz':
+        usuarios = usuarios.filter(aprendiz__isnull=False)
     
     # Ordenar
     usuarios = usuarios.order_by('-date_joined')
+
+    for usuario in usuarios:
+        telefono_contacto = usuario.perfil.telefono if hasattr(usuario, 'perfil') else ''
+        if hasattr(usuario, 'aprendiz') and usuario.aprendiz.telefono:
+            telefono_contacto = usuario.aprendiz.telefono
+        elif hasattr(usuario, 'instructor') and usuario.instructor.telefono:
+            telefono_contacto = usuario.instructor.telefono
+        usuario.telefono_contacto = telefono_contacto
     
     context = {
         'titulo': 'Gestión de Usuarios',
         'usuarios': usuarios,
         'busqueda': busqueda,
         'filtro_activo': filtro_activo,
-        'filtro_staff': filtro_staff,
+        'filtro_rol': filtro_rol,
     }
     return render(request, 'usuarios/listar_usuarios.html', context)
 
