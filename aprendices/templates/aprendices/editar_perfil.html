@@ -146,8 +146,8 @@
                     <div class="avatar-upload-wrapper px-3">
                         <div class="position-relative d-inline-block">
                             <div class="avatar-circle">
-                                {% if user.aprendiz.foto %}
-                                    <img id="avatarImage" src="{{ user.aprendiz.foto.url }}" alt="Mi Foto">
+                                {% if user.perfil.foto_perfil %}
+                                    <img id="avatarImage" src="{{ user.perfil.foto_perfil.url }}" alt="Mi Foto">
                                 {% else %}
                                     <i id="avatarIcon" class="bi bi-person-fill placeholder-icon"></i>
                                     <img id="avatarImage" src="" style="display:none;" alt="Mi Foto">
@@ -155,7 +155,7 @@
                             </div>
                             
                             <div style="position: absolute; width: 0; height: 0; overflow: hidden;">
-                                {{ form.foto }}
+                                {{ form.foto_perfil }}
                             </div>
 
                             <button type="button" class="camera-btn-wrapper" id="btnFakeCamera" title="Subir foto">
