@@ -132,7 +132,7 @@ def editar_perfil_aprendiz(request):
 
     if request.method == 'POST':
         # Le pasamos la información actual (instance) y el usuario para que sincronice ambos
-        form = AprendizPerfilForm(request.POST, instance=aprendiz, user=request.user)
+        form = AprendizPerfilForm(request.POST, request.FILES, instance=aprendiz, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, '¡Tu información se ha actualizado y sincronizado correctamente!')

@@ -233,12 +233,31 @@
                 <h5>Enlaces</h5>
                 <ul class="list-unstyled">
                     <li><a href="{% url 'core:index' %}">Inicio</a></li>
-                    <li><a href="#info">Módulos</a></li>
+                    <li>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#modulosModal">
+                            Módulos
+                        </a>
+                    </li>
                     <li><a href="#">Soporte</a></li>
+                    <li><a href="#" title="Manual de usuario disponible próximamente">Ayuda (Próximamente)</a></li>
                 </ul>
             </div>
 
-            <div class="col-lg-5">
+            <div class="col-lg-3">
+                <h5>Conócenos</h5>
+                <div class="small text-white-50 lh-base">
+                    <p class="mb-2">
+                        <strong class="text-white d-block">Misión</strong>
+                        Facilitar la gestión de la etapa productiva con procesos claros para aprendices, instructores y empresas.
+                    </p>
+                    <p class="mb-0">
+                        <strong class="text-white d-block">Visión</strong>
+                        Ser una plataforma digital de referencia para el seguimiento formativo del SENA a nivel nacional.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-3">
                 <h5>Atención al Ciudadano</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -267,6 +286,66 @@
         </div>
     </div>
 </footer>
+
+<div class="modal fade" id="modulosModal" tabindex="-1" aria-labelledby="modulosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+            <div class="modal-header border-0 text-white" style="background: linear-gradient(90deg, #0f3f19, #1f6d2f);">
+                <h5 class="modal-title fw-bold" id="modulosModalLabel">
+                    <i class="bi bi-grid-1x2-fill me-2"></i>Módulos de APPrendiz
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4">
+                    Estos son los módulos principales del sistema y cómo apoyan el proceso de etapa productiva.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-people-fill text-success me-2"></i>Usuarios</h6>
+                            <p class="small text-muted mb-0">Administración de cuentas, roles y acceso a la plataforma (administrador, instructor y aprendiz).</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-mortarboard-fill text-success me-2"></i>Aprendices</h6>
+                            <p class="small text-muted mb-0">Gestión de datos académicos y personales de aprendices, con su perfil y seguimiento de formación.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-person-badge-fill text-success me-2"></i>Instructores</h6>
+                            <p class="small text-muted mb-0">Registro de instructores, control de información profesional y soporte al acompañamiento formativo.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-building text-success me-2"></i>Empresas</h6>
+                            <p class="small text-muted mb-0">Administración de empresas vinculadas a la etapa productiva y su relación con aprendices.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-journal-check text-success me-2"></i>Bitácoras</h6>
+                            <p class="small text-muted mb-0">Creación y consulta de bitácoras para evidenciar avances, observaciones y estado del proceso.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-4 h-100 bg-light">
+                            <h6 class="fw-bold mb-2"><i class="bi bi-collection-fill text-success me-2"></i>Fichas y Programas</h6>
+                            <p class="small text-muted mb-0">Organización de grupos de formación y programas asociados para una gestión académica estructurada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
