@@ -74,9 +74,13 @@ class CrearBitacoraForm(forms.ModelForm):
             self.fields['correo_institucional_aprendiz'].initial = self.aprendiz.usuario.email
             
             if hasattr(self.aprendiz, 'numero_ficha'):
-                self.fields['numero_grupo_ficha'].initial = getattr(self.aprendiz, 'numero_ficha', '')
-            if hasattr(self.aprendiz, 'programa_formacion'):
-                self.fields['programa_formacion'].initial = getattr(self.aprendiz, 'programa_formacion', '')
+                ficha = getattr(self.aprendiz, 'numero_ficha', None)
+                if ficha:
+                    # Solo el número en "Número de grupo / ficha"
+                    self.fields['numero_grupo_ficha'].initial = ficha.numero
+                    # El nombre del programa en "Programa de formación"
+                    if getattr(ficha, 'programa', None):
+                        self.fields['programa_formacion'].initial = ficha.programa.nombre
 
             # 2. AUTO-LLENADO DE EMPRESA (Busca la bitácora anterior)
             ultima_bitacora = Bitacora.objects.filter(aprendiz_rel=self.aprendiz).order_by('-id').first()
@@ -90,6 +94,16 @@ class CrearBitacoraForm(forms.ModelForm):
                 self.fields['email_jefe'].initial = ultima_bitacora.email_jefe
                 self.fields['modalidad_formacion'].initial = ultima_bitacora.modalidad_formacion
                 self.fields['modalidad_ejecucion'].initial = ultima_bitacora.modalidad_ejecucion
+
+    def clean_numero_identificacion_aprendiz(self):
+        documento = (self.cleaned_data.get('numero_identificacion_aprendiz') or '').strip()
+        if documento and not documento.isdigit():
+            raise forms.ValidationError(
+                'El número de identificación del aprendiz solo permite números (sin letras ni símbolos).'
+            )
+        if documento and (len(documento) < 6 or len(documento) > 20):
+            raise forms.ValidationError('El número de identificación debe tener entre 6 y 20 dígitos.')
+        return documento
 
 
 # --- FORMULARIO PARA LAS ACTIVIDADES ---

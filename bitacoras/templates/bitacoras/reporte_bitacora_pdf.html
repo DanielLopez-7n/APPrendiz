@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Bitácora - APPrendiz SENA</title>
+    <style>
+        /* ======================================================================
+           AVISO IMPORTANTE PARA DESARROLLADORES:
+           JAMÁS agregues {% extends ... %} en este archivo.
+           Este HTML debe estar 100% AISLADO de la interfaz web para evitar
+           filtraciones de menús, fotos de perfil o botones.
+           ======================================================================
+        */
+
+        /* Configuración de página Carta (Letter) con márgenes profesionales */
+        @page {
+            size: letter portrait;
+            margin: 2cm 2cm 2.5cm 2cm;
+            
+            /* Definición del pie de página automático */
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 2cm; width: 17.5cm; top: 25cm; height: 1.5cm;
+            }
+        }
+
+        /* Estilos Globales optimizados para impresión PDF */
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #2b2b2b;
+            line-height: 1.4;
+        }
+
+        /* Encabezado Corporativo Oficial */
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #39a900; /* Verde SENA */
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #39a900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header-subtitle {
+            font-size: 13px;
+            color: #555555;
+            margin-top: 3px;
+        }
+
+        /* Tabla de Datos del Aprendiz / Bitácora (Estructura Rígida) */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+        }
+        .data-table th {
+            background-color: #f4f6f4;
+            color: #333333;
+            text-align: left;
+            padding: 9px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            width: 30%;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .data-table td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            width: 70%;
+            font-size: 11px;
+        }
+        .data-table tr:last-child th, .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Secciones de Título y Contenido Largo */
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #39a900;
+            padding: 7px 12px;
+            margin-top: 20px;
+            margin-bottom: 0;
+            border-radius: 3px 3px 0 0;
+            text-transform: uppercase;
+        }
+        .content-box {
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            padding: 18px;
+            text-align: justify;
+            min-height: 100px;
+            background-color: #fdfdfd;
+            margin-bottom: 25px;
+        }
+
+        /* Bloque de Estado Especial (Sólido y Centrado) */
+        .badge-estado {
+            display: block;
+            width: 90px;
+            text-align: center;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 4px 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 3px;
+        }
+        .bg-aprobada { background-color: #28a745; }
+        .bg-rechazada { background-color: #dc3545; }
+        .bg-pendiente { background-color: #ffc107; color: #000000; border: 1px solid #e0a800; }
+
+        /* Pie de Página Estático */
+        #footer_content {
+            text-align: right;
+            font-size: 9px;
+            color: #888888;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 6px;
+        }
+        .left-footer { float: left; text-align: left; }
+    </style>
+</head>
+<body>
+
+    <table class="header-table">
+        <tr>
+            <td style="width: 75%; vertical-align: middle;">
+                <div class="header-title">Reporte Oficial de Bitácora</div>
+                <div class="header-subtitle">Sistema de Gestión de Etapa Productiva - APPrendiz SENA</div>
+            </td>
+            <td style="width: 25%; text-align: right; vertical-align: middle;">
+                <div style="font-size: 10px; color: #666; margin-top: 8px;">
+                    <strong>Emisión:</strong> {% now "d/m/Y H:i" %}
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="data-table">
+        <tr>
+            <th>Título de la Bitácora</th>
+            <td><strong>{{ bitacora.titulo|default:"Sin título registrado" }}</strong></td>
+        </tr>
+        <tr>
+            <th>Aprendiz Responsable</th>
+            <td>{{ bitacora.aprendiz_rel.usuario.get_full_name|default:bitacora.aprendiz_rel.usuario.username|upper }}</td>
+        </tr>
+        <tr>
+            <th>Fecha de Registro</th>
+            <td>{{ bitacora.fecha_creacion|date:"l, d \d\e F \d\e Y"|title }}</td>
+        </tr>
+        <tr>
+            <th>Estado de Evaluación</th>
+            <td>
+                {% if bitacora.estado == 'Aprobada' or bitacora.estado == 'aprobada' %}
+                    <div class="badge-estado bg-aprobada">APROBADA</div>
+                {% elif bitacora.estado == 'Rechazada' or bitacora.estado == 'rechazada' %}
+                    <div class="badge-estado bg-rechazada">RECHAZADA</div>
+                {% else %}
+                    <div class="badge-estado bg-pendiente">PENDIENTE</div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">DESCRIPCIÓN DE ACTIVIDADES</div>
+    <div class="content-box">
+        {{ bitacora.descripcion|linebreaksbr|default:"El aprendiz no registró detalles para esta bitácora." }}
+    </div>
+
+    {% if bitacora.observaciones %}
+    <div class="section-title" style="background-color: #6c757d;">OBSERVACIONES DEL INSTRUCTOR</div>
+    <table class="data-table" style="margin-bottom: 0; border-top: none;">
+        <tr>
+            <th style="background-color: #f8f9fa; border-top: none; border-right: 1px solid #e0e0e0;">Instructor Evaluador</th>
+            <td style="border-top: none;">{{ bitacora.instructor.usuario.get_full_name|default:"No registrado" }}</td>
+        </tr>
+    </table>
+    <div class="content-box" style="border-top: none; border-color: #e0e0e0;">
+        {{ bitacora.observaciones|linebreaksbr }}
+    </div>
+    {% endif %}
+
+    <div id="footer_content">
+        <div class="left-footer">
+            Documento generado por la plataforma <strong>APPrendiz</strong>
+        </div>
+        Página <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
+</body>
+</html>

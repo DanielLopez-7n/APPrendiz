@@ -20,7 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('main-content');
 
-    if (sidebarToggle && sidebar) {
+    // En el panel administrativo avanzado (sidebar-smart), el toggle se maneja
+    // dentro del template para soportar estados pinned/mobile.
+    const usesSmartSidebar = sidebar && sidebar.classList.contains('sidebar-smart');
+
+    if (sidebarToggle && sidebar && !usesSmartSidebar) {
         sidebarToggle.addEventListener('click', function(e) {
             e.preventDefault();
             // Alternar clase para esconder/mostrar en escritorio

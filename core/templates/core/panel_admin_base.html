@@ -99,6 +99,102 @@
             background-color: var(--sena-green) !important;
             border-color: var(--sena-green) !important;
         }
+<<<<<<< HEAD
+=======
+        #sidebar .nav-link:hover span, #sidebar .nav-link.activo span { color: #111111 !important; font-weight: 700; }
+        #sidebar .nav-link:hover i, #sidebar .nav-link.activo i { color: var(--sena-dark-green) !important; }
+        
+        #sidebar .nav-link.activo { position: relative; }
+        #sidebar .nav-link.activo::before {
+            content: ''; position: absolute; left: -10px; top: 10%; height: 80%; width: 5px;
+            background-color: var(--sena-orange); border-radius: 0 4px 4px 0;
+        }
+
+        /* 4. BOTÓN DE LOGOUT (Corrección de color rojo) */
+        #sidebar .nav-link.logout-btn { background-color: rgba(226, 216, 217, 0.1) !important; margin-top: 15px; }
+        #sidebar .nav-link.logout-btn i, #sidebar .nav-link.logout-btn span { color: #8e8282 !important; }
+        #sidebar .nav-link.logout-btn:hover { background-color: #e3d7d8 !important; transform: scale(1.02); }
+        #sidebar .nav-link.logout-btn:hover span, #sidebar .nav-link.logout-btn:hover i { color: #ffffff !important; }
+
+        .nav-header { padding: 15px 10px 5px 20px; white-space: nowrap; }
+        .nav-header span { color: rgba(255,255,255,0.6); font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
+
+        /* 5. CONTENIDO PRINCIPAL Y CRISTAL */
+        #main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; position: relative; z-index: 10; }
+        #main-content.collapsed { margin-left: var(--sidebar-collapsed-width); }
+
+        .topbar { background-color: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(15px); border-bottom: 2px solid rgba(57, 169, 0, 0.5); position: sticky; top: 0; z-index: 900; }
+
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.92) !important;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 15px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); flex-grow: 1;
+        }
+
+        /* Textos oscuros */
+        .card { background-color: rgba(255, 255, 255, 0.98) !important; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        body, .card, table, .table *, p, span, div { color: #1a1d20; font-weight: 500; }
+        h1, h2, h3, h4, h5, h6, .page-title { color: #111 !important; font-weight: 800; }
+        label, .form-label { color: #333 !important; font-weight: 700 !important; }
+        .text-muted, .small { color: #666 !important; font-weight: 600; }
+
+        .btn-toggle { cursor: pointer; transition: 0.2s; }
+        .btn-toggle:hover { transform: scale(1.1); color: var(--sena-dark-green); }
+
+        #sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1100;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                left: 0 !important;
+                margin-left: 0 !important;
+                transform: translateX(-100%);
+                width: var(--sidebar-width) !important;
+                max-width: 88vw;
+                z-index: 1200;
+            }
+            #sidebar.mobile-open {
+                transform: translateX(0) !important;
+                width: var(--sidebar-width) !important;
+                margin-left: 0 !important;
+            }
+            #main-content { margin-left: 0 !important; }
+            .content-wrapper { margin: 10px; border-radius: 10px; }
+        }
+
+        /* 1. ANIQUILAR EL AZUL Y VERDE POR DEFECTO DE BOOTSTRAP 5 */
+        :root, [data-bs-theme="light"] {
+            --bs-primary: #39a900 !important;
+            --bs-primary-rgb: 57, 169, 0 !important;
+            --bs-success: #39a900 !important;
+            --bs-success-rgb: 57, 169, 0 !important;
+            --bs-info: #39a900 !important;
+            --bs-link-color: #39a900 !important;
+            --bs-link-hover-color: #2d8600 !important;
+            --bs-body-bg: transparent !important;
+        }
+
+        /* 2. DESTRUIR EL FONDO BLANCO (Para liberar el carrusel) */
+        html, body, .dashboard-body, #main-content, #wrapper, #content-wrapper {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+
+        /* 3. CORREGIR FORMULARIOS Y ENLACES (Adiós azul) */
+        a, .text-primary, .text-success, .text-info, .btn-link {
+            color: #39a900 !important;
+            text-decoration: none !important;
+        }
+        a:hover, .btn-link:hover {
+            color: #2d8600 !important;
+        }
+        
+        /* Los títulos de los campos del formulario en gris oscuro, no azul */
+>>>>>>> codex/refactor-sidebar-for-responsive-functionality
         .form-label, .col-form-label, legend, label {
             color: #333333 !important;
             font-weight: 700 !important;
@@ -358,6 +454,7 @@
                 /* Mostrar SIEMPRE los textos en móvil */
             }
 
+<<<<<<< HEAD
             /* CLASE ACTIVA: Sidebar visible en móvil */
             #sidebar.mobile-open {
                 left: 0 !important;
@@ -390,6 +487,43 @@
                 width: 100% !important;
             }
             .content-wrapper { margin: 10px; border-radius: 10px; }
+=======
+        /* Solo se pinta de negro cuando el fondo se vuelve blanco (Hover/Activo) */
+        #sidebar .nav-link:hover span, 
+        #sidebar .nav-link.activo span {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+        #sidebar .nav-link:hover i, 
+        #sidebar .nav-link.activo i {
+            color: var(--sena-dark-green) !important;
+        }
+        
+        /* ==========================================
+           1. ESTADO COLAPSADO CONSISTENTE (MENÚ)
+           ========================================== */
+        #sidebar.collapsed {
+            left: 0 !important;
+            width: var(--sidebar-collapsed-width) !important;
+        }
+        #main-content.collapsed {
+            margin-left: var(--sidebar-collapsed-width) !important;
+            width: calc(100% - var(--sidebar-collapsed-width)) !important;
+        }
+        @media (max-width: 768px) {
+            #sidebar.collapsed {
+                transform: translateX(-100%) !important;
+                width: var(--sidebar-width) !important;
+            }
+            #sidebar.mobile-open.collapsed,
+            #sidebar.mobile-open {
+                transform: translateX(0) !important;
+            }
+            #main-content.collapsed {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+>>>>>>> codex/refactor-sidebar-for-responsive-functionality
         }
 
         /* ==========================================
@@ -754,6 +888,165 @@
             {% block content %}{% endblock %}
         </div>
     </div>
+<<<<<<< HEAD
+=======
+    
+    <style>
+        @media (min-width: 769px) {
+            /* Estado normal (Cerrado por defecto) */
+            .sidebar-smart {
+                width: 85px !important;
+                transition: width 0.3s ease-in-out !important;
+                overflow-x: hidden;
+                z-index: 1040;
+            }
+            .sidebar-smart .user-avatar {
+                width: 45px !important; 
+                height: 45px !important;
+            }
+            .sidebar-smart .text-hide-smart {
+                opacity: 0;
+                white-space: nowrap;
+                transition: opacity 0.2s ease;
+                display: none; /* Escondemos para que no haga scroll */
+            }
+
+            /* Estado Hover (Cuando pasas el mouse) O Fijo (Cuando está Anclado/Pinned) */
+            .sidebar-smart:hover, 
+            .sidebar-smart.pinned {
+                width: 280px !important;
+            }
+            .sidebar-smart:hover .user-avatar, 
+            .sidebar-smart.pinned .user-avatar {
+                width: 80px !important; 
+                height: 80px !important;
+                margin-top: 15px;
+            }
+            .sidebar-smart:hover .text-hide-smart, 
+            .sidebar-smart.pinned .text-hide-smart {
+                opacity: 1;
+                display: block;
+            }
+            .sidebar-smart:hover .nav-item a span, 
+            .sidebar-smart.pinned .nav-item a span {
+                display: inline-block;
+            }
+
+            /* Contenedor Principal (Se adapta al tamaño del menú) */
+            .content-smart {
+                margin-left: 85px !important;
+                width: calc(100% - 85px) !important;
+                transition: all 0.3s ease-in-out !important;
+            }
+            
+            /* Si el menú se ancla, empujamos el contenido para que no lo tape */
+            .content-smart.pinned-content {
+                margin-left: 280px !important;
+                width: calc(100% - 280px) !important;
+            }
+
+            /* Evita que el menú se anime al recargar la página */
+        .preload-transition, .preload-transition * {
+            transition: none !important;
+        }
+        
+        .hover-opacity:hover {
+            opacity: 0.9;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleBtn   = document.getElementById('sidebar-toggle');
+            const sidebar     = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const overlay     = document.getElementById('sidebar-overlay');
+
+            function isMobile() { return window.innerWidth <= 768; }
+
+            // Lógica Móvil
+            function openMobile() {
+                // Evita conflicto con estados legacy.
+                sidebar.classList.remove('collapsed');
+                sidebar.classList.add('mobile-open');
+                if (overlay) overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+            function closeMobile() {
+                sidebar.classList.remove('mobile-open');
+                if (overlay) overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            if (overlay) {
+                overlay.addEventListener('click', closeMobile);
+            }
+
+            // 🌟 NUEVA LÓGICA DE ESCRITORIO (Recordar si está fijado)
+            if (!isMobile() && localStorage.getItem('sidebarPinned') === 'true') {
+                sidebar.classList.add('pinned');
+                mainContent.classList.add('pinned-content');
+                // Estilo visual para el botón cuando está fijado
+                toggleBtn.classList.replace('btn-light', 'btn-success');
+                toggleBtn.querySelector('i').classList.replace('text-success', 'text-white');
+                toggleBtn.querySelector('i').style.color = 'white';
+            }
+
+            // Toggle Botón
+            toggleBtn.addEventListener('click', function () {
+                if (isMobile()) {
+                    const isOpen = sidebar.classList.contains('mobile-open');
+                    if (isOpen) { closeMobile(); } else { openMobile(); }
+                } else {
+                    // PC: Anclar/Desanclar
+                    sidebar.classList.toggle('pinned');
+                    mainContent.classList.toggle('pinned-content');
+                    
+                    // Guardar preferencia
+                    const isPinned = sidebar.classList.contains('pinned');
+                    localStorage.setItem('sidebarPinned', isPinned);
+
+                    // Cambiar el color del botón para dar feedback al usuario
+                    if(isPinned) {
+                        toggleBtn.classList.replace('btn-light', 'btn-success');
+                        toggleBtn.querySelector('i').style.color = 'white';
+                    } else {
+                        toggleBtn.classList.replace('btn-success', 'btn-light');
+                        toggleBtn.querySelector('i').style.color = 'var(--sena-green)';
+                    }
+                }
+            });
+
+            // Limpia estados al cambiar tamaño de pantalla.
+            window.addEventListener('resize', function () {
+                if (!isMobile()) {
+                    closeMobile();
+                }
+            });
+
+            // Módulo activo (Pintar el botón donde estamos parados)
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('#menu-lateral .nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && !link.classList.contains('logout-btn')) {
+                    if ((currentPath.includes(href) && href !== '/') || currentPath === href) {
+                        link.classList.add('activo');
+                    }
+                }
+            });
+
+            // Scroll del sidebar
+            sidebar.addEventListener('scroll', function () {
+                sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
+            });
+            const savedScroll = sessionStorage.getItem('sidebarScroll');
+            if (savedScroll) { sidebar.scrollTop = parseInt(savedScroll); }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+>>>>>>> codex/refactor-sidebar-for-responsive-functionality
 
     <!-- ==========================================
          MODAL LOGOUT
