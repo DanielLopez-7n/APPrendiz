@@ -89,6 +89,13 @@ class ActividadBitacora(models.Model):
     # Columnas exactas de la tabla del Excel
     descripcion_actividad = models.TextField()
     competencias_asociadas = models.TextField()
-    periodo_mes = models.CharField(max_length=50)
+    periodo_mes = models.CharField(max_length=50, blank=True, default='')
+    fecha_inicio_actividad = models.DateField(blank=True, null=True)
+    fecha_fin_actividad = models.DateField(blank=True, null=True)
     evidencia_cumplimiento = models.FileField(max_length=255)
     observaciones = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.fecha_inicio_actividad and self.fecha_fin_actividad:
+            self.periodo_mes = f"{self.fecha_inicio_actividad:%d/%m/%Y} - {self.fecha_fin_actividad:%d/%m/%Y}"
+        super().save(*args, **kwargs)

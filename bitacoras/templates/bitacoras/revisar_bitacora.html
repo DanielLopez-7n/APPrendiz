@@ -396,17 +396,19 @@
                 <table class="table table-studio mb-0">
                     <thead>
                         <tr>
-                            <th style="width:12%">Período/Mes</th>
-                            <th style="width:30%">Descripción de la Actividad</th>
-                            <th style="width:25%">Competencias Asociadas</th>
-                            <th style="width:15%" class="text-center">Evidencia</th>
-                            <th style="width:18%">Observaciones</th>
+                            <th style="width:12%">Fecha inicio</th>
+                            <th style="width:12%">Fecha fin</th>
+                            <th style="width:24%">Descripción de la Actividad</th>
+                            <th style="width:22%">Competencias Asociadas</th>
+                            <th style="width:14%" class="text-center">Evidencia</th>
+                            <th style="width:16%">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for actividad in bitacora.actividades.all %}
                         <tr>
-                            <td class="fw-bold text-success">{{ actividad.periodo_mes }}</td>
+                            <td class="fw-bold text-success">{{ actividad.fecha_inicio_actividad|date:"d/m/Y"|default:"—" }}</td>
+                            <td class="fw-bold text-success">{{ actividad.fecha_fin_actividad|date:"d/m/Y"|default:"—" }}</td>
                             <td>{{ actividad.descripcion_actividad|linebreaksbr }}</td>
                             <td>{{ actividad.competencias_asociadas|linebreaksbr }}</td>
                             <td class="text-center">
@@ -422,7 +424,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-5 fw-bold">
+                            <td colspan="6" class="text-center text-muted py-5 fw-bold">
                                 <i class="bi bi-inbox fs-2 opacity-50 d-block mb-2 text-dark"></i>
                                 No se registraron actividades en este periodo.
                             </td>

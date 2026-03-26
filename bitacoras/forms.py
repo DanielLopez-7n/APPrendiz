@@ -110,16 +110,34 @@ class CrearBitacoraForm(forms.ModelForm):
 class ActividadForm(forms.ModelForm):
     class Meta:
         model = ActividadBitacora
-        fields = ['descripcion_actividad', 'competencias_asociadas', 'periodo_mes', 'evidencia_cumplimiento', 'observaciones']
+        fields = [
+            'descripcion_actividad',
+            'competencias_asociadas',
+            'fecha_inicio_actividad',
+            'fecha_fin_actividad',
+            'evidencia_cumplimiento',
+            'observaciones'
+        ]
         widgets = {
             'descripcion_actividad': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
             'competencias_asociadas': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-            'periodo_mes': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha_inicio_actividad': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'fecha_fin_actividad': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             
             # 🔥 AQUÍ ESTÁ EL TRUCO: Forzamos a que sea un input type="file"
             'evidencia_cumplimiento': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*,.pdf,.doc,.docx'}),
             
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fecha_inicio_actividad')
+        fecha_fin = cleaned_data.get('fecha_fin_actividad')
+
+        if fecha_inicio and fecha_fin and fecha_inicio > fecha_fin:
+            self.add_error('fecha_fin_actividad', 'La fecha fin debe ser mayor o igual a la fecha inicio.')
+
+        return cleaned_data
 # --- FORMSET PARA MULTIPLES FILAS ---
 ActividadFormSet = inlineformset_factory(Bitacora, ActividadBitacora, form=ActividadForm, extra=1, can_delete=True)
