@@ -126,6 +126,13 @@
             border-radius: 0 12px 12px 0;
         }
         .btn-password-toggle:focus { outline: none; box-shadow: none; }
+
+        /* Defensa extra: si no hay modal abierto, cualquier backdrop no debe bloquear clics */
+        body:not(.modal-open) .modal-backdrop,
+        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -431,6 +438,12 @@ document.addEventListener('DOMContentLoaded', function () {
   repairUiOverlays();
   window.addEventListener('pageshow', repairUiOverlays);
   document.addEventListener('hidden.bs.modal', repairUiOverlays);
+  document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+
+  var overlayObserver = new MutationObserver(function () {
+    repairUiOverlays();
+  });
+  overlayObserver.observe(document.body, { childList: true, subtree: false });
 
   var toggle = document.getElementById('togglePassword');
   var pwd = document.getElementById('id_password_modal');
