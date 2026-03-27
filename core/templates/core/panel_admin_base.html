@@ -125,6 +125,13 @@
             z-index: 1100;
         }
 
+        /* Defensa global: un backdrop huérfano no puede bloquear todos los botones */
+        body:not(.modal-open) .modal-backdrop,
+        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
         @media (max-width: 768px) {
             #sidebar {
                 left: 0 !important;
@@ -970,6 +977,26 @@
             const sidebar     = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');
             const overlay     = document.getElementById('sidebar-overlay');
+
+            function repairUiOverlays() {
+                const hasVisibleModal = document.querySelector('.modal.show');
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                }
+                document.querySelectorAll('.dropdown-backdrop').forEach(function (el) { el.remove(); });
+            }
+
+            repairUiOverlays();
+            window.addEventListener('pageshow', repairUiOverlays);
+            document.addEventListener('hidden.bs.modal', repairUiOverlays);
+            document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+
+            const overlayObserver = new MutationObserver(function () {
+                repairUiOverlays();
+            });
+            overlayObserver.observe(document.body, { childList: true, subtree: false });
 
             function isMobile() { return window.innerWidth <= 768; }
 
