@@ -22,7 +22,7 @@ class PerfilUsuario(models.Model):
         blank=True,
         help_text="Número de documento de identidad"
     )
-    
+
     telefono = models.CharField(
         max_length=15, 
         blank=True,

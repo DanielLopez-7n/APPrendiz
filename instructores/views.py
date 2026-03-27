@@ -16,14 +16,16 @@ def es_admin(user):
 def listar_instructores(request):
     instructores = Instructor.objects.select_related('usuario')
     
-    query = request.GET.get('q', '')
-    tipo_contrato = request.GET.get('tipo_contrato', '')
+    query = request.GET.get('q', '').strip()
+    tipo_contrato = request.GET.get('tipo_contrato', '').strip()
 
     if query:
         instructores = instructores.filter(
             Q(cedula__icontains=query) |
             Q(usuario__first_name__icontains=query) |
             Q(usuario__last_name__icontains=query) |
+            Q(usuario__email__icontains=query) |
+            Q(usuario__username__icontains=query) |
             Q(profesion__icontains=query)
         )
         

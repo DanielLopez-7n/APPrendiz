@@ -196,9 +196,38 @@ def ver_detalle_usuario(request, user_id):
     """
     usuario = get_object_or_404(User, id=user_id)
     
+    perfil = getattr(usuario, 'perfil', None)
+    documento_sistema = (perfil.documento if perfil else '') or usuario.username or 'No registrado'
+    telefono_sistema = (perfil.telefono if perfil else '') or 'No registrado'
+    direccion_sistema = (perfil.direccion if perfil else '') or 'No registrada'
+    correo_personal = usuario.email or 'No registrado'
+    tipo_documento = 'No definido'
+    fecha_nacimiento = perfil.fecha_nacimiento if perfil else None
+
+    if hasattr(usuario, 'instructor'):
+        instructor = usuario.instructor
+        documento_sistema = instructor.cedula or documento_sistema
+        telefono_sistema = instructor.telefono or telefono_sistema
+        direccion_sistema = instructor.direccion_residencia or direccion_sistema
+        correo_personal = instructor.correo_personal or correo_personal
+        tipo_documento = instructor.get_tipo_documento_display()
+    elif hasattr(usuario, 'aprendiz'):
+        aprendiz = usuario.aprendiz
+        documento_sistema = aprendiz.documento or documento_sistema
+        telefono_sistema = aprendiz.telefono or telefono_sistema
+        direccion_sistema = aprendiz.direccion_residencia or direccion_sistema
+        correo_personal = aprendiz.correo_personal or correo_personal
+        tipo_documento = aprendiz.get_tipo_documento_display()
+
     context = {
         'titulo': f'Detalle de Usuario: {usuario.get_full_name()}',
-        'usuario': usuario
+        'usuario': usuario,
+        'documento_sistema': documento_sistema,
+        'telefono_sistema': telefono_sistema,
+        'direccion_sistema': direccion_sistema,
+        'correo_personal': correo_personal,
+        'tipo_documento': tipo_documento,
+        'fecha_nacimiento': fecha_nacimiento,
     }
     return render(request, 'usuarios/ver_detalle.html', context)
 
@@ -393,13 +422,27 @@ def perfil_view(request):
             
             # 2. Guardamos datos del Perfil (Foto, Teléfono, Documento)
             perfil_guardado = form_perfil.save()
+            tipo_documento_seleccionado = form_perfil.cleaned_data.get('tipo_documento') or ''
             
-            # 3. SINCRONIZACIÓN (Premium): Si es Instructor, guardamos el teléfono también en su tabla
+            # 3. SINCRONIZACIÓN: si es instructor reflejamos datos personales clave
             if hasattr(usuario, 'instructor'):
                 usuario.instructor.telefono = perfil_guardado.telefono
-                # Si tu modelo Instructor también tiene documento, descomenta la siguiente línea:
-                # usuario.instructor.documento = perfil_guardado.documento
+                if perfil_guardado.direccion:
+                    usuario.instructor.direccion_residencia = perfil_guardado.direccion
+                if usuario.email:
+                    usuario.instructor.correo_personal = usuario.email
+                if tipo_documento_seleccionado:
+                    usuario.instructor.tipo_documento = tipo_documento_seleccionado
                 usuario.instructor.save()
+            elif hasattr(usuario, 'aprendiz'):
+                usuario.aprendiz.telefono = perfil_guardado.telefono
+                if perfil_guardado.direccion:
+                    usuario.aprendiz.direccion_residencia = perfil_guardado.direccion
+                if usuario.email:
+                    usuario.aprendiz.correo_personal = usuario.email
+                if tipo_documento_seleccionado:
+                    usuario.aprendiz.tipo_documento = tipo_documento_seleccionado
+                usuario.aprendiz.save()
             
             messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
             return redirect('usuarios:perfil') 
@@ -433,7 +476,7 @@ def perfil_view(request):
     documento_sistema = usuario.perfil.documento or usuario.username
     telefono_sistema = usuario.perfil.telefono or 'No registrado'
     direccion_sistema = usuario.perfil.direccion or 'No registrada'
-    correo_personal = 'No registrado'
+    correo_personal = usuario.email or 'No registrado'
     tipo_documento = 'No definido'
 
     if hasattr(usuario, 'instructor'):
@@ -454,7 +497,6 @@ def perfil_view(request):
         tipo_documento = aprendiz.get_tipo_documento_display()
         context['ficha_actual'] = getattr(aprendiz.numero_ficha, 'numero', 'No asignada')
         context['programa_formacion'] = getattr(getattr(aprendiz.numero_ficha, 'programa', None), 'nombre', 'No asignado')
-
     context.update({
         'documento_sistema': documento_sistema,
         'telefono_sistema': telefono_sistema,
