@@ -85,7 +85,7 @@
             <div class="col-md-5">
                 <div class="filter-wrapper d-flex align-items-center">
                     <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
-                    <input type="text" name="q" class="input-studio" placeholder="Buscar por documento, nombre, ficha o programa..." value="{{ query|default:request.GET.q }}">
+                    <input type="text" name="q" class="input-studio" placeholder="Buscar por documento, nombre, ficha o programa..." value="{% if request.GET.q %}{{ request.GET.q }}{% elif query %}{{ query }}{% endif %}">
                 </div>
             </div>
             <div class="col-md-3">

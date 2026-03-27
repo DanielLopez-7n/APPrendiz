@@ -19,8 +19,6 @@ urlpatterns = [
     path('crear/', views.crear_usuario_con_perfil, name='crear_usuario'),
     path('usuarios/<int:user_id>/editar/', views.editar_usuario_view, name='editar_usuario'),
     path('usuarios/<int:user_id>/eliminar/', views.eliminar_usuario_view, name='eliminar_usuario'),
-    path('detalle/<int:user_id>/', views.ver_detalle_usuario, name='ver_detalle_usuario'),
-    path('perfil/', views.perfil_view, name='ver_perfil'),
-    path('mi-perfil/', views.perfil_view, name='perfil'),
+    path('ver-detalle/<int:user_id>/', views.ver_detalle_usuario, name='ver_detalle_usuario'),
     path('cambiar-password/', views.cambiar_password, name='cambiar_password'),
 ]

@@ -506,6 +506,7 @@ def perfil_view(request):
     })
     return render(request, 'usuarios/perfil.html', context)
 
+
 # --- VISTA DE CAMBIO DE CONTRASEÑA ---
 
 @login_required
@@ -514,25 +515,30 @@ def cambiar_password(request):
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user) # Mantiene la sesión viva
-            messages.success(request, '¡Excelente! Tu contraseña ha sido actualizada y tu cuenta ahora es segura.')
+            update_session_auth_hash(request, user)
+            messages.success(request, '¡Contraseña actualizada con éxito!')
             
-            # REDIRECCIÓN INTELIGENTE
+            # Redirección tras éxito
             if user.is_staff or user.is_superuser:
-                return redirect('core:dashboard') # Instructores y Admins
+                return redirect('core:dashboard')
             else:
-                return redirect('aprendices:perfil_aprendiz') # Aprendices <-- ¡AQUÍ ESTÁ LA CORRECCIÓN!
+                return redirect('aprendices:perfil_aprendiz') # Perfil del aprendiz (Ahora sí existe)
         else:
-            messages.error(request, 'Hubo un error. Por favor, revisa las validaciones del formulario.')
+            messages.error(request, 'Por favor corrige los errores abajo.')
     else:
         form = PasswordChangeForm(request.user)
 
-    # PLANTILLA BASE DINÁMICA
-    plantilla_base = 'core/panel_admin_base.html' if request.user.is_staff else 'core/base_simple.html'
+    # Lógica dinámica para el botón Cancelar
+    if request.user.is_staff or request.user.is_superuser:
+        template_base = 'core/panel_admin_base.html'
+        url_cancelar = 'core:dashboard'
+    else:
+        template_base = 'master.html'
+        url_cancelar = 'aprendices:perfil_aprendiz' # Perfil base del aprendiz
 
     context = {
         'form': form,
-        'titulo': 'Cambiar Contraseña',
-        'plantilla_base': plantilla_base
+        'template_to_extend': template_base,
+        'url_cancelar': url_cancelar 
     }
     return render(request, 'usuarios/cambiar_password.html', context)

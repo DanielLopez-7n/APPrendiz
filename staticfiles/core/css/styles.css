@@ -1,0 +1,38 @@
+.hero-section {
+    background: linear-gradient(135deg, #1a5f3d 0%, #2d8659 50%, #1e7e4f 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
+    }
+
+.feature-card {
+    transition: transform 0.3s;
+    }
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    }
+
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a5f3d 0%, #2d8659 50%, #1e7e4f 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
+    }
+
+.navbar-brand {
+    font-weight: bold;
+    }
+
+footer a {
+    text-decoration: none;
+    transition: color 0.3s;
+    }
+
+footer a:hover {
+    color: white !important;
+    }
