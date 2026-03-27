@@ -311,6 +311,15 @@
         transition: color 0.3s ease;
     }
 
+    /* Mejora de visibilidad para textos secundarios y botones en modo oscuro */
+    .navbar-dark-custom .text-muted {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+    .navbar-dark-custom .btn-outline-success {
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.45) !important;
+    }
+
     /* Hover verde para los links en modo oscuro */
     .navbar-dark-custom .nav-link:hover {
         color: var(--sena-green) !important;
@@ -341,6 +350,15 @@
     /* Asegurar legibilidad del texto de la cabecera desplazada */
     .navbar-scrolled .navbar-text {
         color: #2d3436;
+    }
+
+    /* Sub-label y botón en modo scroll blanco */
+    .navbar-scrolled .text-muted {
+        color: #636e72 !important;
+    }
+    .navbar-scrolled .btn-outline-success {
+        color: var(--sena-green) !important;
+        border-color: var(--sena-green) !important;
     }
 
 </style>
