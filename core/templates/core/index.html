@@ -156,6 +156,97 @@
         color: #000000;
     }
 
+    .method-step {
+        border: 1px solid #e9ecef;
+        border-radius: 18px;
+        background: #fff;
+        padding: 20px;
+        height: 100%;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .method-step:hover {
+        transform: translateY(-6px);
+        border-color: rgba(57,169,0,.28);
+        box-shadow: 0 20px 35px rgba(15,63,25,.12);
+    }
+    .method-step .icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(57,169,0,0.12);
+        color: var(--sena-green);
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+    }
+    .team-card-home {
+        border: 1px solid #e9ecef;
+        border-radius: 24px;
+        background: #ffffff;
+        padding: 28px;
+        box-shadow: 0 14px 30px rgba(0,0,0,0.05);
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .team-card-home:hover {
+        transform: translateY(-6px);
+        border-color: rgba(57,169,0,.3);
+        box-shadow: 0 24px 45px rgba(15,63,25,.15);
+    }
+    .tech-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 0 8px 8px 0;
+        border-radius: 999px;
+        background: rgba(57,169,0,.12);
+        color: #1f5f00;
+        font-weight: 700;
+        font-size: .8rem;
+        border: 1px solid transparent;
+        transition: all .2s ease;
+    }
+    .tech-badge:hover {
+        background: rgba(57,169,0,.2);
+        border-color: rgba(57,169,0,.35);
+        transform: translateY(-2px);
+    }
+    .section-label-premium {
+        display: inline-block;
+        font-weight: 800;
+        color: #2f5db8;
+        padding-bottom: 6px;
+        border-bottom: 3px solid #67e8ff;
+        letter-spacing: .3px;
+        margin-bottom: 14px;
+    }
+    .dev-profile-card {
+        border: 1px solid #e7eaee;
+        border-radius: 20px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        transition: all .25s ease;
+    }
+    .dev-profile-card:hover {
+        transform: translateY(-5px) scale(1.01);
+        box-shadow: 0 22px 36px rgba(47,93,184,.18);
+    }
+    .dev-avatar {
+        width: 88px;
+        height: 88px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #e8f4ff, #dff7f0);
+        color: #2f5db8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.3rem;
+    }
+
 </style>
 {% endblock %}
 
@@ -182,7 +273,7 @@
             <div class="col-lg-8">
                 <span class="benefit-tag text-white opacity-75">SISTEMA INTEGRAL SENA</span>
                 <h1 class="display-3 fw-bold mb-4">
-                    Gestion de Seguimiento para tu <br>
+                    Gestión de Seguimiento para tu <br>
                     <span class="text-sena-light">Etapa Productiva</span>
                 </h1>
                 <p class="fs-4 mb-5 opacity-90 text-light shadow-text">
@@ -238,40 +329,90 @@
 
 <section id="metodologia" class="py-5">
     <div class="container">
-        <div class="row align-items-center py-5">
-            <div class="col-lg-6 order-lg-2 ms-auto">
-                <span class="benefit-tag">NUESTRA SOLUCIÓN</span>
-                <h2 class="fw-bold display-6 mb-4">Un flujo de trabajo diseñado para el éxito</h2>
-                <p class="text-muted fs-5 mb-4">
-                    Centralizamos contratos, bitácoras y seguimiento en un solo lugar. Reportes claros y acceso rápido para instructores y empresarios.
-                </p>
-                <div class="d-flex mb-4">
-                    <div class="me-3">
-                        <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
-                            <i class="bi bi-lightning-charge-fill fs-4"></i>
-                        </div>
-                    </div>
-                    <div>
-                        <h5 class="fw-bold mb-1">Implementación Ágil</h5>
-                        <p class="text-muted">Carga tus contratos y bitácoras en segundos, no en horas.</p>
+        <div class="py-5">
+            <span class="benefit-tag">METODOLOGÍA APPrendiz</span>
+            <h2 class="fw-bold display-6 mb-4">¿Cómo funciona APPrendiz?</h2>
+            <p class="text-muted fs-5 mb-5">
+                Un proceso claro, digital y trazable para acompañar la etapa productiva de principio a fin.
+            </p>
+
+            <div class="row g-4 mb-5">
+                <div class="col-lg-6">
+                    <div class="method-step">
+                        <span class="icon"><i class="bi bi-building"></i></span>
+                        <h5 class="fw-bold">1. Vinculación y Registro</h5>
+                        <p class="text-muted mb-0">
+                            El proceso inicia con el registro del aprendiz y su respectiva asignación a una empresa y un programa de formación.
+                            El sistema organiza la información centralizando los datos clave para un seguimiento estructurado.
+                        </p>
                     </div>
                 </div>
-                <div class="d-flex mb-4">
-                    <div class="me-3">
-                        <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
-                            <i class="bi bi-shield-check fs-4"></i>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="method-step">
+                        <span class="icon"><i class="bi bi-journal-text"></i></span>
+                        <h5 class="fw-bold">2. Registro de Bitácoras</h5>
+                        <p class="text-muted mb-0">
+                            El aprendiz documenta sus actividades diarias o semanales de forma digital a través de nuestro módulo de bitácoras,
+                            eliminando el papeleo y manteniendo un historial seguro en la nube.
+                        </p>
                     </div>
-                    <div>
-                        <h5 class="fw-bold mb-1">Seguridad Total</h5>
-                        <p class="text-muted">Tu información está protegida y bajo los estándares institucionales.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="method-step">
+                        <span class="icon"><i class="bi bi-person-check"></i></span>
+                        <h5 class="fw-bold">3. Evaluación y Feedback</h5>
+                        <p class="text-muted mb-0">
+                            El instructor asignado recibe notificaciones de las nuevas bitácoras, evalúa el desempeño del aprendiz y cambia el estado de los reportes
+                            (Aprobado, Pendiente o Rechazado), dejando observaciones en tiempo real.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="method-step">
+                        <span class="icon"><i class="bi bi-file-earmark-pdf"></i></span>
+                        <h5 class="fw-bold">4. Generación de Reportes Oficiales</h5>
+                        <p class="text-muted mb-0">
+                            Con un solo clic, el sistema compila toda la información validada y genera un reporte en formato PDF con diseño institucional (SENA),
+                            listo para ser descargado, firmado o archivado.
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 order-lg-1"> <div class="p-3 bg-white rounded-5 text-center shadow-sm img-featured-container">
-                    <img src="{% static 'core/img/aprendices_home.jpg' %}" 
-                        alt="Aprendiz SENA" 
-                        class="img-fluid rounded-4 custom-img-grow">
+
+            <div class="team-card-home">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <span class="section-label-premium">Nuestro Equipo</span>
+                        <h4 class="fw-bold mb-2">Daniel - Desarrollador Full-Stack | Talento SENA</h4>
+                        <p class="text-muted mb-3">
+                            Soy Tecnólogo en Análisis y Desarrollo de Software en formación por el SENA (Colombia), actualmente en etapa productiva.
+                        </p>
+                        <p class="text-muted mb-3">
+                            Diseñé y desarrollé APPrendiz desde cero como una solución real para optimizar y digitalizar el seguimiento académico.
+                            Me apasiona el código limpio, la lógica detrás de las bases de datos relacionales y la creación de interfaces responsivas.
+                            Disfruto profundamente el trabajo en equipo y siempre estoy dispuesto a aprender nuevas tecnologías para construir herramientas que aporten verdadero valor.
+                        </p>
+                        <div>
+                            <span class="tech-badge">Python</span>
+                            <span class="tech-badge">Django</span>
+                            <span class="tech-badge">PostgreSQL</span>
+                            <span class="tech-badge">JavaScript</span>
+                            <span class="tech-badge">Bootstrap 5</span>
+                            <span class="tech-badge">Git / GitHub</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="dev-profile-card">
+                            <div class="dev-avatar">
+                                <i class="bi bi-person-workspace"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">Daniel</h6>
+                            <div class="small text-primary fw-semibold mb-2">Desarrollador Full-Stack</div>
+                            <p class="small text-muted mb-0">
+                                Construcción de arquitectura, backend Django, base de datos y experiencia de usuario del sistema APPrendiz.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

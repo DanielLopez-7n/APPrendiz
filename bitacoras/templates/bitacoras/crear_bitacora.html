@@ -176,8 +176,9 @@
                             <div class="row g-3">
                                 <div class="col-md-6"><label class="label-studio">Descripción de la actividad realizada</label><div class="input-group-studio align-items-start">{{ form_actividad.descripcion_actividad }}</div></div>
                                 <div class="col-md-6"><label class="label-studio">Competencias asociadas</label><div class="input-group-studio align-items-start">{{ form_actividad.competencias_asociadas }}</div></div>
-                                <div class="col-md-3"><label class="label-studio">Período / Mes</label><div class="input-group-studio">{{ form_actividad.periodo_mes }}</div></div>
-                                <div class="col-md-9"><label class="label-studio">Evidencia de cumplimiento (Archivo/Foto)</label><div class="input-group-studio">{{ form_actividad.evidencia_cumplimiento }}</div></div>
+                                <div class="col-md-3"><label class="label-studio">Fecha de inicio</label><div class="input-group-studio">{{ form_actividad.fecha_inicio_actividad }}</div></div>
+                                <div class="col-md-3"><label class="label-studio">Fecha de fin</label><div class="input-group-studio">{{ form_actividad.fecha_fin_actividad }}</div></div>
+                                <div class="col-md-6"><label class="label-studio">Evidencia de cumplimiento (Archivo/Foto)</label><div class="input-group-studio">{{ form_actividad.evidencia_cumplimiento }}</div></div>
                                 <div class="col-12"><label class="label-studio">Observaciones del Aprendiz / Jefe</label><div class="input-group-studio align-items-start">{{ form_actividad.observaciones }}</div></div>
                                 <div class="col-12 text-end">
                                     <div class="d-none">{{ form_actividad.DELETE }}</div>
@@ -194,8 +195,9 @@
                         <div class="row g-3">
                             <div class="col-md-6"><label class="label-studio">Descripción de la actividad</label><div class="input-group-studio align-items-start">{{ formset.empty_form.descripcion_actividad }}</div></div>
                             <div class="col-md-6"><label class="label-studio">Competencias asociadas</label><div class="input-group-studio align-items-start">{{ formset.empty_form.competencias_asociadas }}</div></div>
-                            <div class="col-md-3"><label class="label-studio">Período / Mes</label><div class="input-group-studio">{{ formset.empty_form.periodo_mes }}</div></div>
-                            <div class="col-md-9"><label class="label-studio">Evidencia de cumplimiento (Archivo/Foto)</label><div class="input-group-studio">{{ formset.empty_form.evidencia_cumplimiento }}</div></div>
+                            <div class="col-md-3"><label class="label-studio">Fecha de inicio</label><div class="input-group-studio">{{ formset.empty_form.fecha_inicio_actividad }}</div></div>
+                            <div class="col-md-3"><label class="label-studio">Fecha de fin</label><div class="input-group-studio">{{ formset.empty_form.fecha_fin_actividad }}</div></div>
+                            <div class="col-md-6"><label class="label-studio">Evidencia de cumplimiento (Archivo/Foto)</label><div class="input-group-studio">{{ formset.empty_form.evidencia_cumplimiento }}</div></div>
                             <div class="col-12"><label class="label-studio">Observaciones</label><div class="input-group-studio align-items-start">{{ formset.empty_form.observaciones }}</div></div>
                             <div class="col-12 text-end">
                                 <button type="button" class="btn btn-delete-studio btn-delete-row"><i class="bi bi-trash3 me-2"></i>Eliminar Fila</button>
