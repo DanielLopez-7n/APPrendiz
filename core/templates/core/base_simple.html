@@ -15,6 +15,40 @@
             background-color: rgba(57, 169, 0, 0.1);
             color: #2d8600;
         }
+        .premium-alert {
+            border: 0;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            background: linear-gradient(120deg, #ffffff 0%, #f8fbff 100%);
+            overflow: hidden;
+            padding: .85rem 1rem;
+        }
+        .premium-alert .alert-indicator {
+            width: 4px;
+            border-radius: 999px;
+            align-self: stretch;
+            margin-right: .85rem;
+        }
+        .premium-alert .alert-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: .65rem;
+            font-size: 1rem;
+        }
+        .premium-alert.alert-success .alert-indicator { background: #39a900; }
+        .premium-alert.alert-success .alert-icon { background: rgba(57, 169, 0, 0.14); color: #2d8600; }
+        .premium-alert.alert-error .alert-indicator,
+        .premium-alert.alert-danger .alert-indicator { background: #dc3545; }
+        .premium-alert.alert-error .alert-icon,
+        .premium-alert.alert-danger .alert-icon { background: rgba(220, 53, 69, 0.13); color: #b42318; }
+        .premium-alert.alert-warning .alert-indicator { background: #ff9800; }
+        .premium-alert.alert-warning .alert-icon { background: rgba(255, 152, 0, 0.15); color: #9a6700; }
+        .premium-alert.alert-info .alert-indicator { background: #0d6efd; }
+        .premium-alert.alert-info .alert-icon { background: rgba(13, 110, 253, 0.13); color: #0b4fb3; }
     </style>
 </head>
 <body>
@@ -82,8 +116,20 @@
     <main class="container pb-5">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0" role="alert" style="border-left: 5px solid {% if message.tags == 'success' %}#39a900{% elif message.tags == 'error' %}#dc3545{% else %}#ffc107{% endif %} !important;">
-                    <span class="fw-bold">{{ message }}</span>
+                <div class="alert alert-{{ message.tags }} premium-alert alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <span class="alert-indicator" aria-hidden="true"></span>
+                    <span class="alert-icon" aria-hidden="true">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check2-circle"></i>
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="bi bi-exclamation-triangle"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-circle"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle"></i>
+                        {% endif %}
+                    </span>
+                    <span class="fw-bold flex-grow-1">{{ message }}</span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}

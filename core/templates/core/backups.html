@@ -39,6 +39,19 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
+    .backup-description-input {
+        min-width: 280px;
+        border-radius: 999px;
+        border: 2px solid rgba(255,255,255,0.4);
+        background: rgba(255,255,255,0.92);
+        padding: 11px 18px;
+        font-weight: 600;
+    }
+    .backup-description-input:focus {
+        outline: none;
+        border-color: #fff;
+        box-shadow: 0 0 0 4px rgba(255,255,255,0.22);
+    }
 
     .table-studio th {
         background-color: #f8f9fa !important;
@@ -79,6 +92,17 @@
     
     .btn-delete { background: #ffebee; color: #c62828; }
     .btn-delete:hover { background: #ffcdd2; transform: scale(1.05); }
+    .actions-group {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+    .actions-group .action-btn {
+        margin: 0 !important;
+        flex: 0 0 auto;
+    }
 
     .file-icon {
         font-size: 2rem;
@@ -114,9 +138,19 @@
                 <p class="mb-0 text-white small" style="color: white !important;">Administra los respaldos de la Base de Datos y Archivos Multimedia.</p>
             </div>
             <div>
-                <a href="{% url 'core:crear_backup' %}" class="btn-create-backup shadow-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\'></span> Comprimiendo...'; this.classList.add('disabled');">
-                    <i class="bi bi-cloud-arrow-up-fill me-2 fs-5"></i> Generar Nuevo Respaldo
-                </a>
+                <form method="post" action="{% url 'core:crear_backup' %}" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                    {% csrf_token %}
+                    <input
+                        type="text"
+                        name="descripcion"
+                        class="backup-description-input"
+                        maxlength="180"
+                        placeholder="Descripción breve del respaldo (opcional)"
+                    >
+                    <button type="submit" class="btn-create-backup shadow-sm" onclick="this.innerHTML='<span class=\'spinner-border spinner-border-sm me-2\'></span> Comprimiendo...'; this.classList.add('disabled'); this.form.submit();">
+                        <i class="bi bi-cloud-arrow-up-fill me-2 fs-5"></i> Generar Nuevo Respaldo
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -155,6 +189,9 @@
                                     <div>
                                         <div class="fw-bold text-dark">{{ arch.nombre }}</div>
                                         <div class="small text-muted">Contiene: db.sqlite3 + media/</div>
+                                        {% if arch.descripcion %}
+                                            <div class="small text-success-emphasis mt-1"><i class="bi bi-chat-left-text me-1"></i>{{ arch.descripcion }}</div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </td>
@@ -166,17 +203,24 @@
                             <td>
                                 <div class="fw-bold text-dark">{{ arch.fecha_creacion|date:"d M Y" }}</div>
                                 <div class="small text-muted">{{ arch.fecha_creacion|time:"H:i A" }}</div>
+                                {% if arch.ultima_restauracion %}
+                                    <div class="small text-primary mt-1">
+                                        <i class="bi bi-arrow-repeat me-1"></i> Restaurado: {{ arch.ultima_restauracion|slice:":16"|cut:"T" }}
+                                    </div>
+                                {% endif %}
                             </td>
                             <td class="text-center">
-                                <button type="button" class="action-btn btn-primary bg-primary bg-opacity-10 text-primary shadow-sm me-2" title="Restaurar este respaldo" data-bs-toggle="modal" data-bs-target="#modalRestaurar-{{ forloop.counter }}">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </button>
-                                <a href="{% url 'core:descargar_backup' arch.nombre %}" class="action-btn btn-download shadow-sm me-2" title="Descargar a mi PC">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                                <a href="{% url 'core:eliminar_backup' arch.nombre %}" class="action-btn btn-delete shadow-sm" title="Eliminar respaldo" onclick="return confirm('¿Estás seguro de que deseas eliminar este respaldo de forma permanente? Esta acción no se puede deshacer.');">
-                                    <i class="bi bi-trash-fill"></i>
-                                </a>
+                                <div class="actions-group">
+                                    <button type="button" class="action-btn btn-primary bg-primary bg-opacity-10 text-primary shadow-sm" title="Restaurar este respaldo" data-bs-toggle="modal" data-bs-target="#modalRestaurar-{{ forloop.counter }}">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                    <a href="{% url 'core:descargar_backup' arch.nombre %}" class="action-btn btn-download shadow-sm" title="Descargar a mi PC">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    <a href="{% url 'core:eliminar_backup' arch.nombre %}" class="action-btn btn-delete shadow-sm" title="Eliminar respaldo" onclick="return confirm('¿Estás seguro de que deseas eliminar este respaldo de forma permanente? Esta acción no se puede deshacer.');">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
 
@@ -186,9 +230,12 @@
                                 <i class="bi bi-safe2"></i>
                                 <h5 class="fw-bold text-dark mb-1">No hay copias de seguridad</h5>
                                 <p class="text-muted mb-4">El historial de respaldos está vacío. Genera uno nuevo para asegurar tus datos.</p>
-                                <a href="{% url 'core:crear_backup' %}" class="btn btn-success fw-bold rounded-pill px-4 py-2 shadow-sm">
-                                    <i class="bi bi-plus-circle-fill me-2"></i> Crear Primer Respaldo
-                                </a>
+                                <form method="post" action="{% url 'core:crear_backup' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success fw-bold rounded-pill px-4 py-2 shadow-sm">
+                                        <i class="bi bi-plus-circle-fill me-2"></i> Crear Primer Respaldo
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -218,22 +265,24 @@
             </div>
             <div class="modal-body p-4 text-start">
                 <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-dark fw-bold mb-4">
-                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> Por seguridad, la base de datos no puede sobrescribirse a sí misma mientras el sistema está encendido (Evita corrupción de datos).
+                    <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i> Esta acción restaurará automáticamente la base de datos y archivos multimedia del sistema.
                 </div>
-                <h6 class="fw-bold text-dark mb-3">Protocolo de Restauración Correcto:</h6>
+                <h6 class="fw-bold text-dark mb-3">Protocolo automático de restauración:</h6>
                 <ol class="text-muted small mb-0" style="line-height: 1.8;">
-                    <li>Haz clic en el botón verde de <strong>Descargar a mi PC</strong> para obtener el archivo <code>{{ arch.nombre }}</code>.</li>
-                    <li>Extrae (descomprime) el archivo <code>.zip</code> en tu computadora.</li>
-                    <li>Detén el servidor de la aplicación (la consola negra).</li>
-                    <li>Arrastra y reemplaza la carpeta <code>media/</code> y el archivo <code>db.sqlite3</code> en la carpeta original del proyecto.</li>
-                    <li>Vuelve a encender el servidor. ¡Tus datos estarán restaurados al milímetro!</li>
+                    <li>El sistema creará una copia preventiva automática antes de restaurar.</li>
+                    <li>Se reemplazará <code>db.sqlite3</code> por la versión del respaldo seleccionado.</li>
+                    <li>Se reemplazará la carpeta <code>media/</code> por la contenida en el respaldo.</li>
+                    <li>Al finalizar verás una confirmación del proceso en pantalla.</li>
                 </ol>
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4 fw-bold text-muted" data-bs-dismiss="modal">Entendido</button>
-                <a href="{% url 'core:descargar_backup' arch.nombre %}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm text-white">
-                    <i class="bi bi-download me-2"></i>Descargar Respaldo Ahora
-                </a>
+                <form method="post" action="{% url 'core:restaurar_backup' arch.nombre %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm text-white">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Restaurar Ahora
+                    </button>
+                </form>
             </div>
         </div>
     </div>

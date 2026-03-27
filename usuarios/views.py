@@ -256,8 +256,8 @@ def crear_usuario_con_perfil(request):
         if form_usuario.is_valid() and form_perfil.is_valid():
             # 1. Crear el Usuario base
             usuario = form_usuario.save(commit=False)
-            documento = form_usuario.cleaned_data['username']
-            usuario.set_password(documento)
+            username = form_usuario.cleaned_data['username']
+            usuario.set_password(username)
             
             if rol == 'instructor':
                 usuario.is_staff = True
@@ -267,10 +267,6 @@ def crear_usuario_con_perfil(request):
             # 2. Crear el Perfil
             perfil = form_perfil.save(commit=False)
             perfil.usuario = usuario
-            if rol == 'aprendiz':
-                perfil.documento = documento
-            else:
-                perfil.cedula = documento
             perfil.save()
 
             messages.success(request, f'¡Registro exitoso! Se creó el usuario y el perfil de {rol}.')
