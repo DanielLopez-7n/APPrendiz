@@ -123,6 +123,22 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
             z-index: 1100;
+            display: none;
+            pointer-events: none;
+        }
+
+        #sidebar-overlay.is-active {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Fijación agresiva: ningún backdrop puede secuestrar clics del aplicativo */
+        .modal-backdrop,
+        .offcanvas-backdrop,
+        .dropdown-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
         }
 
         @media (max-width: 768px) {
@@ -544,7 +560,7 @@
     {% bootstrap_javascript %}
 </head>
 <body>
-    <div id="sidebar-overlay" style="display: none;"></div>
+    <div id="sidebar-overlay" aria-hidden="true"></div>
     
     <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="12000" data-bs-pause="false">
         <div class="carousel-inner">
@@ -961,93 +977,134 @@
     
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const toggleBtn   = document.getElementById('sidebar-toggle');
-            const sidebar     = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            const overlay     = document.getElementById('sidebar-overlay');
+            const ui = {
+                toggleBtn: document.getElementById('sidebar-toggle'),
+                sidebar: document.getElementById('sidebar'),
+                mainContent: document.getElementById('main-content'),
+                overlay: document.getElementById('sidebar-overlay'),
+            };
 
-            function isMobile() { return window.innerWidth <= 768; }
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
 
-            // Lógica Móvil
-            function openMobile() {
-                // Evita conflicto con estados legacy.
-                sidebar.classList.remove('collapsed');
-                sidebar.classList.add('mobile-open');
-                if (overlay) overlay.style.display = 'block';
+            function repairUiOverlays() {
+                const hasVisibleModal = document.querySelector('.modal.show');
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                }
+                document.querySelectorAll('.dropdown-backdrop').forEach((el) => el.remove());
+            }
+
+            function setSidebarButtonState(isPinned) {
+                if (!ui.toggleBtn) return;
+                ui.toggleBtn.classList.toggle('btn-success', isPinned);
+                ui.toggleBtn.classList.toggle('btn-light', !isPinned);
+                const icon = ui.toggleBtn.querySelector('i');
+                if (icon) icon.style.color = isPinned ? 'white' : 'var(--sena-green)';
+            }
+
+            function openMobileSidebar() {
+                if (!ui.sidebar) return;
+                ui.sidebar.classList.remove('collapsed');
+                ui.sidebar.classList.add('mobile-open');
+                if (ui.overlay) ui.overlay.classList.add('is-active');
                 document.body.style.overflow = 'hidden';
             }
-            function closeMobile() {
-                sidebar.classList.remove('mobile-open');
-                if (overlay) overlay.style.display = 'none';
+
+            function closeMobileSidebar() {
+                if (ui.sidebar) ui.sidebar.classList.remove('mobile-open');
+                if (ui.overlay) ui.overlay.classList.remove('is-active');
                 document.body.style.overflow = '';
             }
-            if (overlay) {
-                overlay.addEventListener('click', closeMobile);
+
+            function applyPinnedStateFromStorage() {
+                if (!ui.sidebar || !ui.mainContent || isMobile()) return;
+                const isPinned = localStorage.getItem('sidebarPinned') === 'true';
+                ui.sidebar.classList.toggle('pinned', isPinned);
+                ui.mainContent.classList.toggle('pinned-content', isPinned);
+                setSidebarButtonState(isPinned);
             }
 
-            // 🌟 NUEVA LÓGICA DE ESCRITORIO (Recordar si está fijado)
-            if (!isMobile() && localStorage.getItem('sidebarPinned') === 'true') {
-                sidebar.classList.add('pinned');
-                mainContent.classList.add('pinned-content');
-                // Estilo visual para el botón cuando está fijado
-                toggleBtn.classList.replace('btn-light', 'btn-success');
-                toggleBtn.querySelector('i').classList.replace('text-success', 'text-white');
-                toggleBtn.querySelector('i').style.color = 'white';
-            }
+            function bindSidebarInteractions() {
+                if (!ui.toggleBtn || !ui.sidebar || !ui.mainContent) return;
 
-            // Toggle Botón
-            toggleBtn.addEventListener('click', function () {
-                if (isMobile()) {
-                    const isOpen = sidebar.classList.contains('mobile-open');
-                    if (isOpen) { closeMobile(); } else { openMobile(); }
-                } else {
-                    // PC: Anclar/Desanclar
-                    sidebar.classList.toggle('pinned');
-                    mainContent.classList.toggle('pinned-content');
-                    
-                    // Guardar preferencia
-                    const isPinned = sidebar.classList.contains('pinned');
-                    localStorage.setItem('sidebarPinned', isPinned);
-
-                    // Cambiar el color del botón para dar feedback al usuario
-                    if(isPinned) {
-                        toggleBtn.classList.replace('btn-light', 'btn-success');
-                        toggleBtn.querySelector('i').style.color = 'white';
-                    } else {
-                        toggleBtn.classList.replace('btn-success', 'btn-light');
-                        toggleBtn.querySelector('i').style.color = 'var(--sena-green)';
+                ui.toggleBtn.addEventListener('click', function () {
+                    if (isMobile()) {
+                        ui.sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
+                        return;
                     }
-                }
-            });
 
-            // Limpia estados al cambiar tamaño de pantalla.
-            window.addEventListener('resize', function () {
-                if (!isMobile()) {
-                    closeMobile();
-                }
-            });
+                    ui.sidebar.classList.toggle('pinned');
+                    ui.mainContent.classList.toggle('pinned-content');
+                    const isPinned = ui.sidebar.classList.contains('pinned');
+                    localStorage.setItem('sidebarPinned', String(isPinned));
+                    setSidebarButtonState(isPinned);
+                });
 
-            // Módulo activo (Pintar el botón donde estamos parados)
-            const currentPath = window.location.pathname;
-            document.querySelectorAll('#menu-lateral .nav-link').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href && href !== '#' && !link.classList.contains('logout-btn')) {
-                    if ((currentPath.includes(href) && href !== '/') || currentPath === href) {
+                ui.sidebar.addEventListener('scroll', function () {
+                    sessionStorage.setItem('sidebarScroll', String(ui.sidebar.scrollTop));
+                });
+            }
+
+            function bindFallbackClicks() {
+                document.addEventListener('click', function (event) {
+                    const actionLink = event.target.closest('.action-pill a[href], .actions-group a[href]');
+                    if (actionLink) {
+                        event.preventDefault();
+                        window.location.assign(actionLink.href);
+                        return;
+                    }
+
+                    const filterBtn = event.target.closest('button[title="Aplicar Filtros"], button[data-filter-submit]');
+                    if (filterBtn) {
+                        const form = filterBtn.closest('form');
+                        if (!form) return;
+                        event.preventDefault();
+                        typeof form.requestSubmit === 'function' ? form.requestSubmit() : form.submit();
+                    }
+                }, true);
+            }
+
+            function highlightActiveMenuItem() {
+                const currentPath = window.location.pathname;
+                document.querySelectorAll('#menu-lateral .nav-link').forEach((link) => {
+                    const href = link.getAttribute('href');
+                    if (!href || href === '#' || link.classList.contains('logout-btn')) return;
+                    if ((href !== '/' && currentPath.includes(href)) || currentPath === href) {
                         link.classList.add('activo');
                     }
-                }
-            });
+                });
+            }
 
-            // Scroll del sidebar
-            sidebar.addEventListener('scroll', function () {
-                sessionStorage.setItem('sidebarScroll', sidebar.scrollTop);
-            });
+            repairUiOverlays();
+            window.addEventListener('pageshow', repairUiOverlays);
+            document.addEventListener('hidden.bs.modal', repairUiOverlays);
+            document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+            new MutationObserver(repairUiOverlays).observe(document.body, { childList: true, subtree: false });
+
+            if (ui.overlay) ui.overlay.addEventListener('click', closeMobileSidebar);
+            closeMobileSidebar();
+            applyPinnedStateFromStorage();
+            bindSidebarInteractions();
+            bindFallbackClicks();
+            highlightActiveMenuItem();
+
             const savedScroll = sessionStorage.getItem('sidebarScroll');
-            if (savedScroll) { sidebar.scrollTop = parseInt(savedScroll); }
+            if (savedScroll && ui.sidebar) {
+                ui.sidebar.scrollTop = parseInt(savedScroll, 10);
+            }
+
+            window.addEventListener('resize', function () {
+                if (!isMobile()) closeMobileSidebar();
+            });
         });
     </script>
 
