@@ -123,6 +123,20 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
             z-index: 1100;
+            display: none;
+            pointer-events: none;
+        }
+
+        #sidebar-overlay.is-active {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Defensa global: un backdrop huérfano no puede bloquear todos los botones */
+        body:not(.modal-open) .modal-backdrop,
+        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
         /* Defensa global: un backdrop huérfano no puede bloquear todos los botones */
@@ -1005,17 +1019,18 @@
                 // Evita conflicto con estados legacy.
                 sidebar.classList.remove('collapsed');
                 sidebar.classList.add('mobile-open');
-                if (overlay) overlay.style.display = 'block';
+                if (overlay) overlay.classList.add('is-active');
                 document.body.style.overflow = 'hidden';
             }
             function closeMobile() {
                 sidebar.classList.remove('mobile-open');
-                if (overlay) overlay.style.display = 'none';
+                if (overlay) overlay.classList.remove('is-active');
                 document.body.style.overflow = '';
             }
             if (overlay) {
                 overlay.addEventListener('click', closeMobile);
             }
+            closeMobile();
 
             // 🌟 NUEVA LÓGICA DE ESCRITORIO (Recordar si está fijado)
             if (!isMobile() && localStorage.getItem('sidebarPinned') === 'true') {
