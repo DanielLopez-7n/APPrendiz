@@ -123,6 +123,22 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
             z-index: 1100;
+            display: none;
+            pointer-events: none;
+        }
+
+        #sidebar-overlay.is-active {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Fijación agresiva: ningún backdrop puede secuestrar clics del aplicativo */
+        .modal-backdrop,
+        .offcanvas-backdrop,
+        .dropdown-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            display: none !important;
         }
 
         @media (max-width: 768px) {
@@ -961,6 +977,7 @@
     
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <script>
@@ -970,6 +987,26 @@
             const mainContent = document.getElementById('main-content');
             const overlay     = document.getElementById('sidebar-overlay');
 
+            function repairUiOverlays() {
+                const hasVisibleModal = document.querySelector('.modal.show');
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                }
+                document.querySelectorAll('.dropdown-backdrop').forEach(function (el) { el.remove(); });
+            }
+
+            repairUiOverlays();
+            window.addEventListener('pageshow', repairUiOverlays);
+            document.addEventListener('hidden.bs.modal', repairUiOverlays);
+            document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+
+            const overlayObserver = new MutationObserver(function () {
+                repairUiOverlays();
+            });
+            overlayObserver.observe(document.body, { childList: true, subtree: false });
+
             function isMobile() { return window.innerWidth <= 768; }
 
             // Lógica Móvil
@@ -977,17 +1014,18 @@
                 // Evita conflicto con estados legacy.
                 sidebar.classList.remove('collapsed');
                 sidebar.classList.add('mobile-open');
-                if (overlay) overlay.style.display = 'block';
+                if (overlay) overlay.classList.add('is-active');
                 document.body.style.overflow = 'hidden';
             }
             function closeMobile() {
                 sidebar.classList.remove('mobile-open');
-                if (overlay) overlay.style.display = 'none';
+                if (overlay) overlay.classList.remove('is-active');
                 document.body.style.overflow = '';
             }
             if (overlay) {
                 overlay.addEventListener('click', closeMobile);
             }
+            closeMobile();
 
             // 🌟 NUEVA LÓGICA DE ESCRITORIO (Recordar si está fijado)
             if (!isMobile() && localStorage.getItem('sidebarPinned') === 'true') {
