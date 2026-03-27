@@ -18,8 +18,9 @@ from django.contrib.auth import update_session_auth_hash
 @never_cache
 def login_view(request):
     """
-    Vista para el inicio de sesión de usuarios
+    Vista para el inicio de sesión desde el Modal del Index
     """
+    # Si ya está logueado, no tiene nada que hacer aquí
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect('core:dashboard')
@@ -27,53 +28,59 @@ def login_view(request):
             return redirect('aprendices:perfil_aprendiz')
     
     if request.method == 'POST':
+        # .strip() elimina espacios en blanco accidentales que el usuario haya copiado
+        username_input = request.POST.get('username', '').strip()
+        
+        # =========================================================
+        # VALIDACIÓN INFALIBLE: Interceptar usuarios inactivos
+        # =========================================================
+        if username_input:
+            User = get_user_model()
+            
+            # Buscamos de forma segura sin que la app se caiga si no existe
+            user_check = User.objects.filter(
+                Q(username=username_input) | 
+                Q(documento=username_input) | 
+                Q(email=username_input)
+            ).first()
+
+            # Si el usuario existe y su estado es inactivo
+            if user_check and not user_check.is_active:
+                # Lanzamos la alerta roja
+                messages.error(request, 'Tu cuenta ha sido deshabilitada por un administrador. Si crees que es un error, por favor comunícate con soporte.')
+                # Y lo regresamos al index (donde verá la alerta inmediatamente)
+                return redirect('core:index') 
+        # =========================================================
+
+        # Si el usuario está activo (o no existe), el formulario nativo hace su magia
         form = LoginForm(request, data=request.POST)
         
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+            user = form.get_user()
             remember_me = form.cleaned_data.get('remember_me')
             
-            # Autenticar usuario
-            user = authenticate(request, username=username, password=password)
-            
             if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    
-                    # Configurar duración de la sesión
-                    if not remember_me:
-                        request.session.set_expiry(0)  # Expira al cerrar navegador
-                    
-                    messages.success(request, f'¡Bienvenido {user.get_full_name() or user.username}!')
-                    
-                    # Redirigir según el tipo de usuario
-                    next_url = request.POST.get('next') or request.GET.get('next')
-                    
-                    if next_url:
-                        return redirect(next_url)
-                    
-                    elif user.is_staff:
-                        # Si es Instructor/Admin -> Dashboard
-                        return redirect('core:dashboard')
-                    else:
-                        # Si es Aprendiz -> Su Perfil Nuevo
-                        return redirect('aprendices:perfil_aprendiz')
-                        
+                login(request, user)
+                
+                if not remember_me:
+                    request.session.set_expiry(0)
+                
+                messages.success(request, f'¡Bienvenido {user.get_full_name() or user.username}!')
+                
+                next_url = request.POST.get('next') or request.GET.get('next')
+                if next_url:
+                    return redirect(next_url)
+                elif user.is_staff:
+                    return redirect('core:dashboard')
                 else:
-                    messages.error(request, 'Esta cuenta ha sido desactivada.')
-            else:
-                messages.error(request, 'Documento o contraseña incorrectos.')
+                    return redirect('aprendices:perfil_aprendiz')
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
-    else:
-        form = LoginForm()
-    
-    context = {
-        'form': form,
-        'titulo': 'Iniciar Sesión'
-    }
-    return render(request, 'usuarios/login.html', context)
+            # Si el formulario no es válido, es porque la contraseña está mal o el usuario no existe
+            messages.error(request, 'Documento o contraseña incorrectos.')
+            return redirect('core:index')
+
+    # Si intentan entrar a /usuarios/login/ tipeando la URL, los devolvemos al inicio
+    return redirect('core:index')
 
 
 @csrf_protect
