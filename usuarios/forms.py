@@ -331,7 +331,7 @@ class UsuarioForm(forms.ModelForm):
             # Al username le ponemos placeholder más descriptivo
             'username': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Ej. pepe123',
+                'placeholder': 'Ej. user123',
                 'inputmode': 'text',
                 'pattern': '[A-Za-z0-9]+'
             }),
