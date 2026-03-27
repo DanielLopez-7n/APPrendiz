@@ -239,7 +239,7 @@
                         </a>
                     </li>
                     <li><a href="#">Soporte</a></li>
-                    <li><a href="#" title="Manual de usuario disponible próximamente">Ayuda (Próximamente)</a></li>
+                    <li><a href="{% static 'docs/Manual_Usuario_APPrendiz.pdf' %}" target="_blank" rel="noopener">Ayuda (Manual de usuario)</a></li>
                 </ul>
             </div>
 
@@ -286,6 +286,8 @@
         </div>
     </div>
 </footer>
+
+{% include 'core/manual_usuario_button.html' with help_mode='publico' %}
 
 <div class="modal fade" id="modulosModal" tabindex="-1" aria-labelledby="modulosModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">

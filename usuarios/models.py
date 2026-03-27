@@ -24,6 +24,14 @@ class PerfilUsuario(models.Model):
         related_name='perfil'
     )
     
+    tipo_documento = models.CharField(
+        max_length=5,
+        choices=TIPO_DOC_CHOICES,
+        blank=True,
+        default='',
+        help_text="Tipo de documento de identidad"
+    )
+
     documento = models.CharField(
         max_length=20, 
         unique=True,
