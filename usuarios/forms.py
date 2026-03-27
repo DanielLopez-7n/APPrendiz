@@ -217,6 +217,11 @@ class EditarPerfilForm(forms.ModelForm):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'}),
     )
+    fecha_nacimiento = forms.DateField(
+        required=False,
+        input_formats=['%Y-%m-%d', '%d/%m/%Y'],
+        widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+    )
 
     class Meta:
         model = PerfilUsuario
@@ -227,7 +232,6 @@ class EditarPerfilForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
-            'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
     def __init__(self, *args, **kwargs):
     # Sacamos al usuario de los argumentos
