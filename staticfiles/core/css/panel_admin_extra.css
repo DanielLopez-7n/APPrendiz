@@ -1,0 +1,142 @@
+/* Styles extraídos desde panel_admin_base.html
+   Contienen paleta SENA, sidebar, carrusel y reglas generales
+*/
+:root {
+    --sena-green: #39a900;
+    --sena-dark-green: #2d8600;
+    --sena-orange: #ff671f;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 80px;
+    --neutral-text: #111827;
+}
+
+html, body { margin: 0; padding: 0; overflow-x: hidden; background-color: #000; height:100%; }
+
+/* 1. CARRUSEL DE FONDO (Fijo y cubriendo toda la pantalla) */
+#fondo-carrusel { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; }
+#fondo-carrusel .carousel-item img { object-fit: cover; height: 100vh; width: 100%; }
+/* Capa oscura suave para que el carrusel no sature la vista */
+.overlay-oscura { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.28); pointer-events: none; }
+
+/* 2. SIDEBAR (Animado y Estructurado) */
+#sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: rgba(57, 169, 0, 0.95) !important; /* Verde con leve transparencia */
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+/* 3. ESTADOS DEL SIDEBAR: COLAPSADO (Mini-Sidebar) */
+#sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+#sidebar.collapsed .user-name, 
+#sidebar.collapsed .user-role, 
+#sidebar.collapsed .nav-header span, 
+#sidebar.collapsed .nav-link span { display: none !important; }
+#sidebar.collapsed .sidebar-header { padding: 15px 5px !important; }
+#sidebar.collapsed .user-avatar { width: 40px !important; height: 40px !important; }
+#sidebar.collapsed .nav-link { justify-content: center; padding: 10px 0 !important; }
+#sidebar.collapsed .nav-link i { margin: 0 !important; font-size: 1.4rem; }
+
+.sidebar-header { padding: 25px 15px; border-bottom: 1px solid rgba(255,255,255,0.2); text-align: center; transition: 0.3s; }
+.user-avatar { background: linear-gradient(135deg, #46d200 0%, #39a900 100%); border: 3px solid #fff; margin: 0 auto; transition: 0.3s; }
+        
+/* 4. BOTONES DEL MENÚ LATERAL Y HOVER OSCURO */
+#sidebar .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+    border-radius: 8px; margin: 4px 10px;
+    display: flex; align-items: center; white-space: nowrap;
+    transition: all 0.3s ease;
+}
+#sidebar .nav-link i { color: rgba(255,255,255,0.85) !important; margin-right: 12px; font-size: 1.2rem; transition: 0.3s; }
+        
+/* === AQUÍ ESTÁ LA MAGIA DEL CONTRASTE OSCURO === */
+#sidebar .nav-link:hover, #sidebar .nav-link.activo {
+    background-color: #ffffff !important;
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+#sidebar .nav-link:hover span, #sidebar .nav-link.activo span {
+    color: #111111 !important; /* Texto a negro */
+    font-weight: 700;
+}
+#sidebar .nav-link:hover i, #sidebar .nav-link.activo i {
+    color: var(--sena-dark-green) !important; /* Icono a verde oscuro */
+}
+/* Decoración naranja para el activo */
+#sidebar .nav-link.activo { position: relative; }
+#sidebar .nav-link.activo::before {
+    content: ''; position: absolute; left: -10px; top: 10%; height: 80%; width: 5px;
+    background-color: var(--sena-orange); border-radius: 0 4px 4px 0;
+}
+
+.nav-header { padding: 15px 10px 5px 20px; white-space: nowrap; }
+.nav-header span { color: rgba(255,255,255,0.5); font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
+
+/* 5. CONTENIDO PRINCIPAL Y EFECTO CRISTAL (Glassmorphism) */
+#main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex; flex-direction: column;
+}
+#main-content.collapsed { margin-left: var(--sidebar-collapsed-width); }
+
+.topbar {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 2px solid rgba(57, 169, 0, 0.5);
+    position: sticky; top: 0; z-index: 900;
+}
+
+/* Contenedor central translúcido que deja ver el carrusel */
+.content-wrapper {
+    /* Más transparente para dejar notar el carrusel; sigue protegiendo texto */
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 12px;
+    margin: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+    flex-grow: 1;
+    min-height: 60vh;
+}
+
+/* 6. COLORES DE TEXTO DENTRO DE LAS TARJETAS */
+/* Forzar paleta: evitar azules por defecto de bootstrap */
+:root { --bs-primary: var(--sena-green); --bs-info: var(--sena-green); }
+.text-primary, a.text-primary, .bi-info-circle, .bi-info { color: var(--sena-green) !important; }
+.badge.bg-primary, .btn-primary, .btn-outline-primary, .table thead th.bg-primary { background-color: var(--sena-green) !important; border-color: var(--sena-green) !important; }
+body, .card, table, .table * { color: #1a1d20 !important; font-weight: 500; }
+.card { background-color: rgba(255, 255, 255, 0.95) !important; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+h1, h2, h3, h4, h5, h6, .page-title { color: var(--sena-dark-green) !important; font-weight: 800; }
+label, .form-label { color: #333333 !important; font-weight: 700 !important; }
+.text-muted, .small { color: #555555 !important; font-weight: 600; }
+
+/* 7. BOTONES GENERALES */
+.btn-primary, .btn-success { background-color: var(--sena-green) !important; border-color: var(--sena-green) !important; color: white !important; font-weight: 600; border-radius: 8px; }
+.btn-primary:hover, .btn-success:hover { background-color: var(--sena-dark-green) !important; border-color: var(--sena-dark-green) !important; }
+    
+.btn-toggle { cursor: pointer; transition: 0.2s; }
+.btn-toggle:hover { transform: scale(1.1); color: var(--sena-dark-green); }
+
+/* Botón Logout Rojo */
+/* Logout debe verse claramente rojo, sin mezcla con verde */
+.nav-link.text-danger { background-color: transparent !important; color: #e11d48 !important; border-radius: 8px; }
+.nav-link.text-danger i, .nav-link.text-danger span { color: #e11d48 !important; }
+.nav-link.text-danger:hover { background-color: #dc3545 !important; color: #fff !important; }
+.nav-link.text-danger:hover span, .nav-link.text-danger:hover i { color: #fff !important; }
+
+/* 8. ADAPTABILIDAD MÓVIL */
+@media (max-width: 768px) {
+    #sidebar { left: calc(-1 * var(--sidebar-width)); } /* Oculto por defecto en celular */
+    #sidebar.mobile-open { left: 0; }
+    #main-content { margin-left: 0 !important; }
+    .content-wrapper { margin: 10px; border-radius: 10px; }
+}

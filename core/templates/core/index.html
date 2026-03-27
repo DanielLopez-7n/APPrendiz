@@ -7,6 +7,7 @@
 <style>
     :root {
         --sena-green: #39A900;
+        --sena-green-light: #71d93d; /* Un verde más brillante para fondos oscuros */
         --sena-dark: #1a1e21;
         --text-main: #2d3436;
         --bg-light: #ffffff;
@@ -136,7 +137,7 @@
     .min-vh-75 { min-height: 75vh; }
 
     .text-sena-light {
-        color: #71d93d; /* Un verde más brillante para que resalte sobre el fondo oscuro */
+        color: var(--sena-green-light);
         font-weight: 800;
     }
 
@@ -156,42 +157,196 @@
         color: #000000;
     }
 
-    .method-step {
-        border: 1px solid #e9ecef;
+    /* =========================================
+       ESTILO INTERACTIVO CORREGIDO - METODOLOGÍA
+       (Sin rastros de azul/cyan)
+       ========================================= */
+    .bg-sena-interactive {
+        background-color: var(--sena-dark);
+        position: relative;
+        overflow: hidden;
+    }
+
+    #senaParticles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    /* Tarjetas estilo "Cristal Oscuro" (Glassmorphism) */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(57, 169, 0, 0.2);
         border-radius: 18px;
-        background: #fff;
         padding: 20px;
         height: 100%;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
-    .method-step .icon {
-        width: 44px;
-        height: 44px;
+
+    .glass-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(57, 169, 0, 0.6);
+        box-shadow: 0 15px 40px rgba(57, 169, 0, 0.15);
+    }
+
+    .glass-card .icon {
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(57,169,0,0.12);
-        color: var(--sena-green);
-        font-size: 1.25rem;
-        margin-bottom: 10px;
+        background: rgba(57, 169, 0, 0.15);
+        color: var(--sena-green-light); /* Íconos en verde sena brillante */
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        box-shadow: 0 0 15px rgba(57, 169, 0, 0.2);
     }
-    .team-card-home {
-        border: 1px solid #e9ecef;
+
+    .glass-card .text-muted {
+        color: #aeb8c2 !important; 
+    }
+
+    /* Tarjeta del Equipo en modo Dark */
+    .team-card-glass {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(57, 169, 0, 0.25);
         border-radius: 24px;
-        background: #ffffff;
-        padding: 28px;
-        box-shadow: 0 14px 30px rgba(0,0,0,0.05);
+        padding: 40px;
+        color: #ffffff;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     }
+
+    .team-card-glass .text-muted {
+        color: #b2bec3 !important;
+    }
+
     .tech-badge {
         display: inline-block;
         padding: 6px 12px;
         margin: 0 8px 8px 0;
         border-radius: 999px;
         background: rgba(57,169,0,.12);
-        color: #1f5f00;
+        color: var(--sena-green-light);
         font-weight: 700;
         font-size: .8rem;
+        border: 1px solid transparent;
+        transition: all .2s ease;
+    }
+    .tech-badge:hover {
+        background: rgba(57,169,0,.2);
+        border-color: rgba(57,169,0,.35);
+        transform: translateY(-2px);
+    }
+
+    .section-label-premium {
+        display: inline-block;
+        font-weight: 800;
+        color: var(--sena-green-light); /* Título en verde */
+        padding-bottom: 6px;
+        border-bottom: 3px solid var(--sena-green);
+        letter-spacing: .3px;
+        margin-bottom: 14px;
+    }
+
+    .dev-profile-card-dark {
+        background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.2) 100%);
+        border: 1px solid rgba(57, 169, 0, 0.2); /* Borde verde sutil */
+        border-radius: 20px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .dev-profile-card-dark:hover {
+        transform: translateY(-5px);
+        border-color: rgba(57, 169, 0, 0.5); /* Enfoque verde al hover */
+        box-shadow: 0 10px 30px rgba(57, 169, 0, 0.1);
+    }
+
+    .dev-avatar-dark {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        background: rgba(57, 169, 0, 0.1);
+        border: 2px solid var(--sena-green);
+        color: var(--sena-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        box-shadow: 0 0 20px rgba(57, 169, 0, 0.3);
+    }
+
+    /* =========================================
+       TRANSICIÓN DEL HEADER A MODO OSCURO
+       ========================================= */
+    .navbar {
+        transition: background-color 0.4s ease, box-shadow 0.4s ease !important;
+    }
+    
+    /* Clase que se agregará dinámicamente vía JS */
+    .navbar-dark-custom {
+        background-color: rgba(26, 30, 33, 0.95) !important; /* Semi-transparente */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+        border-bottom: 1px solid rgba(57, 169, 0, 0.2); /* Borde verde sutil */
+    }
+
+    /* Cambiar el color de los textos y links a blanco */
+    .navbar-dark-custom .nav-link, 
+    .navbar-dark-custom .navbar-brand,
+    .navbar-dark-custom .navbar-text {
+        color: #ffffff !important;
+        transition: color 0.3s ease;
+    }
+
+    /* Hover verde para los links en modo oscuro */
+    .navbar-dark-custom .nav-link:hover {
+        color: var(--sena-green) !important;
+    }
+
+    /* Truco para volver blanco el ícono de hamburguesa en móviles */
+    .navbar-dark-custom .navbar-toggler-icon {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .navbar-dark-custom .navbar-toggler {
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    /* Estilos para la cabecera cuando se desplaza */
+    .navbar-scrolled {
+        background-color: #ffffff; /* Fondo blanco opaco */
+        color: #2d3436; /* Texto gris oscuro corporativo */
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; /* Transición suave */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra sutil para profundidad */
+    }
+
+    /* Cambiar el color de los enlaces y la marca dentro de la cabecera desplazada */
+    .navbar-scrolled .nav-link,
+    .navbar-scrolled .navbar-brand {
+        color: #2d3436;
+    }
+
+    /* Asegurar legibilidad del texto de la cabecera desplazada */
+    .navbar-scrolled .navbar-text,
+    .navbar-scrolled .text-muted {
+        color: #2d3436 !important;
+    }
+
+    /* Asegurar contraste en modo oscuro dinámico */
+    .navbar-dark-custom .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
     }
 
 </style>
@@ -245,7 +400,7 @@
     <div class="container">
         <div class="row mb-5">
             <div class="col-lg-6">
-                <h2 class="fw-bold display-5">¿Estás pasando por algo de esto?</h2>
+                <h2 class="fw-bold display-5">Desafíos frecuentes que APPrendiz resuelve</h2>
             </div>
         </div>
         <div class="row g-4">
@@ -274,85 +429,99 @@
     </div>
 </section>
 
-<section id="metodologia" class="py-5">
-    <div class="container">
-        <div class="py-5">
-            <span class="benefit-tag">METODOLOGÍA APPrendiz</span>
-            <h2 class="fw-bold display-6 mb-4">⚙️ ¿Cómo funciona APPrendiz?</h2>
-            <p class="text-muted fs-5 mb-5">
-                Un proceso claro, digital y trazable para acompañar la etapa productiva de principio a fin.
-            </p>
+<section id="metodologia" class="py-5 bg-sena-interactive">
+    <canvas id="senaParticles"></canvas>
 
-            <div class="row g-4 mb-5">
-                <div class="col-lg-6">
-                    <div class="method-step">
-                        <span class="icon"><i class="bi bi-building"></i></span>
-                        <h5 class="fw-bold">1. 🏢 Vinculación y Registro</h5>
-                        <p class="text-muted mb-0">
-                            El proceso inicia con el registro del aprendiz y su respectiva asignación a una empresa y un programa de formación.
-                            El sistema organiza la información centralizando los datos clave para un seguimiento estructurado.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="method-step">
-                        <span class="icon"><i class="bi bi-journal-text"></i></span>
-                        <h5 class="fw-bold">2. 📝 Registro de Bitácoras</h5>
-                        <p class="text-muted mb-0">
-                            El aprendiz documenta sus actividades diarias o semanales de forma digital a través de nuestro módulo de bitácoras,
-                            eliminando el papeleo y manteniendo un historial seguro en la nube.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="method-step">
-                        <span class="icon"><i class="bi bi-person-check"></i></span>
-                        <h5 class="fw-bold">3. 👨‍🏫 Evaluación y Feedback</h5>
-                        <p class="text-muted mb-0">
-                            El instructor asignado recibe notificaciones de las nuevas bitácoras, evalúa el desempeño del aprendiz y cambia el estado de los reportes
-                            (Aprobado, Pendiente o Rechazado), dejando observaciones en tiempo real.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="method-step">
-                        <span class="icon"><i class="bi bi-file-earmark-pdf"></i></span>
-                        <h5 class="fw-bold">4. 📄 Generación de Reportes Oficiales</h5>
-                        <p class="text-muted mb-0">
-                            Con un solo clic, el sistema compila toda la información validada y genera un reporte en formato PDF con diseño institucional (SENA),
-                            listo para ser descargado, firmado o archivado.
-                        </p>
-                    </div>
+    <div class="container position-relative py-5" style="z-index: 2;">
+        <span class="benefit-tag" style="color: var(--sena-green-light); text-shadow: 0 0 10px rgba(113,217,61,0.3);">METODOLOGÍA APPRENDIZ</span>
+        <h2 class="fw-bold display-6 mb-4 text-white">¿Cómo funciona APPrendiz?</h2>
+        <p class="fs-5 mb-5" style="color: #b2bec3;">
+            Un proceso claro, digital y trazable para acompañar la etapa productiva de principio a fin.
+        </p>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <span class="icon"><i class="bi bi-building"></i></span>
+                    <h5 class="fw-bold">1. Vinculación y Registro</h5>
+                    <p class="text-muted mb-0">
+                        El proceso inicia con el registro del aprendiz y su respectiva asignación a una empresa y un programa de formación.
+                        El sistema organiza la información centralizando los datos clave para un seguimiento estructurado.
+                    </p>
                 </div>
             </div>
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <span class="icon"><i class="bi bi-journal-text"></i></span>
+                    <h5 class="fw-bold">2. Registro de Bitácoras</h5>
+                    <p class="text-muted mb-0">
+                        El aprendiz documenta sus actividades diarias o semanales de forma digital a través de nuestro módulo de bitácoras,
+                        eliminando el papeleo y manteniendo un historial seguro en la nube.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <span class="icon"><i class="bi bi-person-check"></i></span>
+                    <h5 class="fw-bold">3. Evaluación y Feedback</h5>
+                    <p class="text-muted mb-0">
+                        El instructor asignado recibe notificaciones de las nuevas bitácoras, evalúa el desempeño del aprendiz y cambia el estado de los reportes
+                        (Aprobado, Pendiente o Rechazado), dejando observaciones en tiempo real.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="glass-card">
+                    <span class="icon"><i class="bi bi-file-earmark-pdf"></i></span>
+                    <h5 class="fw-bold">4. Generación de Reportes Oficiales</h5>
+                    <p class="text-muted mb-0">
+                        Con un solo clic, el sistema compila toda la información validada y genera un reporte en formato PDF con diseño institucional (SENA),
+                        listo para ser descargado, firmado o archivado.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-            <div class="team-card-home">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-8">
-                        <span class="benefit-tag mb-2">NUESTRO EQUIPO</span>
-                        <h4 class="fw-bold mb-2">Daniel - Desarrollador Full-Stack | Talento SENA</h4>
-                        <p class="text-muted mb-3">
-                            Soy Tecnólogo en Análisis y Desarrollo de Software en formación por el SENA (Colombia), actualmente en etapa productiva.
-                        </p>
-                        <p class="text-muted mb-3">
-                            Diseñé y desarrollé APPrendiz desde cero como una solución real para optimizar y digitalizar el seguimiento académico.
-                            Me apasiona el código limpio, la lógica detrás de las bases de datos relacionales y la creación de interfaces responsivas.
-                            Disfruto profundamente el trabajo en equipo y siempre estoy dispuesto a aprender nuevas tecnologías para construir herramientas que aporten verdadero valor.
-                        </p>
-                        <div>
-                            <span class="tech-badge">Python</span>
-                            <span class="tech-badge">Django</span>
-                            <span class="tech-badge">PostgreSQL</span>
-                            <span class="tech-badge">JavaScript</span>
-                            <span class="tech-badge">Bootstrap 5</span>
-                            <span class="tech-badge">Git / GitHub</span>
-                        </div>
+        <div class="team-card-glass mt-5">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="section-label-premium">Nuestro Equipo</span>
+                    <h4 class="fw-bold mb-2 text-white">Yerson Daniel López Niño - Análisis y desarrollo de software</h4>
+                    <p class="text-muted mb-3">
+                        Soy Tecnólogo en Análisis y Desarrollo de Software en formación por el SENA (Colombia), actualmente en etapa productiva.
+                    </p>
+                    <p class="text-muted mb-3">
+                        Diseñé y desarrollé APPrendiz desde cero como una solución real para optimizar y digitalizar el seguimiento académico.
+                        Me apasiona el código limpio, la lógica detrás de las bases de datos relacionales y la creación de interfaces responsivas.
+                        Disfruto profundamente el trabajo en equipo y siempre estoy dispuesto a aprender nuevas tecnologías para construir herramientas que aporten verdadero valor.
+                    </p>
+                    <div>
+                        <span class="tech-badge">Python</span>
+                        <span class="tech-badge">Django</span>
+                        <span class="tech-badge">PostgreSQL</span>
+                        <span class="tech-badge">JavaScript</span>
+                        <span class="tech-badge">Bootstrap 5</span>
+                        <span class="tech-badge">Git / GitHub</span>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="p-3 bg-light rounded-4 border text-center">
-                            <img src="{% static 'core/img/aprendices_home.jpg' %}" 
-                                alt="Equipo APPrendiz" 
-                                class="img-fluid rounded-4 custom-img-grow">
+                </div>
+                <div class="col-lg-4">
+                    <div class="dev-profile-card-dark">
+                        <div class="dev-avatar-dark">
+                            <i class="bi bi-person-workspace"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-white">Daniel López</h6>
+                        <div class="small fw-semibold mb-3" style="color: var(--sena-green-light);">Desarrollador Full-Stack</div>
+                        <p class="small text-muted mb-3">
+                            Construcción de arquitectura, backend Django, base de datos y experiencia de usuario del sistema APPrendiz.
+                        </p>
+                        
+                        <div class="d-grid mt-3">
+                            <a href="https://www.linkedin.com/in/yerson-danel-l%C3%B3pez-ni%C3%B1o-5392373ba/" 
+                               target="_blank" 
+                               class="btn btn-sm btn-studio btn-outline-light d-flex align-items-center justify-content-center"
+                               style="border-radius: 8px; padding: 10px 15px; font-weight: 600;">
+                               <i class="bi bi-linkedin fs-6 me-2"></i>Conectar en LinkedIn
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -360,4 +529,178 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. Script para el cambio de color del Header (Master)
+        // Seleccionamos el navbar (asumiendo que usa la etiqueta <nav> o la clase .navbar)
+        const navbar = document.querySelector('.navbar') || document.querySelector('nav');
+        const darkSection = document.getElementById('metodologia');
+
+        if(navbar && darkSection) {
+            window.addEventListener('scroll', () => {
+                // Obtenemos la posición de la sección oscura respecto a la pantalla
+                const sectionTop = darkSection.getBoundingClientRect().top;
+                const sectionBottom = darkSection.getBoundingClientRect().bottom;
+                const navbarHeight = navbar.offsetHeight;
+
+                // Si el navbar entra en la zona de la sección oscura
+                if (sectionTop <= navbarHeight && sectionBottom >= navbarHeight) {
+                    navbar.classList.add('navbar-dark-custom');
+                    
+                    // Remover fondos claros por defecto de Bootstrap (bg-light, bg-white)
+                    navbar.classList.remove('bg-white', 'bg-light'); 
+                } else {
+                    // Si salimos de la sección oscura (hacia arriba o hacia abajo)
+                    navbar.classList.remove('navbar-dark-custom');
+                    
+                    // Volvemos a poner el fondo claro si estaba en el master
+                    // navbar.classList.add('bg-white'); // Ajusta según tu master
+                }
+            });
+        }
+
+        // 2. Script para la red de partículas interactivas
+        const canvas = document.getElementById("senaParticles");
+        const ctx = canvas.getContext("2d");
+        
+        let particlesArray;
+        let isMouseInSection = false;
+
+        // Ajustar tamaño al contenedor
+        function setCanvasSize() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        // Posición del mouse
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 120 // Rango de interacción
+        }
+
+        // Eventos del mouse limitados a la sección
+        canvas.parentElement.addEventListener('mousemove', function(event) {
+            let rect = canvas.getBoundingClientRect();
+            mouse.x = event.clientX - rect.left;
+            mouse.y = event.clientY - rect.top;
+            isMouseInSection = true;
+        });
+
+        canvas.parentElement.addEventListener('mouseleave', function() {
+            mouse.x = undefined;
+            mouse.y = undefined;
+            isMouseInSection = false;
+        });
+
+        // Clase Partícula
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+            }
+            // Dibujar punto
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            // Mover y chequear colisiones
+            update() {
+                if(this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                if(this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        // Inicializar arreglo de partículas
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 12000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) - 0.5;
+                let color = '#39A900'; // VERDE SENA (Fijo, sin azul)
+                
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        // Unir puntos con líneas
+        function connect() {
+            let opacityValue = 1;
+            for(let a = 0; a < particlesArray.length; a++) {
+                for(let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) 
+                                 + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if(distance < (canvas.width/10) * (canvas.height/10)) {
+                        opacityValue = 1 - (distance/10000);
+                        ctx.strokeStyle = 'rgba(57, 169, 0,' + opacityValue + ')'; // Verde SENA transparente (Sin azul)
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Conectar con el mouse si está cerca (Usando color verde sena light)
+                if(isMouseInSection && mouse.x != null) {
+                    let mouseDistance = ((particlesArray[a].x - mouse.x) * (particlesArray[a].x - mouse.x)) 
+                                      + ((particlesArray[a].y - mouse.y) * (particlesArray[a].y - mouse.y));
+                    if(mouseDistance < mouse.radius * mouse.radius) {
+                        ctx.strokeStyle = 'rgba(113, 217, 61, 0.4)'; // Verde SENA light al tocar el mouse (Corregido)
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+                // Bucle de animación
+                function animate() {
+                    requestAnimationFrame(animate);
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    for(let i = 0; i < particlesArray.length; i++) {
+                        particlesArray[i].update();
+                    }
+                    connect();
+                }
+
+                init();
+                animate();
+            });
+
+            /* Detector de desplazamiento para la cabecera */
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar'); /* Selecciona tu cabecera */
+            const threshold = 100; /* Umbral de desplazamiento en píxeles (p. ej., 100px) */
+
+            if (window.scrollY > threshold) {
+                navbar.classList.add('navbar-scrolled'); /* Agrega la clase si se supera el umbral */
+            } else {
+                navbar.classList.remove('navbar-scrolled'); /* Quita la clase si no se supera el umbral */
+            }
+        });
+</script>
 {% endblock %}

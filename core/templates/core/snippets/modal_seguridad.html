@@ -1,0 +1,61 @@
+{% if alerta_password %}
+<!-- Modal de Seguridad Vulnerable -->
+<div class="modal fade" id="seguridadModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="seguridadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2);">
+      
+      <div class="modal-header" style="background-color: #ffc107; border-bottom: none; padding: 20px 25px;">
+        <h5 class="modal-title fw-bold text-dark" id="seguridadModalLabel">
+          <i class="bi bi-shield-exclamation me-2"></i> ¡Aviso de Seguridad Importante!
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body text-center p-4 p-md-5">
+        <div class="mb-4">
+            <i class="bi bi-key-fill text-secondary" style="font-size: 3.5rem;"></i>
+        </div>
+        <h4 class="fw-bold mb-3">Tu cuenta es vulnerable</h4>
+        <p class="text-muted mb-4">
+          Hemos detectado que estás utilizando tu <strong>nombre de usuario</strong> como contraseña. Cualquier persona que conozca esta información podría acceder a tus evaluaciones y bitácoras.
+        </p>
+        <div class="alert alert-warning border-0 rounded-4 py-3">
+            <p class="fw-bold text-dark mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Te recomendamos cambiarla ahora mismo.
+            </p>
+        </div>
+      </div>
+      
+      <div class="modal-footer justify-content-center border-top-0 pb-4">
+        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Recordarme luego</button>
+        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" style="background-color: #39a900; border-color: #39a900;">
+          <i class="bi bi-lock-fill me-2"></i> Cambiar Contraseña ahora
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalElement = document.getElementById('seguridadModal');
+        if (!modalElement) return;
+
+        // Clave por usuario para no repetir el modal en cada navegación.
+        const storageKey = 'alerta_password_mostrada_user_{{ request.user.id }}';
+        const yaMostrada = sessionStorage.getItem(storageKey) === 'true';
+
+        // Mover al final del body para evitar problemas de z-index
+        document.body.appendChild(modalElement);
+        
+        if (!yaMostrada) {
+            const myModal = new bootstrap.Modal(modalElement);
+            setTimeout(() => {
+                myModal.show();
+                sessionStorage.setItem(storageKey, 'true');
+            }, 1000);
+        }
+    });
+</script>
+{% endif %}
