@@ -1,0 +1,278 @@
+{% load static %}
+<style>
+    #manual-help-container {
+        position: fixed;
+        right: 20px;
+        bottom: 92px;
+        z-index: 9998;
+    }
+
+    #manual-help-btn {
+        width: 60px;
+        height: 60px;
+        border: none;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff7e2f 0%, #ff5f1f 100%);
+        color: #fff;
+        font-size: 2rem;
+        font-weight: 700;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #manual-help-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    #manualHelpModal .modal-content {
+        border-radius: 18px;
+        border: 0;
+        overflow: hidden;
+    }
+
+    #manualHelpModal .modal-header {
+        background: #39A900;
+        color: #fff;
+    }
+
+    .manual-assistant-wrapper {
+        border: 1px solid #d7dee3;
+        border-radius: 16px;
+        padding: 14px;
+        background: #ffffff;
+        margin-top: 12px;
+    }
+
+    .manual-disclaimer {
+        background: #f8fff2;
+        border: 1px dashed #9cd47d;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        color: #2d8600;
+        font-size: 0.85rem;
+    }
+
+    .manual-chat-box {
+        max-height: 250px;
+        overflow-y: auto;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fafafa;
+    }
+
+    .manual-msg {
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        font-size: 0.92rem;
+        line-height: 1.45;
+        white-space: pre-line;
+    }
+
+    .manual-msg.bot {
+        background: #e8f5e9;
+        border-left: 4px solid #39A900;
+        color: #1f2b21;
+        margin-right: 24px;
+    }
+
+    .manual-msg.user {
+        background: #f0f2f4;
+        border-left: 4px solid #6c757d;
+        color: #212529;
+        margin-left: 24px;
+    }
+
+    .manual-quick-questions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+    }
+
+    .manual-quick-questions button {
+        border: 1px solid #9bd47a;
+        background: #f4ffec;
+        color: #2d8600;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+    }
+
+    .manual-quick-questions button:hover {
+        background: #e9ffdb;
+    }
+</style>
+
+<div id="manual-help-container">
+    <button id="manual-help-btn" type="button" data-bs-toggle="modal" data-bs-target="#manualHelpModal" aria-label="Abrir ayuda">
+        ?
+    </button>
+</div>
+
+<div class="modal fade" id="manualHelpModal" tabindex="-1" aria-labelledby="manualHelpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="manualHelpModalLabel">
+                    <i class="bi bi-journal-text me-2"></i>Centro de ayuda
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="mb-3 text-muted">Puedes abrir el manual en una nueva pestaña o usar el chat para resolver preguntas frecuentes del sistema APPrendiz.</p>
+                <a href="{% static 'docs/Manual_Usuario_APPrendiz.pdf' %}" target="_blank" rel="noopener" class="btn btn-success w-100 fw-bold rounded-pill mb-2">
+                    <i class="bi bi-box-arrow-up-right me-2"></i>Abrir manual de usuario
+                </a>
+
+                <div class="manual-assistant-wrapper">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-chat-dots me-2"></i>Chatbot de ayuda rápida</h6>
+                        <small class="text-muted">Preguntas frecuentes</small>
+                    </div>
+
+                    <div class="manual-disclaimer">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Este asistente responde solo preguntas predeterminadas del sistema APPrendiz (usuarios, bitácoras, búsqueda, perfiles, fichas y contraseñas).
+                    </div>
+
+                    <div class="manual-chat-box" id="manual-chat-box">
+                        <div class="manual-msg bot">¡Hola! 👋 Soy tu asistente de APPrendiz.
+Puedes hacer preguntas operativas del sistema o usar los botones sugeridos.</div>
+                    </div>
+
+                    <div class="manual-quick-questions">
+                        <button type="button" data-question="¿Cómo crear un usuario?">Crear usuario</button>
+                        <button type="button" data-question="¿Cómo calificar una bitácora?">Calificar bitácora</button>
+                        <button type="button" data-question="¿Cómo listar aprendices?">Listar aprendices</button>
+                        <button type="button" data-question="¿Cómo ver detalle de un aprendiz?">Ver detalle aprendiz</button>
+                        <button type="button" data-question="¿Cómo usar la búsqueda global?">Búsqueda global</button>
+                        <button type="button" data-question="¿Cómo cambiar la contraseña?">Cambiar contraseña</button>
+                        <button type="button" data-question="¿Cómo registrar una ficha?">Registrar ficha</button>
+                        <button type="button" data-question="¿Cómo cerrar sesión?">Cerrar sesión</button>
+                    </div>
+
+                    <div class="input-group mt-1">
+                        <input type="text" id="manual-chat-input" class="form-control" placeholder="Escribe tu pregunta..." maxlength="200">
+                        <button class="btn btn-success" type="button" id="manual-chat-send" aria-label="Enviar pregunta">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('manualHelpModal');
+    if (!modal || modal.dataset.chatInitialized === 'true') return;
+    modal.dataset.chatInitialized = 'true';
+
+    const chatBox = modal.querySelector('#manual-chat-box');
+    const input = modal.querySelector('#manual-chat-input');
+    const sendBtn = modal.querySelector('#manual-chat-send');
+    const quickBtns = modal.querySelectorAll('.manual-quick-questions button');
+
+    const faq = [
+        {
+            required: ['crear', 'usuario'],
+            answer: 'Para crear un usuario:\n1) Ve a Usuarios > Nuevo usuario o Crear usuario.\n2) Completa documento, nombres, correo y rol.\n3) Guarda y valida que aparezca en listado.'
+        },
+        {
+            required: ['calificar', 'bitacora'],
+            answer: 'Para calificar bitácoras:\n1) Abre Bitácoras > Listar/Revisar.\n2) Entra a una bitácora con estado Pendiente.\n3) Agrega observaciones, cambia estado y guarda.'
+        },
+        {
+            required: ['listar', 'aprendiz'],
+            answer: 'Para listar aprendices:\n1) Ve a Aprendices > Listar aprendices.\n2) Usa filtros por documento o nombre.\n3) Abre acciones para ver, editar o consultar bitácoras.'
+        },
+        {
+            required: ['detalle', 'aprendiz'],
+            answer: 'Para ver detalle de aprendiz:\n1) Ve a Aprendices > Listar.\n2) Busca al aprendiz.\n3) Haz clic en el ícono de ver detalle (ojo).'
+        },
+        {
+            required: ['busqueda', 'global'],
+            answer: 'Búsqueda global:\n1) Usa la barra superior del panel.\n2) Escribe nombre, documento, ficha o bitácora.\n3) Pulsa Buscar para ver resultados cruzados.'
+        },
+        {
+            required: ['cambiar', 'contrasena'],
+            answer: 'Cambio de contraseña:\n1) Abre tu menú de perfil.\n2) Selecciona "Cambiar contraseña".\n3) Escribe contraseña actual y nueva, luego confirma.'
+        },
+        {
+            required: ['registrar', 'ficha'],
+            answer: 'Para registrar una ficha:\n1) Ve a Fichas > Crear ficha.\n2) Diligencia número y programa.\n3) Guarda y valida en el listado de fichas.'
+        },
+        {
+            required: ['cerrar', 'sesion'],
+            answer: 'Para cerrar sesión:\n1) Abre el menú de usuario.\n2) Haz clic en "Cerrar sesión".\n3) Confirma en el modal de seguridad.'
+        }
+    ];
+
+    function normalizeText(value) {
+        return (value || '')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function addMessage(text, type) {
+        const msg = document.createElement('div');
+        msg.className = `manual-msg ${type}`;
+        msg.textContent = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotResponse(question) {
+        const normalized = normalizeText(question);
+        if (!normalized) return 'Escribe una pregunta para ayudarte. 😊';
+
+        const words = normalized.split(' ');
+
+        for (const item of faq) {
+            const isMatch = item.required.every((token) => words.includes(token));
+            if (isMatch) return item.answer;
+        }
+
+        return 'Solo puedo responder preguntas predeterminadas del sistema APPrendiz. Prueba con temas como: crear usuario, calificar bitácora, listar aprendices, búsqueda global, cambiar contraseña, registrar ficha o cerrar sesión.';
+    }
+
+    function handleQuestion(question) {
+        const clean = (question || '').trim();
+        if (!clean) return;
+        addMessage(clean, 'user');
+        addMessage(getBotResponse(clean), 'bot');
+    }
+
+    sendBtn.addEventListener('click', () => {
+        handleQuestion(input.value);
+        input.value = '';
+        input.focus();
+    });
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    quickBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const question = btn.getAttribute('data-question') || btn.textContent;
+            handleQuestion(question);
+        });
+    });
+})();
+</script>
