@@ -713,36 +713,6 @@
     }
 </style>
 
-<div id="help-container">
-    <button id="help-btn" onclick="openHelpModal()" aria-label="Abrir manual de usuario">
-        ?
-    </button>
-</div>
-
-<div id="help-modal" class="help-modal" onclick="closeHelpModalOnClickOutside(event)">
-    <div class="help-modal-content">
-        <div class="help-modal-header">
-            <h5><i class="bi bi-question-circle-fill me-2"></i>Centro de Ayuda</h5>
-            <button class="help-modal-close" onclick="closeHelpModal()">&times;</button>
-        </div>
-        <div class="help-modal-body">
-            <i class="bi bi-file-earmark-pdf-fill help-icon-big"></i>
-            <h4>¿Ver el Manual de Usuario?</h4>
-            <p>Se abrirá una guía detallada en formato PDF para ayudarte a navegar y utilizar el sistema APPrendiz.</p>
-        </div>
-        <div class="help-modal-footer">
-            <button class="btn-help-cancel" onclick="closeHelpModal()">Quizás luego</button>
-            <a href="{% static 'docs/Manual_Usuario_APPrendiz.pdf' %}" target="_blank" class="btn-help-confirm">
-                <i class="bi bi-box-arrow-up-right me-2"></i>Sí, abrir manual
-            </a>
-        </div>
-    </div>
-</div>
-
-
-
-
-    </style>
 
     {% load bootstrap5 %}
     {% bootstrap_css %}
