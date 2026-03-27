@@ -418,6 +418,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+  function repairUiOverlays() {
+    var hasVisibleModal = document.querySelector('.modal.show');
+    if (!hasVisibleModal) {
+      document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('padding-right');
+    }
+    document.querySelectorAll('.dropdown-backdrop').forEach(function (el) { el.remove(); });
+  }
+
+  repairUiOverlays();
+  window.addEventListener('pageshow', repairUiOverlays);
+  document.addEventListener('hidden.bs.modal', repairUiOverlays);
+
   var toggle = document.getElementById('togglePassword');
   var pwd = document.getElementById('id_password_modal');
   if (toggle && pwd) {
