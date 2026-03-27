@@ -2,6 +2,13 @@ from django import forms
 from .models import Instructor
 from aprendices.models import Aprendiz
 from django.contrib.auth.models import User
+from core.form_validators import (
+    validate_digits,
+    validate_email_length,
+    validate_person_name,
+    validate_phone,
+    validate_text_length,
+)
 
 class InstructorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -11,11 +18,7 @@ class InstructorForm(forms.ModelForm):
         self.fields['profesion'].widget.attrs['maxlength'] = 70
 
     def clean_cedula(self):
-        cedula = (self.cleaned_data.get('cedula') or '').strip()
-        if not cedula.isdigit():
-            raise forms.ValidationError('La cédula solo permite números (sin letras ni símbolos).')
-        if len(cedula) < 6 or len(cedula) > 20:
-            raise forms.ValidationError('La cédula debe tener entre 6 y 20 dígitos.')
+        cedula = validate_digits(self.cleaned_data.get('cedula'), 'cédula', min_len=6, max_len=20)
         if Instructor.objects.filter(cedula=cedula).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError('Este documento ya está registrado en instructores.')
         if Aprendiz.objects.filter(documento=cedula).exists():
@@ -26,27 +29,18 @@ class InstructorForm(forms.ModelForm):
         return cedula
 
     def clean_telefono(self):
-        telefono = (self.cleaned_data.get('telefono') or '').strip()
-        if telefono and (not telefono.isdigit() or len(telefono) < 7 or len(telefono) > 15):
-            raise forms.ValidationError('El teléfono debe tener entre 7 y 15 dígitos numéricos.')
-        return telefono
+        return validate_phone(self.cleaned_data.get('telefono'), 'teléfono', min_len=7, max_len=15, required=False)
 
     def clean_correo_personal(self):
-        correo = (self.cleaned_data.get('correo_personal') or '').strip()
-        if len(correo) > 70:
-            raise forms.ValidationError('El correo personal no puede superar 70 caracteres.')
-        return correo
+        return validate_email_length(self.cleaned_data.get('correo_personal'), max_len=70)
 
     def clean_direccion_residencia(self):
-        direccion = (self.cleaned_data.get('direccion_residencia') or '').strip()
-        if len(direccion) > 70:
-            raise forms.ValidationError('La dirección no puede superar 70 caracteres.')
-        return direccion
+        return validate_text_length(self.cleaned_data.get('direccion_residencia'), 'dirección', min_len=5, max_len=70)
 
     def clean_profesion(self):
-        profesion = (self.cleaned_data.get('profesion') or '').strip()
-        if len(profesion) > 70:
-            raise forms.ValidationError('La profesión no puede superar 70 caracteres.')
+        profesion = validate_text_length(self.cleaned_data.get('profesion'), 'profesión', min_len=2, max_len=70)
+        if profesion.isdigit():
+            raise forms.ValidationError('La profesión no puede contener solo números.')
         return profesion
 
     class Meta:
