@@ -211,6 +211,13 @@ DEFAULT_FROM_EMAIL = 'APPrendiz SENA <tu_correo_del_proyecto@gmail.com>'
 # ==========================================
 # CONFIGURACIÓN DE GOOGLE reCAPTCHA
 # ==========================================
-# Si están vacías, la validación reCAPTCHA en login queda deshabilitada.
-RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
-RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
+# En DEBUG usamos las llaves públicas de prueba de Google para que el widget
+# se vea y funcione en desarrollo sin configuración adicional.
+RECAPTCHA_SITE_KEY = os.environ.get(
+    'RECAPTCHA_SITE_KEY',
+    '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' if DEBUG else ''
+)
+RECAPTCHA_SECRET_KEY = os.environ.get(
+    'RECAPTCHA_SECRET_KEY',
+    '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe' if DEBUG else ''
+)
