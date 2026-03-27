@@ -175,3 +175,4 @@ cython_debug/
 
 # Archivos de usuario específicos de este proyecto
 evidencias/
+backups/
