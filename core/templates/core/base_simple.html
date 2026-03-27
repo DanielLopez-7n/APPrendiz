@@ -16,11 +16,13 @@
             color: #2d8600;
         }
 
-        /* Defensa extra: evitar que backdrops huérfanos bloqueen clics */
-        body:not(.modal-open) .modal-backdrop,
-        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
+        /* Fijación agresiva: ningún backdrop puede bloquear clics */
+        .modal-backdrop,
+        .offcanvas-backdrop,
+        .dropdown-backdrop {
             opacity: 0 !important;
             pointer-events: none !important;
+            display: none !important;
         }
     </style>
 </head>
