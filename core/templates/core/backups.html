@@ -92,6 +92,17 @@
     
     .btn-delete { background: #ffebee; color: #c62828; }
     .btn-delete:hover { background: #ffcdd2; transform: scale(1.05); }
+    .actions-group {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+    .actions-group .action-btn {
+        margin: 0 !important;
+        flex: 0 0 auto;
+    }
 
     .file-icon {
         font-size: 2rem;
@@ -199,15 +210,17 @@
                                 {% endif %}
                             </td>
                             <td class="text-center">
-                                <button type="button" class="action-btn btn-primary bg-primary bg-opacity-10 text-primary shadow-sm me-2" title="Restaurar este respaldo" data-bs-toggle="modal" data-bs-target="#modalRestaurar-{{ forloop.counter }}">
-                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                </button>
-                                <a href="{% url 'core:descargar_backup' arch.nombre %}" class="action-btn btn-download shadow-sm me-2" title="Descargar a mi PC">
-                                    <i class="bi bi-download"></i>
-                                </a>
-                                <a href="{% url 'core:eliminar_backup' arch.nombre %}" class="action-btn btn-delete shadow-sm" title="Eliminar respaldo" onclick="return confirm('¿Estás seguro de que deseas eliminar este respaldo de forma permanente? Esta acción no se puede deshacer.');">
-                                    <i class="bi bi-trash-fill"></i>
-                                </a>
+                                <div class="actions-group">
+                                    <button type="button" class="action-btn btn-primary bg-primary bg-opacity-10 text-primary shadow-sm" title="Restaurar este respaldo" data-bs-toggle="modal" data-bs-target="#modalRestaurar-{{ forloop.counter }}">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </button>
+                                    <a href="{% url 'core:descargar_backup' arch.nombre %}" class="action-btn btn-download shadow-sm" title="Descargar a mi PC">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    <a href="{% url 'core:eliminar_backup' arch.nombre %}" class="action-btn btn-delete shadow-sm" title="Eliminar respaldo" onclick="return confirm('¿Estás seguro de que deseas eliminar este respaldo de forma permanente? Esta acción no se puede deshacer.');">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
                             </td>
                         </tr>
 
