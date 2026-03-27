@@ -562,6 +562,27 @@
           .alert-border-info { border-left: 6px solid #0dcaf0 !important; }
     </style>
 
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+    <div id="sidebar-overlay" aria-hidden="true"></div>
+    
+    <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="12000" data-bs-pause="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'core/img_bg/fondo1.png' %}" class="d-block w-100" alt="Fondo 1">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo2.png' %}" class="d-block w-100" alt="Fondo 2">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo3.png' %}" class="d-block w-100" alt="Fondo 3">
+                <div class="overlay-oscura"></div>
+            </div>
     {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
   </head>
   <body>
@@ -1271,6 +1292,7 @@
           toggleBtn.querySelector("i").style.color = "white";
         }
 
+<<<<<<< HEAD
         // Toggle Botón
         toggleBtn.addEventListener("click", function () {
           if (isMobile()) {
@@ -1279,12 +1301,121 @@
               closeMobile();
             } else {
               openMobile();
+=======
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const ui = {
+                toggleBtn: document.getElementById('sidebar-toggle'),
+                sidebar: document.getElementById('sidebar'),
+                mainContent: document.getElementById('main-content'),
+                overlay: document.getElementById('sidebar-overlay'),
+            };
+
+            function isMobile() {
+                return window.innerWidth <= 768;
+            }
+
+            function repairUiOverlays() {
+                const hasVisibleModal = document.querySelector('.modal.show');
+                if (!hasVisibleModal) {
+                    document.querySelectorAll('.modal-backdrop').forEach((el) => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('padding-right');
+                }
+                document.querySelectorAll('.dropdown-backdrop').forEach((el) => el.remove());
+            }
+
+            function setSidebarButtonState(isPinned) {
+                if (!ui.toggleBtn) return;
+                ui.toggleBtn.classList.toggle('btn-success', isPinned);
+                ui.toggleBtn.classList.toggle('btn-light', !isPinned);
+                const icon = ui.toggleBtn.querySelector('i');
+                if (icon) icon.style.color = isPinned ? 'white' : 'var(--sena-green)';
+            }
+
+            function openMobileSidebar() {
+                if (!ui.sidebar) return;
+                ui.sidebar.classList.remove('collapsed');
+                ui.sidebar.classList.add('mobile-open');
+                if (ui.overlay) ui.overlay.classList.add('is-active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMobileSidebar() {
+                if (ui.sidebar) ui.sidebar.classList.remove('mobile-open');
+                if (ui.overlay) ui.overlay.classList.remove('is-active');
+                document.body.style.overflow = '';
+            }
+
+            function applyPinnedStateFromStorage() {
+                if (!ui.sidebar || !ui.mainContent || isMobile()) return;
+                const isPinned = localStorage.getItem('sidebarPinned') === 'true';
+                ui.sidebar.classList.toggle('pinned', isPinned);
+                ui.mainContent.classList.toggle('pinned-content', isPinned);
+                setSidebarButtonState(isPinned);
+            }
+            closeMobile();
+
+            function bindSidebarInteractions() {
+                if (!ui.toggleBtn || !ui.sidebar || !ui.mainContent) return;
+
+                ui.toggleBtn.addEventListener('click', function () {
+                    if (isMobile()) {
+                        ui.sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
+                        return;
+                    }
+
+                    ui.sidebar.classList.toggle('pinned');
+                    ui.mainContent.classList.toggle('pinned-content');
+                    const isPinned = ui.sidebar.classList.contains('pinned');
+                    localStorage.setItem('sidebarPinned', String(isPinned));
+                    setSidebarButtonState(isPinned);
+                });
+
+                ui.sidebar.addEventListener('scroll', function () {
+                    sessionStorage.setItem('sidebarScroll', String(ui.sidebar.scrollTop));
+                });
+            }
+
+            function bindFallbackClicks() {
+                document.addEventListener('click', function (event) {
+                    const actionLink = event.target.closest('.action-pill a[href], .actions-group a[href]');
+                    if (actionLink) {
+                        event.preventDefault();
+                        window.location.assign(actionLink.href);
+                        return;
+                    }
+
+                    const filterBtn = event.target.closest('button[title="Aplicar Filtros"], button[data-filter-submit]');
+                    if (filterBtn) {
+                        const form = filterBtn.closest('form');
+                        if (!form) return;
+                        event.preventDefault();
+                        typeof form.requestSubmit === 'function' ? form.requestSubmit() : form.submit();
+                    }
+                }, true);
+            }
+
+            function highlightActiveMenuItem() {
+                const currentPath = window.location.pathname;
+                document.querySelectorAll('#menu-lateral .nav-link').forEach((link) => {
+                    const href = link.getAttribute('href');
+                    if (!href || href === '#' || link.classList.contains('logout-btn')) return;
+                    if ((href !== '/' && currentPath.includes(href)) || currentPath === href) {
+                        link.classList.add('activo');
+                    }
+                });
+>>>>>>> 690530c7dee95989c98c79aa3cd968db77b416eb
             }
           } else {
             // PC: Anclar/Desanclar
             sidebar.classList.toggle("pinned");
             mainContent.classList.toggle("pinned-content");
 
+<<<<<<< HEAD
             // Guardar preferencia
             const isPinned = sidebar.classList.contains("pinned");
             localStorage.setItem("sidebarPinned", isPinned);
@@ -1324,6 +1455,29 @@
         // Scroll del sidebar
         sidebar.addEventListener("scroll", function () {
           sessionStorage.setItem("sidebarScroll", sidebar.scrollTop);
+=======
+            repairUiOverlays();
+            window.addEventListener('pageshow', repairUiOverlays);
+            document.addEventListener('hidden.bs.modal', repairUiOverlays);
+            document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+            new MutationObserver(repairUiOverlays).observe(document.body, { childList: true, subtree: false });
+
+            if (ui.overlay) ui.overlay.addEventListener('click', closeMobileSidebar);
+            closeMobileSidebar();
+            applyPinnedStateFromStorage();
+            bindSidebarInteractions();
+            bindFallbackClicks();
+            highlightActiveMenuItem();
+
+            const savedScroll = sessionStorage.getItem('sidebarScroll');
+            if (savedScroll && ui.sidebar) {
+                ui.sidebar.scrollTop = parseInt(savedScroll, 10);
+            }
+
+            window.addEventListener('resize', function () {
+                if (!isMobile()) closeMobileSidebar();
+            });
+>>>>>>> 690530c7dee95989c98c79aa3cd968db77b416eb
         });
         const savedScroll = sessionStorage.getItem("sidebarScroll");
         if (savedScroll) {
