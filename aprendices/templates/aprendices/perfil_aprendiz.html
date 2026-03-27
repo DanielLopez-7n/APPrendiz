@@ -186,8 +186,10 @@
         </div>
     </div>
 
+</div>
+
 {% if alerta_password %}
-<div class="modal fade" id="modalSeguridadPassword" data-bs-backdrop="static" data--keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalSeguridadPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
             
@@ -225,8 +227,26 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        function limpiarBackdropsHuerfanos() {
+            const modalAbierto = document.querySelector('.modal.show');
+            if (!modalAbierto) {
+                document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                    backdrop.remove();
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+            }
+        }
+
+        limpiarBackdropsHuerfanos();
+
+        const modalElement = document.getElementById('modalSeguridadPassword');
+        if (!modalElement) return;
+
+        modalElement.addEventListener('hidden.bs.modal', limpiarBackdropsHuerfanos);
+
         if (!sessionStorage.getItem('alerta_password_mostrada')) {
-            var myModal = new bootstrap.Modal(document.getElementById('modalSeguridadPassword'));
+            var myModal = new bootstrap.Modal(modalElement);
             myModal.show();
             sessionStorage.setItem('alerta_password_mostrada', 'true');
         }
