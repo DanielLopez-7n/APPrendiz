@@ -3,6 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from .models import PerfilUsuario
 from aprendices.models import Aprendiz
+from instructores.models import Instructor
 from aprendices.forms import PAIS_CHOICES
 from core.form_validators import (
     validate_digits,
@@ -237,12 +238,15 @@ class EditarPerfilForm(forms.ModelForm):
         self.fields['tipo_documento'].label = "Tipo de Documento"
 
         if self.usuario:
-            tipo_doc_actual = ''
+            tipo_doc_actual = (self.instance.tipo_documento if self.instance else '') or ''
             if hasattr(self.usuario, 'instructor'):
-                tipo_doc_actual = self.usuario.instructor.tipo_documento or ''
+                tipo_doc_actual = self.usuario.instructor.tipo_documento or tipo_doc_actual
             elif hasattr(self.usuario, 'aprendiz'):
-                tipo_doc_actual = self.usuario.aprendiz.tipo_documento or ''
+                tipo_doc_actual = self.usuario.aprendiz.tipo_documento or tipo_doc_actual
             self.fields['tipo_documento'].initial = tipo_doc_actual
+
+            if self.instance and self.instance.fecha_nacimiento:
+                self.fields['fecha_nacimiento'].initial = self.instance.fecha_nacimiento
 
         if 'documento' in self.fields:
             self.fields['documento'].label = "Documento de Identidad"
@@ -257,7 +261,30 @@ class EditarPerfilForm(forms.ModelForm):
         documento = self.cleaned_data.get('documento')
         if not documento and self.instance:
             return self.instance.documento
+<<<<<<< codex/add-user-manual-and-update-buttons-u58mz7
+
+        documento = validate_digits(documento, 'documento', min_len=6, max_len=20)
+
+        perfil_qs = PerfilUsuario.objects.filter(documento=documento)
+        if self.instance and self.instance.pk:
+            perfil_qs = perfil_qs.exclude(pk=self.instance.pk)
+        if perfil_qs.exists():
+            raise forms.ValidationError('Este número de documento ya está registrado por otro usuario del sistema.')
+
+        usuario_id_actual = getattr(self.usuario, 'id', None)
+        if Aprendiz.objects.filter(documento=documento).exclude(usuario_id=usuario_id_actual).exists():
+            raise forms.ValidationError('Este número de documento ya existe en un registro de aprendiz.')
+
+        if Instructor.objects.filter(cedula=documento).exclude(usuario_id=usuario_id_actual).exists():
+            raise forms.ValidationError('Este número de documento ya existe en un registro de instructor.')
+
+        if User.objects.filter(username=documento).exclude(pk=usuario_id_actual).exists():
+            raise forms.ValidationError('Este número de documento ya está en uso como usuario de acceso.')
+
+        return documento
+=======
         return validate_digits(documento, 'documento', min_len=6, max_len=20)
+>>>>>>> main
 
     def clean_telefono(self):
         return validate_phone(self.cleaned_data.get('telefono'), 'teléfono', min_len=7, max_len=15, required=False)
@@ -267,6 +294,16 @@ class EditarPerfilForm(forms.ModelForm):
         if not direccion:
             return direccion
         return validate_text_length(direccion, 'dirección', min_len=5, max_len=70)
+<<<<<<< codex/add-user-manual-and-update-buttons-u58mz7
+
+    def save(self, commit=True):
+        perfil = super().save(commit=False)
+        perfil.tipo_documento = self.cleaned_data.get('tipo_documento') or ''
+        if commit:
+            perfil.save()
+        return perfil
+=======
+>>>>>>> main
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 

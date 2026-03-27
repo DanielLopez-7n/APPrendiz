@@ -201,7 +201,7 @@ def ver_detalle_usuario(request, user_id):
     telefono_sistema = (perfil.telefono if perfil else '') or 'No registrado'
     direccion_sistema = (perfil.direccion if perfil else '') or 'No registrada'
     correo_personal = usuario.email or 'No registrado'
-    tipo_documento = 'No definido'
+    tipo_documento = perfil.get_tipo_documento_display() if perfil and perfil.tipo_documento else 'No definido'
     fecha_nacimiento = perfil.fecha_nacimiento if perfil else None
 
     if hasattr(usuario, 'instructor'):
@@ -431,8 +431,7 @@ def perfil_view(request):
                     usuario.instructor.direccion_residencia = perfil_guardado.direccion
                 if usuario.email:
                     usuario.instructor.correo_personal = usuario.email
-                if tipo_documento_seleccionado:
-                    usuario.instructor.tipo_documento = tipo_documento_seleccionado
+                usuario.instructor.tipo_documento = tipo_documento_seleccionado
                 usuario.instructor.save()
             elif hasattr(usuario, 'aprendiz'):
                 usuario.aprendiz.telefono = perfil_guardado.telefono
@@ -440,8 +439,7 @@ def perfil_view(request):
                     usuario.aprendiz.direccion_residencia = perfil_guardado.direccion
                 if usuario.email:
                     usuario.aprendiz.correo_personal = usuario.email
-                if tipo_documento_seleccionado:
-                    usuario.aprendiz.tipo_documento = tipo_documento_seleccionado
+                usuario.aprendiz.tipo_documento = tipo_documento_seleccionado
                 usuario.aprendiz.save()
             
             messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
@@ -477,7 +475,7 @@ def perfil_view(request):
     telefono_sistema = usuario.perfil.telefono or 'No registrado'
     direccion_sistema = usuario.perfil.direccion or 'No registrada'
     correo_personal = usuario.email or 'No registrado'
-    tipo_documento = 'No definido'
+    tipo_documento = usuario.perfil.get_tipo_documento_display() if usuario.perfil and usuario.perfil.tipo_documento else 'No definido'
 
     if hasattr(usuario, 'instructor'):
         instructor = usuario.instructor
@@ -503,6 +501,7 @@ def perfil_view(request):
         'direccion_sistema': direccion_sistema,
         'correo_personal': correo_personal,
         'tipo_documento': tipo_documento,
+        'fecha_nacimiento': usuario.perfil.fecha_nacimiento,
     })
     return render(request, 'usuarios/perfil.html', context)
 
