@@ -2,6 +2,13 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import Bitacora, ActividadBitacora
 from django.contrib.auth.models import User
+from core.form_validators import (
+    validate_digits,
+    validate_email_length,
+    validate_person_name,
+    validate_phone,
+    validate_text_length,
+)
 
 # --- FORMULARIO PRINCIPAL DE LA BITÁCORA ---
 class CrearBitacoraForm(forms.ModelForm):
@@ -96,14 +103,45 @@ class CrearBitacoraForm(forms.ModelForm):
                 self.fields['modalidad_ejecucion'].initial = ultima_bitacora.modalidad_ejecucion
 
     def clean_numero_identificacion_aprendiz(self):
-        documento = (self.cleaned_data.get('numero_identificacion_aprendiz') or '').strip()
-        if documento and not documento.isdigit():
-            raise forms.ValidationError(
-                'El número de identificación del aprendiz solo permite números (sin letras ni símbolos).'
-            )
-        if documento and (len(documento) < 6 or len(documento) > 20):
-            raise forms.ValidationError('El número de identificación debe tener entre 6 y 20 dígitos.')
-        return documento
+        documento = self.cleaned_data.get('numero_identificacion_aprendiz')
+        if not documento:
+            return documento
+        return validate_digits(documento, 'número de identificación', min_len=6, max_len=20)
+
+
+    def clean_contacto_telefonico_aprendiz(self):
+        return validate_phone(self.cleaned_data.get('contacto_telefonico_aprendiz'), 'teléfono del aprendiz', min_len=7, max_len=15, required=False)
+
+    def clean_correo_personal_aprendiz(self):
+        return validate_email_length(self.cleaned_data.get('correo_personal_aprendiz'), max_len=70)
+
+    def clean_direccion_residencia_aprendiz(self):
+        return validate_text_length(self.cleaned_data.get('direccion_residencia_aprendiz'), 'dirección de residencia', min_len=5, max_len=120)
+
+    def clean_nombre_empresa(self):
+        nombre = validate_text_length(self.cleaned_data.get('nombre_empresa'), 'nombre de empresa', min_len=2, max_len=120)
+        if nombre.isdigit():
+            raise forms.ValidationError('El nombre de la empresa no puede ser solo números.')
+        return nombre
+
+    def clean_nit_empresa(self):
+        nit = (self.cleaned_data.get('nit_empresa') or '').replace('.', '').replace('-', '').strip()
+        return validate_digits(nit, 'NIT de la empresa', min_len=6, max_len=15)
+
+    def clean_nombre_jefe(self):
+        return validate_person_name(self.cleaned_data.get('nombre_jefe'), 'nombre del jefe', min_len=3, max_len=70)
+
+    def clean_cargo_jefe(self):
+        cargo = validate_text_length(self.cleaned_data.get('cargo_jefe'), 'cargo del jefe', min_len=2, max_len=70)
+        if cargo.isdigit():
+            raise forms.ValidationError('El cargo no puede ser solo números.')
+        return cargo
+
+    def clean_telefono_jefe(self):
+        return validate_phone(self.cleaned_data.get('telefono_jefe'), 'teléfono del jefe', min_len=7, max_len=15, required=False)
+
+    def clean_email_jefe(self):
+        return validate_email_length(self.cleaned_data.get('email_jefe'), max_len=70)
 
 
 # --- FORMULARIO PARA LAS ACTIVIDADES ---
@@ -129,6 +167,24 @@ class ActividadForm(forms.ModelForm):
             
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }
+
+    def clean_descripcion_actividad(self):
+        texto = validate_text_length(self.cleaned_data.get('descripcion_actividad'), 'descripción de actividad', min_len=10, max_len=2000)
+        if texto.isdigit():
+            raise forms.ValidationError('La descripción de la actividad no puede contener solo números.')
+        return texto
+
+    def clean_competencias_asociadas(self):
+        texto = validate_text_length(self.cleaned_data.get('competencias_asociadas'), 'competencias asociadas', min_len=5, max_len=2000)
+        if texto.isdigit():
+            raise forms.ValidationError('Las competencias no pueden contener solo números.')
+        return texto
+
+    def clean_observaciones(self):
+        texto = self.cleaned_data.get('observaciones')
+        if not texto:
+            return texto
+        return validate_text_length(texto, 'observaciones', min_len=2, max_len=2000)
 
     def clean(self):
         cleaned_data = super().clean()

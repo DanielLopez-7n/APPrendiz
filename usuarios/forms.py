@@ -4,24 +4,21 @@ from django.contrib.auth.models import User
 from .models import PerfilUsuario
 from aprendices.models import Aprendiz
 from aprendices.forms import PAIS_CHOICES
+from core.form_validators import (
+    validate_digits,
+    validate_email_length,
+    validate_person_name,
+    validate_phone,
+    validate_text_length,
+)
 
 
 def validar_solo_numeros(valor, etiqueta='documento'):
-    valor = (valor or '').strip()
-    if not valor.isdigit():
-        raise forms.ValidationError(
-            f'El campo "{etiqueta}" solo permite números (sin letras ni símbolos).'
-        )
-    return valor
+    return validate_digits(valor, etiqueta, min_len=1, max_len=20)
 
 
 def validar_longitud_campo(valor, etiqueta, minimo=1, maximo=20):
-    valor = (valor or '').strip()
-    if len(valor) < minimo or len(valor) > maximo:
-        raise forms.ValidationError(
-            f'El campo "{etiqueta}" debe tener entre {minimo} y {maximo} caracteres.'
-        )
-    return valor
+    return validate_text_length(valor, etiqueta, min_len=minimo, max_len=maximo)
 
 class LoginForm(AuthenticationForm):
     """
@@ -140,20 +137,16 @@ class RegistroForm(UserCreationForm):
     
     def clean_email(self):
         """Valida que el email no exista en la base de datos"""
-        email = (self.cleaned_data.get('email') or '').strip()
-        if len(email) > 70:
-            raise forms.ValidationError('El correo no puede superar 70 caracteres.')
+        email = validate_email_length(self.cleaned_data.get('email'), max_len=70)
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Este correo electrónico ya está registrado.')
         return email
 
     def clean_first_name(self):
-        nombre = (self.cleaned_data.get('first_name') or '').strip()
-        return validar_longitud_campo(nombre, 'nombre', minimo=2, maximo=70)
+        return validate_person_name(self.cleaned_data.get('first_name'), 'nombre', min_len=2, max_len=70)
 
     def clean_last_name(self):
-        apellido = (self.cleaned_data.get('last_name') or '').strip()
-        return validar_longitud_campo(apellido, 'apellido', minimo=2, maximo=70)
+        return validate_person_name(self.cleaned_data.get('last_name'), 'apellido', min_len=2, max_len=70)
     
     def save(self, commit=True):
         """
@@ -175,12 +168,15 @@ class RegistroForm(UserCreationForm):
 
 
 class EditarUsuarioForm(forms.ModelForm):
-    """
-    Formulario para editar información del usuario
-    """
-    # usuarios/forms.py
+    def clean_first_name(self):
+        return validate_person_name(self.cleaned_data.get('first_name'), 'nombre', min_len=2, max_len=70)
 
-class EditarUsuarioForm(forms.ModelForm):
+    def clean_last_name(self):
+        return validate_person_name(self.cleaned_data.get('last_name'), 'apellido', min_len=2, max_len=70)
+
+    def clean_email(self):
+        return validate_email_length(self.cleaned_data.get('email'), max_len=70)
+
     class Meta:
         model = User
         # 1. AQUÍ: Agrega el campo is_active para activar/desactivar usuario
@@ -259,11 +255,18 @@ class EditarPerfilForm(forms.ModelForm):
 
     def clean_documento(self):
         documento = self.cleaned_data.get('documento')
-        # Si está readonly y vacío, dejamos el valor actual.
         if not documento and self.instance:
             return self.instance.documento
-        documento = validar_solo_numeros(documento, 'documento')
-        return validar_longitud_campo(documento, 'documento', minimo=6, maximo=20)
+        return validate_digits(documento, 'documento', min_len=6, max_len=20)
+
+    def clean_telefono(self):
+        return validate_phone(self.cleaned_data.get('telefono'), 'teléfono', min_len=7, max_len=15, required=False)
+
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion')
+        if not direccion:
+            return direccion
+        return validate_text_length(direccion, 'dirección', min_len=5, max_len=70)
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 
@@ -305,9 +308,7 @@ class UsuarioForm(forms.ModelForm):
 
     def clean_email(self):
         """Validar que el correo no se repita"""
-        email = (self.cleaned_data.get('email') or '').strip()
-        if len(email) > 70:
-            raise forms.ValidationError('El correo no puede superar 70 caracteres.')
+        email = validate_email_length(self.cleaned_data.get('email'), max_len=70)
         # Si estamos editando (self.instance.pk existe), excluimos al usuario actual de la búsqueda
         if self.instance.pk:
             if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
@@ -330,12 +331,10 @@ class UsuarioForm(forms.ModelForm):
         return username
 
     def clean_first_name(self):
-        nombre = (self.cleaned_data.get('first_name') or '').strip()
-        return validar_longitud_campo(nombre, 'nombre', minimo=2, maximo=70)
+        return validate_person_name(self.cleaned_data.get('first_name'), 'nombre', min_len=2, max_len=70)
 
     def clean_last_name(self):
-        apellido = (self.cleaned_data.get('last_name') or '').strip()
-        return validar_longitud_campo(apellido, 'apellido', minimo=2, maximo=70)
+        return validate_person_name(self.cleaned_data.get('last_name'), 'apellido', min_len=2, max_len=70)
     
     # Nuevo formulario para que los usuarios editen su propio perfil
 
@@ -443,6 +442,18 @@ class AprendizPerfilForm(forms.ModelForm):
             if hasattr(user, 'perfil') and user.perfil.foto_perfil:
                 self.fields['foto_perfil'].initial = user.perfil.foto_perfil
 
+    def clean_first_name(self):
+        return validate_person_name(self.cleaned_data.get('first_name'), 'nombre', min_len=2, max_len=70)
+
+    def clean_last_name(self):
+        return validate_person_name(self.cleaned_data.get('last_name'), 'apellido', min_len=2, max_len=70)
+
+    def clean_email(self):
+        return validate_email_length(self.cleaned_data.get('email'), max_len=70)
+
+    def clean_telefono(self):
+        return validate_phone(self.cleaned_data.get('telefono'), 'teléfono', min_len=7, max_len=15, required=False)
+
     def save(self, commit=True):
         aprendiz = super(AprendizPerfilForm, self).save(commit=False)
         user = aprendiz.usuario
@@ -499,6 +510,15 @@ class EditarMiPropioUsuarioForm(forms.ModelForm):
     Formulario súper seguro: Solo permite cambiar datos básicos.
     Ignora por completo el is_active, is_staff, etc.
     """
+    def clean_first_name(self):
+        return validate_person_name(self.cleaned_data.get('first_name'), 'nombre', min_len=2, max_len=70)
+
+    def clean_last_name(self):
+        return validate_person_name(self.cleaned_data.get('last_name'), 'apellido', min_len=2, max_len=70)
+
+    def clean_email(self):
+        return validate_email_length(self.cleaned_data.get('email'), max_len=70)
+
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email'] # ¡Cero rastro de is_active!
