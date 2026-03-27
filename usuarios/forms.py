@@ -261,7 +261,6 @@ class EditarPerfilForm(forms.ModelForm):
         documento = self.cleaned_data.get('documento')
         if not documento and self.instance:
             return self.instance.documento
-<<<<<<< codex/add-user-manual-and-update-buttons-u58mz7
 
         documento = validate_digits(documento, 'documento', min_len=6, max_len=20)
 
@@ -282,9 +281,6 @@ class EditarPerfilForm(forms.ModelForm):
             raise forms.ValidationError('Este número de documento ya está en uso como usuario de acceso.')
 
         return documento
-=======
-        return validate_digits(documento, 'documento', min_len=6, max_len=20)
->>>>>>> main
 
     def clean_telefono(self):
         return validate_phone(self.cleaned_data.get('telefono'), 'teléfono', min_len=7, max_len=15, required=False)
@@ -294,7 +290,6 @@ class EditarPerfilForm(forms.ModelForm):
         if not direccion:
             return direccion
         return validate_text_length(direccion, 'dirección', min_len=5, max_len=70)
-<<<<<<< codex/add-user-manual-and-update-buttons-u58mz7
 
     def save(self, commit=True):
         perfil = super().save(commit=False)
@@ -302,8 +297,6 @@ class EditarPerfilForm(forms.ModelForm):
         if commit:
             perfil.save()
         return perfil
-=======
->>>>>>> main
         
 # --- Nuevo formulario agregado para usuarios sin contraseña ---
 
