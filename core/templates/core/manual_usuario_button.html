@@ -38,6 +38,55 @@
         background: #39A900;
         color: #fff;
     }
+
+    .manual-chat-box {
+        max-height: 230px;
+        overflow-y: auto;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fafafa;
+    }
+
+    .manual-msg {
+        border-radius: 12px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        font-size: 0.92rem;
+        line-height: 1.4;
+        white-space: pre-line;
+    }
+
+    .manual-msg.bot {
+        background: #e8f5e9;
+        border-left: 4px solid #39A900;
+        color: #1f2b21;
+    }
+
+    .manual-msg.user {
+        background: #f0f2f4;
+        border-left: 4px solid #6c757d;
+        color: #212529;
+    }
+
+    .manual-quick-questions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .manual-quick-questions button {
+        border: 1px solid #b7e1a0;
+        background: #f7fff1;
+        color: #2d8600;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+    }
+
+    .manual-quick-questions button:hover {
+        background: #ecffe1;
+    }
 </style>
 
 <div id="manual-help-container">
@@ -47,20 +96,135 @@
 </div>
 
 <div class="modal fade" id="manualHelpModal" tabindex="-1" aria-labelledby="manualHelpModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow-lg">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold" id="manualHelpModalLabel">
-                    <i class="bi bi-journal-text me-2"></i>Manual de Usuario
+                    <i class="bi bi-journal-text me-2"></i>Centro de ayuda
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="mb-3 text-muted">Puedes abrir el manual en una nueva pestaña para consultar todo el paso a paso del sistema.</p>
-                <a href="{% static 'docs/Manual_Usuario_APPrendiz.pdf' %}" target="_blank" rel="noopener" class="btn btn-success w-100 fw-bold rounded-pill">
+                <p class="mb-3 text-muted">Puedes abrir el manual en una nueva pestaña o usar el chat de ayuda rápida para preguntas frecuentes.</p>
+                <a href="{% static 'docs/Manual_Usuario_APPrendiz.pdf' %}" target="_blank" rel="noopener" class="btn btn-success w-100 fw-bold rounded-pill mb-3">
                     <i class="bi bi-box-arrow-up-right me-2"></i>Abrir manual de usuario
                 </a>
+
+                <div class="border rounded-4 p-3 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-chat-dots me-2"></i>Chatbot de ayuda rápida</h6>
+                        <small class="text-muted">Respuestas básicas del sistema</small>
+                    </div>
+
+                    <div class="manual-chat-box" id="manual-chat-box">
+                        <div class="manual-msg bot">¡Hola! 👋 Soy tu asistente de APPrendiz.
+Puedes preguntarme cosas como: crear usuario, calificar bitácoras, ver perfil, recuperar contraseña, o usar la búsqueda.</div>
+                    </div>
+
+                    <div class="manual-quick-questions mt-2 mb-2">
+                        <button type="button" data-question="¿Cómo crear un usuario?">Crear usuario</button>
+                        <button type="button" data-question="¿Cómo calificar una bitácora?">Calificar bitácora</button>
+                        <button type="button" data-question="¿Cómo ver detalle de un aprendiz?">Ver detalle aprendiz</button>
+                        <button type="button" data-question="¿Cómo busco información rápido?">Búsqueda rápida</button>
+                        <button type="button" data-question="¿Cómo cambiar la contraseña?">Cambiar contraseña</button>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="manual-chat-input" class="form-control" placeholder="Escribe tu pregunta..." maxlength="180">
+                        <button class="btn btn-success" type="button" id="manual-chat-send">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const modal = document.getElementById('manualHelpModal');
+    if (!modal || modal.dataset.chatInitialized === 'true') return;
+    modal.dataset.chatInitialized = 'true';
+
+    const chatBox = modal.querySelector('#manual-chat-box');
+    const input = modal.querySelector('#manual-chat-input');
+    const sendBtn = modal.querySelector('#manual-chat-send');
+    const quickBtns = modal.querySelectorAll('.manual-quick-questions button');
+
+    const faq = [
+        {
+            keys: ['crear usuario', 'nuevo usuario', 'registrar usuario'],
+            answer: 'Para crear usuario:\n1) Ve a Usuarios > Crear usuario.\n2) Completa datos obligatorios y rol.\n3) Guarda y valida que quede en estado activo.'
+        },
+        {
+            keys: ['calificar', 'evaluar', 'bitácora', 'bitacora'],
+            answer: 'Para calificar bitácoras:\n1) Entra a Bitácoras > Listar/Revisar.\n2) Abre la bitácora pendiente.\n3) Registra observaciones, define estado y guarda.'
+        },
+        {
+            keys: ['ver detalle', 'detalle aprendiz', 'perfil aprendiz', 'aprendiz'],
+            answer: 'Para ver detalle de un aprendiz:\n1) Ve a Aprendices > Listar.\n2) Usa el buscador por nombre/documento.\n3) Abre el icono de "ver" para consultar toda la información.'
+        },
+        {
+            keys: ['buscar', 'búsqueda', 'filtro', 'encontrar'],
+            answer: 'Búsqueda rápida:\n1) Usa la barra superior.\n2) Escribe nombre, documento, ficha o bitácora.\n3) Pulsa Buscar para ver resultados globales.'
+        },
+        {
+            keys: ['contraseña', 'clave', 'password'],
+            answer: 'Cambio de contraseña:\n1) Abre tu menú de perfil.\n2) Selecciona "Cambiar contraseña".\n3) Escribe contraseña actual y nueva, luego confirma.'
+        },
+        {
+            keys: ['manual', 'guía', 'guia', 'instructivo'],
+            answer: 'Puedes abrir el manual completo con el botón verde "Abrir manual de usuario" aquí mismo.'
+        }
+    ];
+
+    function addMessage(text, type) {
+        const msg = document.createElement('div');
+        msg.className = `manual-msg ${type}`;
+        msg.textContent = text;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function getBotResponse(question) {
+        const normalized = question.toLowerCase().trim();
+        if (!normalized) return 'Escribe una pregunta para ayudarte. 😊';
+
+        for (const item of faq) {
+            if (item.keys.some(k => normalized.includes(k))) {
+                return item.answer;
+            }
+        }
+
+        return 'No encontré una respuesta exacta. Te recomiendo abrir el manual o reformular con palabras como: usuario, bitácora, búsqueda, contraseña, aprendiz.';
+    }
+
+    function handleQuestion(question) {
+        const clean = (question || '').trim();
+        if (!clean) return;
+        addMessage(clean, 'user');
+        addMessage(getBotResponse(clean), 'bot');
+    }
+
+    sendBtn.addEventListener('click', () => {
+        handleQuestion(input.value);
+        input.value = '';
+        input.focus();
+    });
+
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            sendBtn.click();
+        }
+    });
+
+    quickBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const question = btn.getAttribute('data-question') || btn.textContent;
+            handleQuestion(question);
+        });
+    });
+})();
+</script>
