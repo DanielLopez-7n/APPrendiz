@@ -82,16 +82,16 @@
     </div>
 
     <div class="card-studio mb-4">
-        <form method="GET" action="{% url 'instructores:listar_instructores' %}" class="row g-3 align-items-center">
+        <form method="GET" action="{% url 'instructores:listar_instructores' %}" class="row g-3 align-items-center" id="filtroInstructoresForm">
             <div class="col-md-5">
                 <div class="filter-wrapper d-flex align-items-center">
                     <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
-                    <input type="text" name="q" class="input-studio" placeholder="Buscar por cédula, nombre o profesión..." value="{{ request.GET.q }}">
+                    <input type="text" name="q" class="input-studio" placeholder="Buscar por cédula, nombre, correo o profesión..." value="{{ request.GET.q }}">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="filter-wrapper" style="border-left-color: #adb5bd;">
-                    <select name="tipo_contrato" class="select-studio">
+                    <select name="tipo_contrato" class="select-studio" id="tipoContratoFiltro">
                         <option value="">Todos los contratos</option>
                         <option value="PLANTA" {% if request.GET.tipo_contrato == 'PLANTA' %}selected{% endif %}>Planta</option>
                         <option value="CONTRATISTA" {% if request.GET.tipo_contrato == 'CONTRATISTA' %}selected{% endif %}>Contratista</option>
@@ -237,6 +237,14 @@
     document.addEventListener("DOMContentLoaded", function() {
         const modales = document.querySelectorAll('.modal');
         modales.forEach(modal => { document.body.appendChild(modal); });
+
+        const selectContrato = document.getElementById('tipoContratoFiltro');
+        const filtroForm = document.getElementById('filtroInstructoresForm');
+        if (selectContrato && filtroForm) {
+            selectContrato.addEventListener('change', function () {
+                filtroForm.submit();
+            });
+        }
     });
 </script>
 {% endblock %}
