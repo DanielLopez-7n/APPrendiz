@@ -30,9 +30,9 @@
                         <input type="hidden" name="next" value="{{ request.GET.next }}">
 
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento" required autofocus>
+                            <input type="text" class="form-control" id="id_username" name="username" placeholder="Usuario" pattern="[A-Za-z0-9]+" required autofocus>
                             <label for="id_username" class="text-muted">
-                                <i class="bi bi-card-heading me-1"></i> Documento / Usuario
+                                <i class="bi bi-card-heading me-1"></i> Usuario
                             </label>
                         </div>
 

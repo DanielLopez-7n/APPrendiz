@@ -1,4 +1,5 @@
 from django import forms
+import re
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from .models import PerfilUsuario
@@ -21,20 +22,30 @@ def validar_solo_numeros(valor, etiqueta='documento'):
 def validar_longitud_campo(valor, etiqueta, minimo=1, maximo=20):
     return validate_text_length(valor, etiqueta, min_len=minimo, max_len=maximo)
 
+
+def validar_usuario_alfanumerico(valor, etiqueta='nombre de usuario', minimo=4, maximo=20):
+    valor = validate_text_length(valor, etiqueta, min_len=minimo, max_len=maximo)
+    if not re.fullmatch(r'[A-Za-z0-9]+', valor or ''):
+        raise forms.ValidationError(
+            'El nombre de usuario solo puede contener letras y números (sin espacios ni signos).'
+        )
+    return valor
+
 class LoginForm(AuthenticationForm):
     """
     Formulario personalizado para inicio de sesión
     Usamos el campo username para almacenar el documento
     """
     username = forms.CharField(
-        label='Documento',
+        label='Usuario',
         max_length=20,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingrese su documento',
+            'placeholder': 'Ingrese su usuario',
             'autofocus': True,
-            'inputmode': 'numeric',
-            'pattern': '[0-9]*'
+            'autocomplete': 'username',
+            'inputmode': 'text',
+            'pattern': '[A-Za-z0-9]+'
         })
     )
     
@@ -56,8 +67,7 @@ class LoginForm(AuthenticationForm):
     )
 
     def clean_username(self):
-        valor = validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
-        return validar_longitud_campo(valor, 'documento', minimo=6, maximo=20)
+        return validar_usuario_alfanumerico(self.cleaned_data.get('username'), 'usuario', minimo=4, maximo=20)
 
 
 class RegistroForm(UserCreationForm):
@@ -321,14 +331,14 @@ class UsuarioForm(forms.ModelForm):
             # Al username le ponemos placeholder más descriptivo
             'username': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Documento',
-                'inputmode': 'numeric',
-                'pattern': '[0-9]*'
+                'placeholder': 'Ej. pepe123',
+                'inputmode': 'text',
+                'pattern': '[A-Za-z0-9]+'
             }),
         }
         
         labels = {
-            'username': 'Número de Documento (Usuario)',
+            'username': 'Nombre de Usuario',
             'email': 'Correo Institucional',
             'first_name': 'Nombres',
             'last_name': 'Apellidos',
@@ -353,15 +363,14 @@ class UsuarioForm(forms.ModelForm):
         return email
 
     def clean_username(self):
-        """Validar que el documento no se repita"""
-        username = validar_solo_numeros(self.cleaned_data.get('username'), 'documento')
-        username = validar_longitud_campo(username, 'documento', minimo=6, maximo=20)
+        """Validar username alfanumérico único"""
+        username = validar_usuario_alfanumerico(self.cleaned_data.get('username'), 'nombre de usuario', minimo=4, maximo=20)
         if self.instance.pk:
             if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
-                raise forms.ValidationError('Este documento ya está registrado.')
+                raise forms.ValidationError('Este nombre de usuario ya está registrado.')
         else:
             if User.objects.filter(username=username).exists():
-                raise forms.ValidationError('Este documento ya está registrado.')
+                raise forms.ValidationError('Este nombre de usuario ya está registrado.')
         return username
 
     def clean_first_name(self):
@@ -436,7 +445,8 @@ class AprendizPerfilForm(forms.ModelForm):
     pais_etapa = forms.ChoiceField(
         choices=PAIS_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'}),
-        label='País donde realiza la etapa'
+        label='País donde realiza la etapa',
+        required=False,
     )
 
     class Meta:

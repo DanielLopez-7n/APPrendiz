@@ -39,7 +39,11 @@ class AprendizForm(forms.ModelForm):
         empty_value=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    pais_etapa = forms.ChoiceField(choices=PAIS_CHOICES, widget=forms.Select(attrs={'class': 'form-select'}))
+    pais_etapa = forms.ChoiceField(
+        choices=PAIS_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
