@@ -1257,7 +1257,7 @@
     </script>
 
     {% include 'core/accesibilidad.html' %}
-    {% include 'core/manual_usuario_button.html' %}
+    {% include 'core/manual_usuario_button.html' with help_mode='admin' %}
     {% block extra_js %}{% endblock %}
 
     <div class="modal fade" id="logoutAdminModal" tabindex="-1" aria-labelledby="logoutAdminModalLabel" aria-hidden="true">
