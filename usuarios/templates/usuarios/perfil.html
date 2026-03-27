@@ -82,6 +82,27 @@
         border-radius: 999px; font-size: .8rem; font-weight: 800;
         background: rgba(57,169,0,.12); color: #2d8600; border: 1px solid rgba(57,169,0,.2);
     }
+    .form-feedback-summary {
+        background: #fff4f4;
+        border: 1px solid #ffd8d8;
+        border-left: 4px solid #dc3545;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 1rem;
+    }
+    .form-feedback-summary ul { margin: 0; padding-left: 1rem; }
+    .field-error {
+        color: #b42318;
+        font-weight: 600;
+        margin-top: .4rem;
+        font-size: .83rem;
+        display: block;
+    }
+    .input-error {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, .12) !important;
+        background-color: #fff7f7 !important;
+    }
 </style>
 {% endblock %}
 
@@ -111,6 +132,23 @@
                     </div>
 
                     <div class="px-4 px-md-5 pb-5">
+                        {% if form_usuario.errors or form_perfil.errors %}
+                            <div class="form-feedback-summary" role="alert" aria-live="polite">
+                                <strong class="d-block mb-1">Revisa los campos marcados para continuar:</strong>
+                                <ul>
+                                    {% for field in form_usuario %}
+                                        {% for error in field.errors %}
+                                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    {% for field in form_perfil %}
+                                        {% for error in field.errors %}
+                                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
                         
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
                             <div>
@@ -170,35 +208,43 @@
                             <div class="col-md-6">
                                 <label class="form-label">Nombres</label>
                                 {{ form_usuario.first_name }}
+                                {% for error in form_usuario.first_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Apellidos</label>
                                 {{ form_usuario.last_name }}
+                                {% for error in form_usuario.last_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Correo Electrónico</label>
                                 {{ form_usuario.email }}
+                                {% for error in form_usuario.email.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
 
                             <div class="col-md-6">
                                 <label class="form-label">Tipo de Documento</label>
                                 {{ form_perfil.tipo_documento }}
+                                {% for error in form_perfil.tipo_documento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Número de Documento</label>
                                 {{ form_perfil.documento }}
+                                {% for error in form_perfil.documento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Teléfono de Contacto</label>
                                 {{ form_perfil.telefono }}
+                                {% for error in form_perfil.telefono.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Fecha de Nacimiento</label>
                                 {{ form_perfil.fecha_nacimiento }}
+                                {% for error in form_perfil.fecha_nacimiento.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Dirección de Residencia</label>
                                 {{ form_perfil.direccion }}
+                                {% for error in form_perfil.direccion.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
                             </div>
                         </div>
 
@@ -236,6 +282,17 @@
                 if(icon) icon.style.display = 'none';
             }
             reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // Marca visualmente los campos con error
+    document.querySelectorAll('.field-error').forEach(errorNode => {
+        const fieldContainer = errorNode.closest('.col-md-6, .col-12');
+        if (!fieldContainer) return;
+        const field = fieldContainer.querySelector('input, select, textarea');
+        if (field) {
+            field.classList.add('input-error');
+            field.setAttribute('aria-invalid', 'true');
         }
     });
 </script>
