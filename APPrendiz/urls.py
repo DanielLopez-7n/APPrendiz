@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings               
 from django.conf.urls.static import static
 from core.views import CustomLoginView
+from django.contrib.auth import views as auth_views
 from django.conf.urls import handler404
 from django.shortcuts import render
 
@@ -33,6 +34,13 @@ urlpatterns = [
     path('programas/', include('programas.urls')),
     path('fichas/', include('fichas.urls')),
     path('accounts/login/', CustomLoginView.as_view(), name='login'),
+    path(
+        'accounts/password_reset/',
+        auth_views.PasswordResetView.as_view(
+            html_email_template_name='registration/password_reset_email_html.html'
+        ),
+        name='password_reset'
+    ),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
