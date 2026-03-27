@@ -339,8 +339,14 @@
     }
 
     /* Asegurar legibilidad del texto de la cabecera desplazada */
-    .navbar-scrolled .navbar-text {
-        color: #2d3436;
+    .navbar-scrolled .navbar-text,
+    .navbar-scrolled .text-muted {
+        color: #2d3436 !important;
+    }
+
+    /* Asegurar contraste en modo oscuro dinámico */
+    .navbar-dark-custom .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
     }
 
 </style>
