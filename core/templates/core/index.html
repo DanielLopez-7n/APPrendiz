@@ -349,6 +349,50 @@
         color: rgba(255, 255, 255, 0.7) !important;
     }
 
+    /* Capa degradada para legibilidad del texto */
+    .hero-overlay {
+        background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+        top: 0;
+        left: 0;
+        z-index: 2;
+        pointer-events: none; /* <--- ESTA ES LA MAGIA: El mouse ignorará esta capa */
+    }
+
+    /* Vamos a asegurarnos de que el texto esté siempre por encima de todo */
+    .z-3 { 
+        z-index: 10 !important; 
+        pointer-events: auto; /* Para asegurar que el texto sí reciba los clics */
+    }
+
+    /* =========================================
+       CAPAS DEL HERO Y BLOQUEO DE CLICS
+       ========================================= */
+    /* 1. Forzamos la sombra y el carrusel para que ignoren el mouse */
+    #heroCarousel, .hero-overlay {
+        pointer-events: none !important;
+    }
+
+    .hero-overlay {
+        background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+        top: 0;
+        left: 0;
+        z-index: 1 !important;
+    }
+
+    /* 2. Traemos el contenedor del texto y botones hacia el frente absoluto */
+    .hero-carousel-bg .container {
+        position: relative !important;
+        z-index: 99 !important; 
+        pointer-events: auto !important;
+    }
+
+    /* 3. Aseguramos que los botones sean clickeables y tengan el cursor de manito */
+    .btn-studio {
+        position: relative !important;
+        z-index: 100 !important;
+        cursor: pointer !important;
+    }
+
 </style>
 {% endblock %}
 
