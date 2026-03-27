@@ -316,10 +316,62 @@ def obtener_notificaciones(request):
 # ==========================================
 import os
 import zipfile
+import shutil
+import tempfile
 from django.conf import settings
 from django.http import FileResponse, Http404
 from django.contrib import messages
 from datetime import datetime
+from django.db import connections
+
+
+BACKUP_METADATA_FILENAME = 'backups_metadata.json'
+
+
+def _cargar_metadata_backups(backups_dir):
+    metadata_path = os.path.join(backups_dir, BACKUP_METADATA_FILENAME)
+    if not os.path.exists(metadata_path):
+        return {}
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+            return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _guardar_metadata_backups(backups_dir, metadata):
+    metadata_path = os.path.join(backups_dir, BACKUP_METADATA_FILENAME)
+    with open(metadata_path, 'w', encoding='utf-8') as fh:
+        json.dump(metadata, fh, ensure_ascii=False, indent=2)
+
+
+def _generar_zip_respaldo(backups_dir, prefijo='backup_sena', descripcion=''):
+    if not os.path.exists(backups_dir):
+        os.makedirs(backups_dir)
+
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    zip_filename = f'{prefijo}_{timestamp}.zip'
+    zip_filepath = os.path.join(backups_dir, zip_filename)
+
+    db_path = os.path.join(settings.BASE_DIR, 'db.sqlite3')
+    media_path = settings.MEDIA_ROOT
+
+    with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        if os.path.exists(db_path):
+            zipf.write(db_path, os.path.basename(db_path))
+
+        if os.path.exists(media_path):
+            for root, dirs, files in os.walk(media_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, settings.BASE_DIR)
+                    zipf.write(file_path, arcname)
+
+        if descripcion:
+            zipf.comment = descripcion.encode('utf-8')[:65535]
+
+    return zip_filename, zip_filepath
 
 # Función auxiliar para comprobar superusuario
 def es_superusuario(user):
@@ -334,16 +386,20 @@ def listar_backups(request):
     # Crear directorio si no existe
     if not os.path.exists(backups_dir):
         os.makedirs(backups_dir)
-        
+    metadata = _cargar_metadata_backups(backups_dir)
+
     archivos = []
     for f in os.listdir(backups_dir):
         if f.endswith('.zip'):
             filepath = os.path.join(backups_dir, f)
             stats = os.stat(filepath)
+            meta_actual = metadata.get(f, {})
             archivos.append({
                 'nombre': f,
                 'tamano_mb': round(stats.st_size / (1024 * 1024), 2),
-                'fecha_creacion': datetime.fromtimestamp(stats.st_ctime)
+                'fecha_creacion': datetime.fromtimestamp(stats.st_ctime),
+                'descripcion': meta_actual.get('descripcion', ''),
+                'ultima_restauracion': meta_actual.get('ultima_restauracion', ''),
             })
             
     # Ordenar del más reciente al más antiguo
@@ -356,33 +412,31 @@ def listar_backups(request):
 @user_passes_test(es_superusuario)
 def crear_backup(request):
     """Genera un archivo ZIP conteniendo la Base de Datos y la carpeta Media"""
+    if request.method != 'POST':
+        messages.warning(request, 'Usa el formulario para generar una copia de seguridad.')
+        return redirect('core:listar_backups')
+
     try:
         backups_dir = os.path.join(settings.BASE_DIR, 'backups')
-        if not os.path.exists(backups_dir):
-            os.makedirs(backups_dir)
-            
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        zip_filename = f'backup_sena_{timestamp}.zip'
-        zip_filepath = os.path.join(backups_dir, zip_filename)
-        
-        db_path = os.path.join(settings.BASE_DIR, 'db.sqlite3')
-        media_path = settings.MEDIA_ROOT
-        
-        # Comprimir
-        with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # 1. Base de datos
-            if os.path.exists(db_path):
-                zipf.write(db_path, os.path.basename(db_path))
-                
-            # 2. Archivos Multimedia (firmas, fotos, anexos)
-            if os.path.exists(media_path):
-                for root, dirs, files in os.walk(media_path):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        # Calcula la ruta relativa para no guardar toda la ruta completa C:\ en el zip
-                        arcname = os.path.relpath(file_path, settings.BASE_DIR)
-                        zipf.write(file_path, arcname)
-                        
+        descripcion = (request.POST.get('descripcion') or '').strip()
+        if len(descripcion) > 180:
+            raise ValueError('La descripción no puede superar 180 caracteres.')
+
+        zip_filename, _ = _generar_zip_respaldo(
+            backups_dir=backups_dir,
+            prefijo='backup_sena',
+            descripcion=descripcion,
+        )
+
+        metadata = _cargar_metadata_backups(backups_dir)
+        metadata[zip_filename] = {
+            'descripcion': descripcion,
+            'creado_por': request.user.username,
+            'fecha_creacion': datetime.now().isoformat(timespec='seconds'),
+            'ultima_restauracion': metadata.get(zip_filename, {}).get('ultima_restauracion', ''),
+        }
+        _guardar_metadata_backups(backups_dir, metadata)
+
         messages.success(request, f'Backup generado exitosamente: {zip_filename}')
     except Exception as e:
         messages.error(request, f'Error al generar copias de seguridad: {str(e)}')
@@ -422,10 +476,81 @@ def eliminar_backup(request, nombre_archivo):
     if os.path.exists(filepath):
         try:
             os.remove(filepath)
+            metadata = _cargar_metadata_backups(backups_dir)
+            if nombre_archivo in metadata:
+                del metadata[nombre_archivo]
+                _guardar_metadata_backups(backups_dir, metadata)
             messages.success(request, f'Archivo devuelto: {nombre_archivo} eliminado.')
         except Exception as e:
             messages.error(request, f'Error al eliminar el archivo: {e}')
     else:
         messages.warning(request, 'El archivo no fue encontrado.')
         
+    return redirect('core:listar_backups')
+
+
+@login_required
+@user_passes_test(es_superusuario)
+def restaurar_backup(request, nombre_archivo):
+    """Restaura automáticamente db.sqlite3 y media/ desde un backup zip."""
+    if request.method != 'POST':
+        messages.warning(request, 'La restauración debe ejecutarse desde el botón del sistema.')
+        return redirect('core:listar_backups')
+
+    if '..' in nombre_archivo or not nombre_archivo.endswith('.zip'):
+        raise Http404("Archivo no permitido")
+
+    backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+    filepath = os.path.join(backups_dir, nombre_archivo)
+
+    if not os.path.exists(filepath):
+        messages.error(request, 'El respaldo seleccionado no existe.')
+        return redirect('core:listar_backups')
+
+    db_destino = os.path.join(settings.BASE_DIR, 'db.sqlite3')
+    media_destino = settings.MEDIA_ROOT
+
+    try:
+        # 1) Crear respaldo automático previo (rollback rápido)
+        respaldo_previo, _ = _generar_zip_respaldo(
+            backups_dir=backups_dir,
+            prefijo='pre_restore_auto',
+            descripcion=f'Respaldo automático previo a restaurar {nombre_archivo}',
+        )
+
+        # 2) Cerrar conexiones activas a SQLite antes de reemplazar el archivo
+        for conn in connections.all():
+            conn.close()
+
+        # 3) Extraer en temporal y reemplazar destinos
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with zipfile.ZipFile(filepath, 'r') as zipf:
+                zipf.extractall(tmpdir)
+
+            db_origen = os.path.join(tmpdir, 'db.sqlite3')
+            media_origen = os.path.join(tmpdir, 'media')
+
+            if os.path.exists(db_origen):
+                shutil.copy2(db_origen, db_destino)
+
+            if os.path.exists(media_origen):
+                if os.path.exists(media_destino):
+                    shutil.rmtree(media_destino)
+                shutil.copytree(media_origen, media_destino)
+
+        metadata = _cargar_metadata_backups(backups_dir)
+        if nombre_archivo not in metadata:
+            metadata[nombre_archivo] = {}
+        metadata[nombre_archivo]['ultima_restauracion'] = datetime.now().isoformat(timespec='seconds')
+        metadata[nombre_archivo]['restaurado_por'] = request.user.username
+        _guardar_metadata_backups(backups_dir, metadata)
+
+        messages.success(
+            request,
+            f'Restauración completada con éxito desde {nombre_archivo}. '
+            f'Se creó respaldo preventivo: {respaldo_previo}.'
+        )
+    except Exception as e:
+        messages.error(request, f'Error al restaurar el respaldo: {e}')
+
     return redirect('core:listar_backups')
