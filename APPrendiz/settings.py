@@ -207,3 +207,10 @@ EMAIL_HOST_PASSWORD = 'cyzi yxvk iolo dojo'
 
 # Opcional: Para que el correo diga que viene del sistema y no de tu nombre personal
 DEFAULT_FROM_EMAIL = 'APPrendiz SENA <tu_correo_del_proyecto@gmail.com>'
+
+# ==========================================
+# CONFIGURACIÓN DE GOOGLE reCAPTCHA
+# ==========================================
+# Si están vacías, la validación reCAPTCHA en login queda deshabilitada.
+RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
+RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')

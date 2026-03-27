@@ -11,6 +11,7 @@ from aprendices.forms import AprendizForm
 from instructores.forms import InstructorForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.conf import settings
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -71,7 +72,8 @@ def login_view(request):
     
     context = {
         'form': form,
-        'titulo': 'Iniciar Sesión'
+        'titulo': 'Iniciar Sesión',
+        'recaptcha_site_key': settings.RECAPTCHA_SITE_KEY,
     }
     return render(request, 'usuarios/login.html', context)
 
