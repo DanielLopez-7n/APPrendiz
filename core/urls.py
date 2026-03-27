@@ -23,6 +23,7 @@ urlpatterns = [
     # --- Copias de Seguridad (Backups) ---
     path('backups/', views.listar_backups, name='listar_backups'),
     path('backups/crear/', views.crear_backup, name='crear_backup'),
+    path('backups/restaurar/<str:nombre_archivo>/', views.restaurar_backup, name='restaurar_backup'),
     path('backups/descargar/<str:nombre_archivo>/', views.descargar_backup, name='descargar_backup'),
     path('backups/eliminar/<str:nombre_archivo>/', views.eliminar_backup, name='eliminar_backup'),
-]
+]
