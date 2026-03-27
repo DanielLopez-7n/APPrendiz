@@ -36,7 +36,10 @@
         border-left: 4px solid #39A900; display: flex; align-items: center; margin-bottom: 20px;
     }
     .input-group-studio i { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
-    .input-group-studio input { flex-grow: 1; border: none !important; background: transparent !important; padding: 12px 0; font-weight: 700; outline: none; }
+    .input-group-studio input, .input-group-studio select {
+        flex-grow: 1; border: none !important; background: transparent !important;
+        padding: 12px 0; font-weight: 700; outline: none;
+    }
 
     .btn-save { background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px; font-weight: 800; width: 100%; transition: 0.3s; }
     .btn-save:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
@@ -230,6 +233,40 @@
                                     <i class="bi bi-telephone"></i>{{ form_perfil.telefono }}
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <label class="label-studio">Dirección de Residencia</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-geo-alt"></i>{{ form_perfil.direccion }}
+                                </div>
+                            </div>
+
+                            {% if mostrar_campos_extra %}
+                            <div class="col-md-6">
+                                <label class="label-studio">Tipo de documento</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-card-heading"></i>
+                                    <select name="tipo_documento_extra">
+                                        {% for value, label in tipo_documento_choices %}
+                                            <option value="{{ value }}" {% if tipo_documento_actual == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-studio">Correo personal</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-envelope-paper"></i>
+                                    <input type="email" name="correo_personal_extra" value="{{ correo_personal_editable }}" placeholder="correo@ejemplo.com">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="label-studio">Dirección (Ficha de rol)</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-pin-map"></i>
+                                    <input type="text" name="direccion_extra" value="{{ direccion_editable }}" placeholder="Dirección de residencia">
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
 
                         <div class="row mt-5">

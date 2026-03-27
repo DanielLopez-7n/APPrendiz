@@ -11,6 +11,8 @@ from aprendices.forms import AprendizForm
 from instructores.forms import InstructorForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from aprendices.models import Aprendiz
+from instructores.models import Instructor
 
 # ==================== VISTAS DE AUTENTICACIÓN ====================
 
@@ -141,10 +143,10 @@ def lista_usuarios_view(request):
     # Obtener parámetros de búsqueda y filtrado
     busqueda = request.GET.get('buscar', '')
     filtro_activo = request.GET.get('activo', '')
-    filtro_staff = request.GET.get('staff', '')
+    filtro_rol = request.GET.get('rol', '')
     
     # Query base
-    usuarios = User.objects.select_related('perfil').all()
+    usuarios = User.objects.select_related('perfil', 'aprendiz', 'instructor').all()
     
     # Aplicar filtros
     if busqueda:
@@ -159,18 +161,30 @@ def lista_usuarios_view(request):
     if filtro_activo:
         usuarios = usuarios.filter(is_active=filtro_activo == 'true')
     
-    if filtro_staff:
-        usuarios = usuarios.filter(is_staff=filtro_staff == 'true')
+    if filtro_rol == 'administrador':
+        usuarios = usuarios.filter(is_staff=True).exclude(instructor__isnull=False)
+    elif filtro_rol == 'instructor':
+        usuarios = usuarios.filter(instructor__isnull=False)
+    elif filtro_rol == 'aprendiz':
+        usuarios = usuarios.filter(aprendiz__isnull=False)
     
     # Ordenar
     usuarios = usuarios.order_by('-date_joined')
+
+    for usuario in usuarios:
+        telefono_contacto = usuario.perfil.telefono if hasattr(usuario, 'perfil') else ''
+        if hasattr(usuario, 'aprendiz') and usuario.aprendiz.telefono:
+            telefono_contacto = usuario.aprendiz.telefono
+        elif hasattr(usuario, 'instructor') and usuario.instructor.telefono:
+            telefono_contacto = usuario.instructor.telefono
+        usuario.telefono_contacto = telefono_contacto
     
     context = {
         'titulo': 'Gestión de Usuarios',
         'usuarios': usuarios,
         'busqueda': busqueda,
         'filtro_activo': filtro_activo,
-        'filtro_staff': filtro_staff,
+        'filtro_rol': filtro_rol,
     }
     return render(request, 'usuarios/listar_usuarios.html', context)
 
@@ -382,12 +396,19 @@ def perfil_view(request):
             # 2. Guardamos datos del Perfil (Foto, Teléfono, Documento)
             perfil_guardado = form_perfil.save()
             
-            # 3. SINCRONIZACIÓN (Premium): Si es Instructor, guardamos el teléfono también en su tabla
+            # 3. SINCRONIZACIÓN DE CAMPOS EXTENDIDOS POR ROL
             if hasattr(usuario, 'instructor'):
+                usuario.instructor.tipo_documento = request.POST.get('tipo_documento_extra', usuario.instructor.tipo_documento)
+                usuario.instructor.correo_personal = request.POST.get('correo_personal_extra', usuario.instructor.correo_personal)
+                usuario.instructor.direccion_residencia = request.POST.get('direccion_extra', usuario.instructor.direccion_residencia)
                 usuario.instructor.telefono = perfil_guardado.telefono
-                # Si tu modelo Instructor también tiene documento, descomenta la siguiente línea:
-                # usuario.instructor.documento = perfil_guardado.documento
                 usuario.instructor.save()
+            elif hasattr(usuario, 'aprendiz'):
+                usuario.aprendiz.tipo_documento = request.POST.get('tipo_documento_extra', usuario.aprendiz.tipo_documento)
+                usuario.aprendiz.correo_personal = request.POST.get('correo_personal_extra', usuario.aprendiz.correo_personal)
+                usuario.aprendiz.direccion_residencia = request.POST.get('direccion_extra', usuario.aprendiz.direccion_residencia)
+                usuario.aprendiz.telefono = perfil_guardado.telefono
+                usuario.aprendiz.save()
             
             messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
             return redirect('usuarios:perfil') 
@@ -433,6 +454,8 @@ def perfil_view(request):
         tipo_documento = instructor.get_tipo_documento_display()
         context['profesion'] = instructor.profesion
         context['tipo_contrato'] = instructor.get_tipo_contrato_display()
+        correo_personal_editable = instructor.correo_personal or ''
+        direccion_editable = instructor.direccion_residencia or ''
     elif hasattr(usuario, 'aprendiz'):
         aprendiz = usuario.aprendiz
         documento_sistema = aprendiz.documento or documento_sistema
@@ -442,6 +465,11 @@ def perfil_view(request):
         tipo_documento = aprendiz.get_tipo_documento_display()
         context['ficha_actual'] = getattr(aprendiz.numero_ficha, 'numero', 'No asignada')
         context['programa_formacion'] = getattr(getattr(aprendiz.numero_ficha, 'programa', None), 'nombre', 'No asignado')
+        correo_personal_editable = aprendiz.correo_personal or ''
+        direccion_editable = aprendiz.direccion_residencia or ''
+    else:
+        correo_personal_editable = ''
+        direccion_editable = usuario.perfil.direccion or ''
 
     context.update({
         'documento_sistema': documento_sistema,
@@ -449,6 +477,19 @@ def perfil_view(request):
         'direccion_sistema': direccion_sistema,
         'correo_personal': correo_personal,
         'tipo_documento': tipo_documento,
+        'mostrar_campos_extra': hasattr(usuario, 'aprendiz') or hasattr(usuario, 'instructor'),
+        'tipo_documento_actual': (
+            usuario.instructor.tipo_documento if hasattr(usuario, 'instructor')
+            else usuario.aprendiz.tipo_documento if hasattr(usuario, 'aprendiz')
+            else ''
+        ),
+        'tipo_documento_choices': (
+            Instructor.TIPO_DOC_CHOICES if hasattr(usuario, 'instructor')
+            else Aprendiz.TIPO_DOC_CHOICES if hasattr(usuario, 'aprendiz')
+            else []
+        ),
+        'correo_personal_editable': correo_personal_editable,
+        'direccion_editable': direccion_editable,
     })
     return render(request, 'usuarios/perfil.html', context)
 
