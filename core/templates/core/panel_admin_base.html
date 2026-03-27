@@ -533,7 +533,10 @@
         box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
     }
 
-
+    .alert-border-success { border-left: 6px solid var(--sena-green) !important; }
+    .alert-border-danger, .alert-border-error { border-left: 6px solid #dc3545 !important; }
+    .alert-border-warning { border-left: 6px solid #ffc107 !important; }
+    .alert-border-info { border-left: 6px solid #0dcaf0 !important; }
     </style>
 
     {% load bootstrap5 %}
@@ -878,7 +881,7 @@
         {% if messages %}
             <div class="container-fluid mt-3 px-4">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert" style="border-left: 6px solid {% if message.tags == 'success' %}var(--sena-green){% elif message.tags == 'error' %}#dc3545{% else %}#ffc107{% endif %} !important;">
+                    <div class="alert alert-{{ message.tags }} alert-border-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-3" role="alert">
                         <span class="fw-bold">{{ message }}</span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -955,6 +958,7 @@
         .hover-opacity:hover {
             opacity: 0.9;
         }
+    
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1048,6 +1052,7 @@
     </script>
 
     {% block extra_js %}{% endblock %}
+    {% include 'core/accesibilidad.html' %}
 
     <div class="modal fade" id="logoutAdminModal" tabindex="-1" aria-labelledby="logoutAdminModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

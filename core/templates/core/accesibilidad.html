@@ -1,93 +1,175 @@
 <style>
-    /* Diseño del contenedor y botones (se mantiene igual) */
+    /* =========================================
+       DISEÑO DEL MENÚ DE ACCESIBILIDAD
+       ========================================= */
     #a11y-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; }
-    #a11y-btn { background-color: #39A900; color: white; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.8rem; box-shadow: 0 4px 8px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.2s; }
-    #a11y-btn:hover { transform: scale(1.1); }
-    #a11y-menu { background-color: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); width: 240px; margin-bottom: 15px; overflow: hidden; display: none; max-height: 70vh; overflow-y: auto;}
-    #a11y-menu.show { display: block; }
-    .a11y-option-btn { width: 100%; background: none; border: none; border-bottom: 1px solid #eee; padding: 12px 15px; text-align: left; color: #333; font-weight: 500; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
-    .a11y-option-btn:hover { background-color: #f8f9fa; color: #39A900; }
-    .a11y-option-btn.active { background-color: #e8f5e9; border-left: 4px solid #39A900; color: #39A900; font-weight: bold;}
-    .a11y-option-btn:last-child { border-bottom: none; color: #dc3545; }
+    
+    #a11y-btn { 
+        background-color: #39A900; color: white; border: 3px solid #ffffff; width: 65px; height: 65px; 
+        border-radius: 50%; font-size: 2rem; box-shadow: 0 6px 15px rgba(0,0,0,0.3); 
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        display: flex; justify-content: center; align-items: center;
+    }
+    #a11y-btn:hover { transform: scale(1.1) rotate(10deg); background-color: #2D8600; }
+    
+    #a11y-menu { 
+        background-color: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        width: 280px; margin-bottom: 15px; overflow: hidden; 
+        opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none; transition: all 0.3s ease;
+    }
+    #a11y-menu.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    
+    .a11y-header { 
+        background-color: #39A900; color: white; padding: 15px; 
+        display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.1rem;
+    }
+    .a11y-close-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; }
+    
+    .a11y-body { max-height: 60vh; overflow-y: auto; padding-bottom: 10px; }
+    
+    .a11y-option-btn { 
+        width: 100%; background: none; border: none; border-bottom: 1px solid #f0f0f0; 
+        padding: 14px 20px; text-align: left; color: #444; font-weight: 500; 
+        cursor: pointer; transition: all 0.2s; font-size: 0.95rem; display: flex; align-items: center;
+    }
+    .a11y-option-btn i { font-size: 1.2rem; width: 30px; }
+    .a11y-option-btn:hover { background-color: #f8f9fa; color: #39A900; padding-left: 25px; }
+    .a11y-option-btn.active { background-color: #e8f5e9; border-left: 5px solid #39A900; color: #39A900; font-weight: 700; padding-left: 15px; }
+    
+    .a11y-reset-btn { color: #dc3545; font-weight: 600; border-bottom: none; }
+    .a11y-reset-btn:hover { background-color: #fff1f0; color: #c82333; }
 
-    /* --- LAS 7 CLASES DE ACCESIBILIDAD --- */
+    /* =========================================
+       CLASES DE ACCESIBILIDAD (MODIFICADORES)
+       ========================================= */
     
-    /* 1. Texto Grande */
-    body.a11y-text-large { font-size: 125% !important; }
-    body.a11y-text-large h1, body.a11y-text-large h2, body.a11y-text-large h3, body.a11y-text-large h4, body.a11y-text-large h5, body.a11y-text-large h6 { font-size: 135% !important; }
+    /* 1. Texto Grande (Aplica a html para que use 'rem' dinámicamente) */
+    html.a11y-text-large { font-size: 115% !important; }
     
-    /* 2. Alto Contraste */
-    body.a11y-contrast, body.a11y-contrast .card, body.a11y-contrast .sidebar, body.a11y-contrast .topbar { background-color: #000000 !important; color: #FFFF00 !important; border-color: #FFFF00 !important; backdrop-filter: none !important; }
-    body.a11y-contrast * { color: #FFFF00 !important; }
-    body.a11y-contrast #fondo-carrusel { display: none !important; }
+    /* 2. Alto Contraste (Mejorado para no romper tarjetas) */
+    body.a11y-contrast, body.a11y-contrast .card, body.a11y-contrast .navbar, body.a11y-contrast .sidebar, 
+    body.a11y-contrast footer, body.a11y-contrast section, body.a11y-contrast div { 
+        background-color: #000000 !important; color: #00FF00 !important; border-color: #00FF00 !important; backdrop-filter: none !important;
+    }
+    body.a11y-contrast * { color: #00FF00 !important; text-shadow: none !important; box-shadow: none !important; }
+    body.a11y-contrast a { color: #FFFF00 !important; text-decoration: underline !important; }
+    body.a11y-contrast img:not(.logo) { filter: grayscale(100%) contrast(150%) !important; }
 
     /* 3. Escala de Grises */
-    body.a11y-grayscale { filter: grayscale(100%) !important; }
+    body.a11y-grayscale { filter: grayscale(100%) contrast(110%) !important; }
 
-    /* 4. Fuente para Dislexia (Usa Comic Sans como respaldo universal comprobado para dislexia) */
-    body.a11y-dyslexia * { font-family: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif !important; letter-spacing: 0.15em !important; line-height: 1.6 !important; }
+    /* 4. Fuente para Dislexia (Optimizada con mejor espaciado) */
+    body.a11y-dyslexia, body.a11y-dyslexia * { 
+        font-family: 'Lexend', 'OpenDyslexic', 'Comic Sans MS', sans-serif !important; 
+        letter-spacing: 0.1em !important; word-spacing: 0.15em !important; line-height: 1.7 !important; 
+    }
 
     /* 5. Resaltar Enlaces */
-    body.a11y-highlight-links a, body.a11y-highlight-links button { background-color: #000 !important; color: #FFFF00 !important; outline: 3px solid #FFFF00 !important; text-decoration: underline !important; font-weight: bold !important; }
+    body.a11y-highlight-links a, body.a11y-highlight-links button { 
+        background-color: #000 !important; color: #FFFF00 !important; 
+        outline: 3px solid #FFFF00 !important; outline-offset: 2px !important;
+        text-decoration: underline !important; font-weight: bold !important; 
+    }
 
-    /* 6. Cursor Grande (Genera un cursor de flecha gigante nativo) */
-    body.a11y-big-cursor, body.a11y-big-cursor * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z'/%3E%3C/svg%3E"), auto !important; }
-
-    /* 7. Pausar Animaciones */
-    body.a11y-pause-animations * { animation: none !important; transition: none !important; }
+    /* 6. Cursor Grande */
+    body.a11y-big-cursor, body.a11y-big-cursor * { 
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z'/%3E%3C/svg%3E"), auto !important; 
+    }
+    
+    /* 7. Lector de pantalla (Indicador visual al pasar el cursor) */
+    body.a11y-speech *:hover { outline: 2px dashed #39A900 !important; cursor: help !important; }
 </style>
 
 <div id="a11y-container">
     <div id="a11y-menu">
-        <div style="background-color: #39A900; color: white; padding: 12px; text-align: center; font-weight: bold;">
-            <i class="bi bi-universal-access-circle me-1"></i> Accesibilidad
+        <div class="a11y-header">
+            <span><i class="bi bi-universal-access-circle me-2"></i>Accesibilidad</span>
+            <button class="a11y-close-btn" onclick="document.getElementById('a11y-menu').classList.remove('show')">&times;</button>
         </div>
-        <button id="btn-a11y-text-large" class="a11y-option-btn" onclick="toggleA11yClass('a11y-text-large')"><i class="bi bi-zoom-in me-2"></i> Aumentar Texto</button>
-        <button id="btn-a11y-contrast" class="a11y-option-btn" onclick="toggleA11yClass('a11y-contrast')"><i class="bi bi-circle-half me-2"></i> Alto Contraste</button>
-        <button id="btn-a11y-grayscale" class="a11y-option-btn" onclick="toggleA11yClass('a11y-droplet-half')"><i class="bi bi-droplet-half me-2"></i> Escala de Grises</button>
-        <button id="btn-a11y-dyslexia" class="a11y-option-btn" onclick="toggleA11yClass('a11y-dyslexia')"><i class="bi bi-type me-2"></i> Fuente Dislexia</button>
-        <button id="btn-a11y-highlight-links" class="a11y-option-btn" onclick="toggleA11yClass('a11y-highlight-links')"><i class="bi bi-link-45deg me-2"></i> Resaltar Enlaces</button>
-        <button id="btn-a11y-big-cursor" class="a11y-option-btn" onclick="toggleA11yClass('a11y-big-cursor')"><i class="bi bi-cursor-fill me-2"></i> Cursor Grande</button>
-        <button id="btn-a11y-pause-animations" class="a11y-option-btn" onclick="toggleA11yClass('a11y-pause-animations')"><i class="bi bi-pause-circle me-2"></i> Pausar Animaciones</button>
-        <button class="a11y-option-btn" onclick="resetA11y()"><i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer todo</button>
+        <div class="a11y-body">
+            <button id="btn-a11y-speech" class="a11y-option-btn" onclick="toggleA11yClass('a11y-speech')"><i class="bi bi-volume-up"></i> Lector de Pantalla</button>
+            <button id="btn-a11y-text-large" class="a11y-option-btn" onclick="toggleA11yClass('a11y-text-large', true)"><i class="bi bi-zoom-in"></i> Aumentar Texto</button>
+            <button id="btn-a11y-contrast" class="a11y-option-btn" onclick="toggleA11yClass('a11y-contrast')"><i class="bi bi-circle-half"></i> Alto Contraste</button>
+            <button id="btn-a11y-grayscale" class="a11y-option-btn" onclick="toggleA11yClass('a11y-grayscale')"><i class="bi bi-droplet-half"></i> Escala de Grises</button>
+            <button id="btn-a11y-dyslexia" class="a11y-option-btn" onclick="toggleA11yClass('a11y-dyslexia')"><i class="bi bi-type"></i> Fuente Dislexia</button>
+            <button id="btn-a11y-highlight-links" class="a11y-option-btn" onclick="toggleA11yClass('a11y-highlight-links')"><i class="bi bi-link-45deg"></i> Resaltar Enlaces</button>
+            <button id="btn-a11y-big-cursor" class="a11y-option-btn" onclick="toggleA11yClass('a11y-big-cursor')"><i class="bi bi-cursor-fill"></i> Cursor Grande</button>
+            <button class="a11y-option-btn a11y-reset-btn" onclick="resetA11y()"><i class="bi bi-arrow-counterclockwise"></i> Restablecer todo</button>
+        </div>
     </div>
-    <button id="a11y-btn" onclick="document.getElementById('a11y-menu').classList.toggle('show')">
+    <button id="a11y-btn" onclick="document.getElementById('a11y-menu').classList.toggle('show')" aria-label="Abrir menú de accesibilidad">
         <i class="bi bi-universal-access-circle"></i>
     </button>
 </div>
 
 <script>
-    const a11yClasses = ['a11y-text-large', 'a11y-contrast', 'a11y-grayscale', 'a11y-dyslexia', 'a11y-highlight-links', 'a11y-big-cursor', 'a11y-pause-animations'];
+    // Lista actualizada de clases
+    const a11yClasses = ['a11y-speech', 'a11y-text-large', 'a11y-contrast', 'a11y-grayscale', 'a11y-dyslexia', 'a11y-highlight-links', 'a11y-big-cursor', 'a11y-pause-animations'];
 
     document.addEventListener('DOMContentLoaded', () => {
         a11yClasses.forEach(cls => {
             if (localStorage.getItem(cls) === 'true') {
-                document.body.classList.add(cls);
-                document.getElementById('btn-' + cls).classList.add('active'); // Pinta el botón de verde si está activo
+                // El aumento de texto va en el HTML, el resto en el BODY
+                const targetEl = cls === 'a11y-text-large' ? document.documentElement : document.body;
+                targetEl.classList.add(cls);
+                const btn = document.getElementById('btn-' + cls);
+                if(btn) btn.classList.add('active');
             }
         });
     });
 
-    function toggleA11yClass(className) {
-        const body = document.body;
+    // Función principal para alternar clases
+    function toggleA11yClass(className, isHtmlTag = false) {
+        const targetElement = isHtmlTag ? document.documentElement : document.body;
         const btn = document.getElementById('btn-' + className);
-        if (body.classList.contains(className)) {
-            body.classList.remove(className);
+        
+        if (targetElement.classList.contains(className)) {
+            targetElement.classList.remove(className);
             btn.classList.remove('active');
             localStorage.setItem(className, 'false');
+            
+            // Si apaga el lector, detener cualquier audio sonando
+            if(className === 'a11y-speech') window.speechSynthesis.cancel();
+            
         } else {
-            body.classList.add(className);
+            targetElement.classList.add(className);
             btn.classList.add('active');
             localStorage.setItem(className, 'true');
         }
     }
 
+    // Función para restablecer todo
     function resetA11y() {
         a11yClasses.forEach(cls => {
-            document.body.classList.remove(cls);
-            document.getElementById('btn-' + cls).classList.remove('active');
+            const targetEl = cls === 'a11y-text-large' ? document.documentElement : document.body;
+            targetEl.classList.remove(cls);
+            const btn = document.getElementById('btn-' + cls);
+            if(btn) btn.classList.remove('active');
             localStorage.setItem(cls, 'false');
         });
+        window.speechSynthesis.cancel();
         document.getElementById('a11y-menu').classList.remove('show');
     }
+
+    // =========================================
+    // LÓGICA DEL LECTOR DE PANTALLA
+    // =========================================
+    document.addEventListener('click', function(e) {
+        // Solo leer si la clase está activa y el clic NO fue en el propio menú de accesibilidad
+        if (document.body.classList.contains('a11y-speech') && !e.target.closest('#a11y-container')) {
+            let textToRead = e.target.innerText || e.target.value || e.target.alt;
+            
+            if (textToRead && textToRead.trim() !== '') {
+                // Evitar que el clic ejecute enlaces/botones inmediatamente para dar tiempo a leer
+                // (Opcional: puedes comentar la siguiente línea si prefieres que la acción suceda al mismo tiempo)
+                e.preventDefault(); 
+                
+                window.speechSynthesis.cancel(); // Detener audio anterior
+                let utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = 'es-ES'; // Español
+                utterance.rate = 0.9; // Velocidad un poco más lenta y clara
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+    });
 </script>
