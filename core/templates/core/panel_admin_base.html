@@ -97,7 +97,7 @@
         .nav-header span { color: rgba(255,255,255,0.6); font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; }
 
         /* 5. CONTENIDO PRINCIPAL Y CRISTAL */
-        #main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; position: relative; z-index: 10; }
+        #main-content { margin-left: var(--sidebar-width); min-height: 100vh; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; position: relative; z-index: 10; pointer-events: auto !important; }
         #main-content.collapsed { margin-left: var(--sidebar-collapsed-width); }
 
         .topbar { background-color: rgba(255, 255, 255, 0.9) !important; backdrop-filter: blur(15px); border-bottom: 2px solid rgba(57, 169, 0, 0.5); position: sticky; top: 0; z-index: 900; }
@@ -122,13 +122,18 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.45);
-            z-index: 1100;
+            z-index: 1040;
+            display: none;
+            pointer-events: none;
+        }
+        #sidebar-overlay.active {
+            display: block;
+            pointer-events: auto;
         }
 
-        /* Defensa global: un backdrop huérfano no puede bloquear todos los botones */
-        body:not(.modal-open) .modal-backdrop,
-        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
-            opacity: 0 !important;
+        /* Defensa global: un backdrop huérfano no debe bloquear botones */
+        .modal-backdrop:not(.show), .offcanvas-backdrop:not(.show) {
+            display: none !important;
             pointer-events: none !important;
         }
 
@@ -1005,12 +1010,18 @@
                 // Evita conflicto con estados legacy.
                 sidebar.classList.remove('collapsed');
                 sidebar.classList.add('mobile-open');
-                if (overlay) overlay.style.display = 'block';
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.classList.add('active');
+                }
                 document.body.style.overflow = 'hidden';
             }
             function closeMobile() {
                 sidebar.classList.remove('mobile-open');
-                if (overlay) overlay.style.display = 'none';
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                }
                 document.body.style.overflow = '';
             }
             if (overlay) {

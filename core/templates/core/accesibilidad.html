@@ -71,28 +71,19 @@
         text-decoration: underline !important; font-weight: bold !important; 
     }
 
-<<<<<<< HEAD
     /* 6. Cursor Grande */
     body.a11y-big-cursor, body.a11y-big-cursor * { 
         cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z'/%3E%3C/svg%3E"), auto !important; 
     }
-    
-    /* 7. Lector de pantalla (Indicador visual al pasar el cursor) */
-    body.a11y-speech *:hover { outline: 2px dashed #39A900 !important; cursor: help !important; }
-=======
-    /* 6. Cursor Grande (Genera un cursor de flecha gigante nativo) */
-    body.a11y-big-cursor, body.a11y-big-cursor * { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87c.45 0 .67-.54.35-.85L6.35 2.86a.5.5 0 0 0-.85.35z'/%3E%3C/svg%3E"), auto !important; }
-    body.a11y-big-cursor a,
-    body.a11y-big-cursor button,
-    body.a11y-big-cursor .btn,
-    body.a11y-big-cursor [role="button"],
-    body.a11y-big-cursor input[type="submit"] {
-        cursor: pointer !important;
-    }
 
-    /* 7. Pausar Animaciones */
-    body.a11y-pause-animations * { animation: none !important; transition: none !important; }
->>>>>>> a72bc9302a2e81d5d42e6b86fe1a52b4b6210802
+    /* 7. Pausar Animaciones (Corregido para no romper menús de Bootstrap) */
+    body.a11y-pause-animations *, body.a11y-pause-animations .carousel-inner { 
+        animation: none !important; scroll-behavior: auto !important;
+        /* Se eliminó transition: none y transform: none para proteger la barra lateral */
+    }
+    
+    /* 8. Lector de pantalla (Indicador visual al pasar el cursor) */
+    body.a11y-speech *:hover { outline: 2px dashed #39A900 !important; cursor: help !important; }
 </style>
 
 <div id="a11y-container">
@@ -109,19 +100,9 @@
             <button id="btn-a11y-dyslexia" class="a11y-option-btn" onclick="toggleA11yClass('a11y-dyslexia')"><i class="bi bi-type"></i> Fuente Dislexia</button>
             <button id="btn-a11y-highlight-links" class="a11y-option-btn" onclick="toggleA11yClass('a11y-highlight-links')"><i class="bi bi-link-45deg"></i> Resaltar Enlaces</button>
             <button id="btn-a11y-big-cursor" class="a11y-option-btn" onclick="toggleA11yClass('a11y-big-cursor')"><i class="bi bi-cursor-fill"></i> Cursor Grande</button>
+            <button id="btn-a11y-pause-animations" class="a11y-option-btn" onclick="toggleA11yClass('a11y-pause-animations')"><i class="bi bi-pause-circle"></i> Pausar Animaciones</button>
             <button class="a11y-option-btn a11y-reset-btn" onclick="resetA11y()"><i class="bi bi-arrow-counterclockwise"></i> Restablecer todo</button>
         </div>
-<<<<<<< HEAD
-=======
-        <button id="btn-a11y-text-large" class="a11y-option-btn" onclick="toggleA11yClass('a11y-text-large')"><i class="bi bi-zoom-in me-2"></i> Aumentar Texto</button>
-        <button id="btn-a11y-contrast" class="a11y-option-btn" onclick="toggleA11yClass('a11y-contrast')"><i class="bi bi-circle-half me-2"></i> Alto Contraste</button>
-        <button id="btn-a11y-grayscale" class="a11y-option-btn" onclick="toggleA11yClass('a11y-grayscale')"><i class="bi bi-droplet-half me-2"></i> Escala de Grises</button>
-        <button id="btn-a11y-dyslexia" class="a11y-option-btn" onclick="toggleA11yClass('a11y-dyslexia')"><i class="bi bi-type me-2"></i> Fuente Dislexia</button>
-        <button id="btn-a11y-highlight-links" class="a11y-option-btn" onclick="toggleA11yClass('a11y-highlight-links')"><i class="bi bi-link-45deg me-2"></i> Resaltar Enlaces</button>
-        <button id="btn-a11y-big-cursor" class="a11y-option-btn" onclick="toggleA11yClass('a11y-big-cursor')"><i class="bi bi-cursor-fill me-2"></i> Cursor Grande</button>
-        <button id="btn-a11y-pause-animations" class="a11y-option-btn" onclick="toggleA11yClass('a11y-pause-animations')"><i class="bi bi-pause-circle me-2"></i> Pausar Animaciones</button>
-        <button class="a11y-option-btn" onclick="resetA11y()"><i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer todo</button>
->>>>>>> a72bc9302a2e81d5d42e6b86fe1a52b4b6210802
     </div>
     <button id="a11y-btn" onclick="document.getElementById('a11y-menu').classList.toggle('show')" aria-label="Abrir menú de accesibilidad">
         <i class="bi bi-universal-access-circle"></i>
@@ -176,30 +157,24 @@
         window.speechSynthesis.cancel();
         document.getElementById('a11y-menu').classList.remove('show');
     }
-<<<<<<< HEAD
 
     // =========================================
     // LÓGICA DEL LECTOR DE PANTALLA
     // =========================================
     document.addEventListener('click', function(e) {
-        // Solo leer si la clase está activa y el clic NO fue en el propio menú de accesibilidad
         if (document.body.classList.contains('a11y-speech') && !e.target.closest('#a11y-container')) {
             let textToRead = e.target.innerText || e.target.value || e.target.alt;
             
             if (textToRead && textToRead.trim() !== '') {
-                // Evitar que el clic ejecute enlaces/botones inmediatamente para dar tiempo a leer
-                // (Opcional: puedes comentar la siguiente línea si prefieres que la acción suceda al mismo tiempo)
-                e.preventDefault(); 
+                // BORRAMOS o comentamos el e.preventDefault() para que los botones sí funcionen
+                // e.preventDefault(); 
                 
-                window.speechSynthesis.cancel(); // Detener audio anterior
+                window.speechSynthesis.cancel();
                 let utterance = new SpeechSynthesisUtterance(textToRead);
-                utterance.lang = 'es-ES'; // Español
-                utterance.rate = 0.9; // Velocidad un poco más lenta y clara
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9;
                 window.speechSynthesis.speak(utterance);
             }
         }
     });
 </script>
-=======
-</script>
->>>>>>> a72bc9302a2e81d5d42e6b86fe1a52b4b6210802
