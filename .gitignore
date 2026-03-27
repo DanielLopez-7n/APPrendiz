@@ -175,3 +175,7 @@ cython_debug/
 
 # Archivos de usuario específicos de este proyecto
 evidencias/
+# Backups y bases de datos locales
+backups/
+*.sql
+*.psql
