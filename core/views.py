@@ -238,6 +238,17 @@ class CustomLoginView(LoginView):
     def form_invalid(self, form):
         # Cuando las credenciales son inválidas, mostramos la vista completa de login
         context = self.get_context_data(form=form)
+
+        username = self.request.POST.get('username', '').strip()
+        context['login_error_message'] = 'Usuario o contraseña incorrectos.'
+
+        if username:
+            usuario_inactivo = User.objects.filter(username__iexact=username, is_active=False).exists()
+            if usuario_inactivo:
+                context['login_error_message'] = (
+                    'Tu cuenta está inactiva. Por favor comunícate con un administrador.'
+                )
+
         # renderizamos la plantilla dedicada donde el usuario puede corregir credenciales
         return render(self.request, 'usuarios/login.html', context, status=401)
 
