@@ -15,6 +15,13 @@
             background-color: rgba(57, 169, 0, 0.1);
             color: #2d8600;
         }
+
+        /* Defensa extra: evitar que backdrops huérfanos bloqueen clics */
+        body:not(.modal-open) .modal-backdrop,
+        body:not(.offcanvas-backdrop-open) .offcanvas-backdrop {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +118,12 @@
             repairUiOverlays();
             window.addEventListener('pageshow', repairUiOverlays);
             document.addEventListener('hidden.bs.modal', repairUiOverlays);
+            document.addEventListener('hidden.bs.offcanvas', repairUiOverlays);
+
+            const overlayObserver = new MutationObserver(function () {
+                repairUiOverlays();
+            });
+            overlayObserver.observe(document.body, { childList: true, subtree: false });
         });
     </script>
 
