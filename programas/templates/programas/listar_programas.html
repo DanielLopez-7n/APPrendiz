@@ -137,7 +137,7 @@
                         
                         <td class="text-end">
                             <div class="action-pill">
-                                <a href="{% url 'programas:editar_programa' pk=programa.id %}" class="btn" title="Editar Programa">
+                                <a href="{% url 'programas:editar_programa' pk=programa.id %}" class="btn" title="Editar Programa" onclick="window.location.href=this.href; return false;">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <div class="vr opacity-25"></div>

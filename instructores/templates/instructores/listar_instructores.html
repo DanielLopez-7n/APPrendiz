@@ -177,15 +177,15 @@
 
                         <td class="text-end">
                             <div class="action-pill">
-                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn" title="Ver Hoja de Vida">
+                                <a href="{% url 'instructores:ver_detalle_instructor' instructor.id %}" class="btn" title="Ver Hoja de Vida" onclick="window.location.href=this.href; return false;">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 <div class="vr opacity-25"></div>
-                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn" title="Editar Información">
+                                <a href="{% url 'instructores:editar_instructor' instructor.id %}" class="btn" title="Editar Información" onclick="window.location.href=this.href; return false;">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
                                 <div class="vr opacity-25"></div>
-                                <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}" title="Eliminar Instructor">
+                                <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarInstructorModal{{ instructor.pk }}" title="Eliminar Instructor" onclick="var m=document.getElementById('eliminarInstructorModal{{ instructor.pk }}'); if(m){m.style.display='block'; m.classList.add('show'); m.removeAttribute('aria-hidden'); document.body.classList.add('modal-open');} return false;">
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>
                             </div>

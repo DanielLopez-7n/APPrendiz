@@ -166,17 +166,17 @@
 
                         <td class="text-end">
                             <div class="action-pill">
-                                <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn" title="Ver Detalles">
+                                <a href="{% url 'aprendices:ver_detalle_aprendiz' aprendiz.id %}" class="btn" title="Ver Detalles" onclick="window.location.href=this.href; return false;">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 
                                 {% if request.user.is_superuser %}
                                     <div class="vr opacity-25"></div>
-                                    <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn" title="Editar Aprendiz">
+                                    <a href="{% url 'aprendices:editar_aprendiz' aprendiz.id %}" class="btn" title="Editar Aprendiz" onclick="window.location.href=this.href; return false;">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <div class="vr opacity-25"></div>
-                                    <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarAprendizModal{{ aprendiz.id }}" title="Eliminar Aprendiz">
+                                    <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#eliminarAprendizModal{{ aprendiz.id }}" title="Eliminar Aprendiz" onclick="var m=document.getElementById('eliminarAprendizModal{{ aprendiz.id }}'); if(m){m.style.display='block'; m.classList.add('show'); m.removeAttribute('aria-hidden'); document.body.classList.add('modal-open');} return false;">
                                         <i class="bi bi-trash3-fill"></i>
                                     </button>
                                 {% endif %}

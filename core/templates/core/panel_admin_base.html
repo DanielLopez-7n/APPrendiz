@@ -773,6 +773,27 @@
           .alert-border-info { border-left: 6px solid #0dcaf0 !important; }
     </style>
 
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+    <div id="sidebar-overlay" style="display: none !important; pointer-events: none !important;" aria-hidden="true"></div>
+    
+    <div id="fondo-carrusel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="12000" data-bs-pause="false">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'core/img_bg/fondo1.png' %}" class="d-block w-100" alt="Fondo 1">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo2.png' %}" class="d-block w-100" alt="Fondo 2">
+                <div class="overlay-oscura"></div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'core/img_bg/fondo3.png' %}" class="d-block w-100" alt="Fondo 3">
+                <div class="overlay-oscura"></div>
+            </div>
     {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
   </head>
   <body>
@@ -1511,6 +1532,43 @@
                 repairUiOverlays();
             });
             overlayObserver.observe(document.body, { childList: true, subtree: false });
+
+            // Fallback universal: asegurar que botones de acciones y filtros sí ejecuten algo.
+            document.addEventListener('click', function (event) {
+                const actionLink = event.target.closest('.action-pill a[href], .actions-group a[href]');
+                if (actionLink) {
+                    event.preventDefault();
+                    window.location.assign(actionLink.href);
+                    return;
+                }
+
+                const filterBtn = event.target.closest('button[title="Aplicar Filtros"], button[data-filter-submit]');
+                if (filterBtn) {
+                    const form = filterBtn.closest('form');
+                    if (form) {
+                        event.preventDefault();
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit();
+                        } else {
+                            form.submit();
+                        }
+                    }
+                    return;
+                }
+
+                const modalTrigger = event.target.closest('[data-bs-toggle="modal"][data-bs-target]');
+                if (modalTrigger && (!window.bootstrap || !window.bootstrap.Modal)) {
+                    const targetSelector = modalTrigger.getAttribute('data-bs-target');
+                    const modal = targetSelector ? document.querySelector(targetSelector) : null;
+                    if (modal) {
+                        event.preventDefault();
+                        modal.style.display = 'block';
+                        modal.classList.add('show');
+                        modal.removeAttribute('aria-hidden');
+                        document.body.classList.add('modal-open');
+                    }
+                }
+            }, true);
 
             function isMobile() { return window.innerWidth <= 768; }
 
