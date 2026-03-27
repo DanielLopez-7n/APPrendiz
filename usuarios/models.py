@@ -9,6 +9,15 @@ class PerfilUsuario(models.Model):
     Modelo para extender la información del usuario
     Relacionado 1:1 con el modelo User de Django
     """
+    TIPO_DOC_CHOICES = [
+        ('', 'No definido'),
+        ('CC', 'Cédula de Ciudadanía'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('CE', 'Cédula de Extranjería'),
+        ('PEP', 'PEP'),
+        ('PAS', 'Pasaporte'),
+    ]
+
     user = models.OneToOneField(
         User, 
         on_delete=models.CASCADE,
