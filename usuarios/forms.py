@@ -207,13 +207,27 @@ class EditarPerfilForm(forms.ModelForm):
     """
     Formulario para editar el perfil del usuario
     """
+    TIPO_DOC_CHOICES = [
+        ('', 'No definido'),
+        ('CC', 'Cédula de Ciudadanía'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('CE', 'Cédula de Extranjería'),
+        ('PEP', 'PEP'),
+        ('PAS', 'Pasaporte'),
+    ]
+    tipo_documento = forms.ChoiceField(
+        choices=TIPO_DOC_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
     class Meta:
         model = PerfilUsuario
         fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}), # Añadido para el username
-            'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -223,17 +237,25 @@ class EditarPerfilForm(forms.ModelForm):
         self.usuario = kwargs.pop('usuario', None)
         super().__init__(*args, **kwargs)
 
-        # Si el usuario es Admin o Instructor, DESBLOQUEAMOS los campos
-        if self.usuario and self.usuario.is_staff:
-            if 'documento' in self.fields:
-                self.fields['documento'].widget.attrs.pop('readonly', None)
-                self.fields['documento'].widget.attrs['class'] = 'form-control'
-                self.fields['documento'].label = "Documento de Identidad"
-                
-            if 'telefono' in self.fields:
-                self.fields['telefono'].widget.attrs.pop('readonly', None)
-                self.fields['telefono'].widget.attrs['class'] = 'form-control'
-                self.fields['telefono'].label = "Teléfono de Contacto"
+        # Etiquetas amigables para todos los perfiles
+        self.fields['tipo_documento'].label = "Tipo de Documento"
+
+        if self.usuario:
+            tipo_doc_actual = ''
+            if hasattr(self.usuario, 'instructor'):
+                tipo_doc_actual = self.usuario.instructor.tipo_documento or ''
+            elif hasattr(self.usuario, 'aprendiz'):
+                tipo_doc_actual = self.usuario.aprendiz.tipo_documento or ''
+            self.fields['tipo_documento'].initial = tipo_doc_actual
+
+        if 'documento' in self.fields:
+            self.fields['documento'].label = "Documento de Identidad"
+        if 'telefono' in self.fields:
+            self.fields['telefono'].label = "Teléfono de Contacto"
+        if 'direccion' in self.fields:
+            self.fields['direccion'].label = "Dirección de Residencia"
+        if 'fecha_nacimiento' in self.fields:
+            self.fields['fecha_nacimiento'].label = "Fecha de Nacimiento"
 
     def clean_documento(self):
         documento = self.cleaned_data.get('documento')

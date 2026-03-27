@@ -194,7 +194,12 @@
                         <p class="text-muted small">Mantén tu información actualizada para la gestión de tus bitácoras.</p>
                     </div>
 
-                    <h5 class="form-section-title"><i class="bi bi-person-vcard"></i> Información Personal</h5>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <h5 class="form-section-title mb-0"><i class="bi bi-person-vcard"></i> Mi Información Personal</h5>
+                        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-success rounded-pill fw-bold px-4 py-2">
+                            <i class="bi bi-key-fill me-2"></i>Cambiar Contraseña
+                        </a>
+                    </div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="label-studio">Nombres *</label>

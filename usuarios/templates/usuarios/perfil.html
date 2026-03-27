@@ -36,7 +36,15 @@
         border-left: 4px solid #39A900; display: flex; align-items: center; margin-bottom: 20px;
     }
     .input-group-studio i { color: #39A900; margin-right: 15px; font-size: 1.2rem; }
-    .input-group-studio input { flex-grow: 1; border: none !important; background: transparent !important; padding: 12px 0; font-weight: 700; outline: none; }
+    .input-group-studio input,
+    .input-group-studio select {
+        flex-grow: 1;
+        border: none !important;
+        background: transparent !important;
+        padding: 12px 0;
+        font-weight: 700;
+        outline: none;
+    }
 
     .btn-save { background: #39A900; color: white; border: none; padding: 16px 40px; border-radius: 50px; font-weight: 800; width: 100%; transition: 0.3s; }
     .btn-save:hover { background: #2d8600; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 169, 0, 0.2); }
@@ -219,6 +227,12 @@
                         <h5 class="section-title mt-4"><i class="bi bi-shield-lock me-2 text-success"></i>Datos del Sistema</h5>
                         <div class="row g-3">
                             <div class="col-md-6">
+                                <label class="label-studio">Tipo de documento</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-card-list"></i>{{ form_perfil.tipo_documento }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <label class="label-studio">Documento de Identidad</label>
                                 <div class="input-group-studio">
                                     <i class="bi bi-hash"></i>{{ form_perfil.documento }}
@@ -230,13 +244,36 @@
                                     <i class="bi bi-telephone"></i>{{ form_perfil.telefono }}
                                 </div>
                             </div>
+                            <div class="col-md-8">
+                                <label class="label-studio">Dirección de residencia</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-geo-alt"></i>{{ form_perfil.direccion }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="label-studio">Fecha de nacimiento</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-calendar-event"></i>{{ form_perfil.fecha_nacimiento }}
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="label-studio">Correo personal</label>
+                                <div class="input-group-studio">
+                                    <i class="bi bi-envelope"></i>{{ form_usuario.email }}
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="row mt-5">
-                            <div class="col-md-4">
+                        <div class="row mt-5 g-3">
+                            <div class="col-md-3">
                                 <a href="{% url cancel_url %}" class="btn btn-light rounded-pill w-100 py-3 fw-bold border">Cancelar</a>
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-4">
+                                <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-success rounded-pill w-100 py-3 fw-bold">
+                                    <i class="bi bi-key-fill me-2"></i>Cambiar Contraseña
+                                </a>
+                            </div>
+                            <div class="col-md-5">
                                 <button type="submit" class="btn-save">Actualizar Mi Información</button>
                             </div>
                         </div>
