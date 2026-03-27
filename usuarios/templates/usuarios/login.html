@@ -50,6 +50,17 @@
                             </label>
                         </div>
 
+                        {% if recaptcha_site_key %}
+                            <input type="hidden" name="recaptcha_token" id="id_recaptcha_token">
+                            <div class="mb-3">
+                                <div
+                                    class="g-recaptcha"
+                                    data-sitekey="{{ recaptcha_site_key }}"
+                                    data-callback="setRecaptchaToken">
+                                </div>
+                            </div>
+                        {% endif %}
+
                         <button type="submit" class="btn w-100 py-3 mb-3 text-white fw-bold shadow-sm" style="background-color: var(--sena-green, #39a900);">
                             INGRESAR AL SISTEMA
                         </button>
@@ -64,4 +75,16 @@
             </div>
     </div>
 </div>
+
+{% if recaptcha_site_key %}
+<script>
+    function setRecaptchaToken(token) {
+        const recaptchaInput = document.getElementById('id_recaptcha_token');
+        if (recaptchaInput) {
+            recaptchaInput.value = token;
+        }
+    }
+</script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
 {% endblock %}
