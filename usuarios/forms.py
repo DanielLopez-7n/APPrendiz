@@ -209,11 +209,12 @@ class EditarPerfilForm(forms.ModelForm):
     """
     class Meta:
         model = PerfilUsuario
-        fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
+        fields = ['tipo_documento', 'documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}), # Añadido para el username
-            'documento': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
+            'documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
             'foto_perfil': forms.FileInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -223,17 +224,17 @@ class EditarPerfilForm(forms.ModelForm):
         self.usuario = kwargs.pop('usuario', None)
         super().__init__(*args, **kwargs)
 
-        # Si el usuario es Admin o Instructor, DESBLOQUEAMOS los campos
-        if self.usuario and self.usuario.is_staff:
-            if 'documento' in self.fields:
-                self.fields['documento'].widget.attrs.pop('readonly', None)
-                self.fields['documento'].widget.attrs['class'] = 'form-control'
-                self.fields['documento'].label = "Documento de Identidad"
-                
-            if 'telefono' in self.fields:
-                self.fields['telefono'].widget.attrs.pop('readonly', None)
-                self.fields['telefono'].widget.attrs['class'] = 'form-control'
-                self.fields['telefono'].label = "Teléfono de Contacto"
+        # Etiquetas amigables para todos los perfiles
+        if 'tipo_documento' in self.fields:
+            self.fields['tipo_documento'].label = "Tipo de Documento"
+        if 'documento' in self.fields:
+            self.fields['documento'].label = "Documento de Identidad"
+        if 'telefono' in self.fields:
+            self.fields['telefono'].label = "Teléfono de Contacto"
+        if 'direccion' in self.fields:
+            self.fields['direccion'].label = "Dirección de Residencia"
+        if 'fecha_nacimiento' in self.fields:
+            self.fields['fecha_nacimiento'].label = "Fecha de Nacimiento"
 
     def clean_documento(self):
         documento = self.cleaned_data.get('documento')

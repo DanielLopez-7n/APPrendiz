@@ -15,8 +15,8 @@ def listar_aprendices(request):
     aprendices = Aprendiz.objects.select_related('usuario', 'numero_ficha')
     
     # 1. Capturamos lo que el usuario escribió en la barra
-    query = request.GET.get('q', '')
-    modalidad = request.GET.get('modalidad', '')
+    query = request.GET.get('q', '').strip()
+    modalidad = request.GET.get('modalidad', '').strip()
 
     # 2. Si escribió algo, filtramos por nombre, apellido, documento o ficha
     if query:
@@ -24,7 +24,9 @@ def listar_aprendices(request):
             Q(documento__icontains=query) |
             Q(usuario__first_name__icontains=query) |
             Q(usuario__last_name__icontains=query) |
-            Q(numero_ficha__numero__icontains=query)
+            Q(usuario__email__icontains=query) |
+            Q(numero_ficha__numero__icontains=query) |
+            Q(numero_ficha__programa__nombre__icontains=query)
         )
     
     # 3. Si seleccionó un filtro del desplegable

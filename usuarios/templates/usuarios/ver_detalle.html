@@ -156,6 +156,43 @@
                     </div>
                 </div>
 
+                <div class="row g-4 mt-1">
+                    <div class="col-12">
+                        <h6 class="section-title"><i class="bi bi-person-vcard-fill"></i> Información Personal Registrada</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <span class="data-label">Documento</span>
+                            <div class="data-value"><i class="bi bi-hash text-success me-2"></i>{{ documento_sistema }}</div>
+
+                            <span class="data-label">Tipo de Documento</span>
+                            <div class="data-value"><i class="bi bi-card-heading text-success me-2"></i>{{ tipo_documento }}</div>
+
+                            <span class="data-label">Fecha de Nacimiento</span>
+                            <div class="data-value">
+                                <i class="bi bi-calendar-heart text-success me-2"></i>
+                                {% if fecha_nacimiento %}
+                                    {{ fecha_nacimiento|date:"d M Y" }}
+                                {% else %}
+                                    <span class="text-muted fst-italic">No registrada</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-box">
+                            <span class="data-label">Teléfono</span>
+                            <div class="data-value"><i class="bi bi-telephone text-success me-2"></i>{{ telefono_sistema }}</div>
+
+                            <span class="data-label">Dirección</span>
+                            <div class="data-value"><i class="bi bi-geo-alt text-success me-2"></i>{{ direccion_sistema }}</div>
+
+                            <span class="data-label">Correo personal</span>
+                            <div class="data-value"><i class="bi bi-envelope-at text-success me-2"></i>{{ correo_personal }}</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-sm-end gap-3 mt-5 pt-4 border-top">
                     <a href="{% url 'usuarios:lista_usuarios' %}" class="btn btn-light btn-action-studio border-2 text-dark shadow-sm">
                         <i class="bi bi-arrow-left me-2"></i>Volver al Listado
