@@ -50,9 +50,14 @@
             <p class="text-muted">Aquí tienes el resumen de tus bitácoras y actividades.</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-sena btn-lg fw-bold shadow-sm px-4 rounded-pill">
-                <i class="bi bi-plus-lg me-2"></i>Nueva Bitácora
-            </a>
+            <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-success btn-lg fw-bold shadow-sm px-4 rounded-pill">
+                    <i class="bi bi-key-fill me-2"></i>Cambiar Contraseña
+                </a>
+                <a href="{% url 'bitacoras:crear_bitacora' %}" class="btn btn-sena btn-lg fw-bold shadow-sm px-4 rounded-pill">
+                    <i class="bi bi-plus-lg me-2"></i>Nueva Bitácora
+                </a>
+            </div>
         </div>
     </div>
 

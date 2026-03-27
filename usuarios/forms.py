@@ -209,9 +209,10 @@ class EditarPerfilForm(forms.ModelForm):
     """
     class Meta:
         model = PerfilUsuario
-        fields = ['documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
+        fields = ['tipo_documento', 'documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}), # Añadido para el username
+            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'documento': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
@@ -224,6 +225,8 @@ class EditarPerfilForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Etiquetas amigables para todos los perfiles
+        if 'tipo_documento' in self.fields:
+            self.fields['tipo_documento'].label = "Tipo de Documento"
         if 'documento' in self.fields:
             self.fields['documento'].label = "Documento de Identidad"
         if 'telefono' in self.fields:
