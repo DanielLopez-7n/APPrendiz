@@ -20,7 +20,7 @@
 
                     {% if form.errors %}
                         <div class="alert alert-danger py-2 small text-center mb-3">
-                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Usuario o contraseña incorrectos.
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ login_error_message|default:"Usuario o contraseña incorrectos." }}
                         </div>
                     {% endif %}
 
@@ -30,7 +30,7 @@
                         <input type="hidden" name="next" value="{{ request.GET.next }}">
 
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento" required autofocus>
+                            <input type="text" class="form-control" id="id_username" name="username" placeholder="Documento" value="{{ request.POST.username|default:'' }}" required autofocus>
                             <label for="id_username" class="text-muted">
                                 <i class="bi bi-card-heading me-1"></i> Documento / Usuario
                             </label>
