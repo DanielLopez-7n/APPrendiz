@@ -1,7 +1,11 @@
 from django import forms
 import re
+import json
+from urllib import parse, request
+from urllib.error import URLError
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+from django.conf import settings
 from .models import PerfilUsuario
 from aprendices.models import Aprendiz
 from instructores.models import Instructor
@@ -66,8 +70,49 @@ class LoginForm(AuthenticationForm):
         label='Recordarme'
     )
 
+    recaptcha_token = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput()
+    )
+
     def clean_username(self):
         return validar_usuario_alfanumerico(self.cleaned_data.get('username'), 'usuario', minimo=4, maximo=20)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        self._validar_recaptcha(cleaned_data.get('recaptcha_token'))
+        return cleaned_data
+
+    def _validar_recaptcha(self, recaptcha_token):
+        recaptcha_secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
+        if not recaptcha_secret_key:
+            return
+
+        if not recaptcha_token:
+            raise forms.ValidationError('Debes completar la validación de reCAPTCHA.')
+
+        payload = parse.urlencode({
+            'secret': recaptcha_secret_key,
+            'response': recaptcha_token,
+            'remoteip': self.request.META.get('REMOTE_ADDR') if self.request else '',
+        }).encode()
+
+        req = request.Request(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data=payload,
+            method='POST',
+        )
+
+        try:
+            with request.urlopen(req, timeout=8) as response:
+                result = json.loads(response.read().decode('utf-8'))
+        except (URLError, TimeoutError, ValueError):
+            raise forms.ValidationError(
+                'No se pudo validar reCAPTCHA. Intenta nuevamente en unos segundos.'
+            )
+
+        if not result.get('success'):
+            raise forms.ValidationError('La validación de reCAPTCHA falló. Intenta otra vez.')
 
 
 class RegistroForm(UserCreationForm):
