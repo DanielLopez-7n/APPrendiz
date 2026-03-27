@@ -207,12 +207,25 @@ class EditarPerfilForm(forms.ModelForm):
     """
     Formulario para editar el perfil del usuario
     """
+    TIPO_DOC_CHOICES = [
+        ('', 'No definido'),
+        ('CC', 'Cédula de Ciudadanía'),
+        ('TI', 'Tarjeta de Identidad'),
+        ('CE', 'Cédula de Extranjería'),
+        ('PEP', 'PEP'),
+        ('PAS', 'Pasaporte'),
+    ]
+    tipo_documento = forms.ChoiceField(
+        choices=TIPO_DOC_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'}),
+    )
+
     class Meta:
         model = PerfilUsuario
         fields = ['tipo_documento', 'documento', 'telefono', 'direccion', 'foto_perfil', 'fecha_nacimiento']        
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}), # Añadido para el username
-            'tipo_documento': forms.Select(attrs={'class': 'form-select'}),
             'documento': forms.TextInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'direccion': forms.TextInput(attrs={'class': 'form-control'}),
@@ -225,8 +238,16 @@ class EditarPerfilForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Etiquetas amigables para todos los perfiles
-        if 'tipo_documento' in self.fields:
-            self.fields['tipo_documento'].label = "Tipo de Documento"
+        self.fields['tipo_documento'].label = "Tipo de Documento"
+
+        if self.usuario:
+            tipo_doc_actual = ''
+            if hasattr(self.usuario, 'instructor'):
+                tipo_doc_actual = self.usuario.instructor.tipo_documento or ''
+            elif hasattr(self.usuario, 'aprendiz'):
+                tipo_doc_actual = self.usuario.aprendiz.tipo_documento or ''
+            self.fields['tipo_documento'].initial = tipo_doc_actual
+
         if 'documento' in self.fields:
             self.fields['documento'].label = "Documento de Identidad"
         if 'telefono' in self.fields:

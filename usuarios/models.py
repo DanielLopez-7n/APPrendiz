@@ -32,14 +32,6 @@ class PerfilUsuario(models.Model):
         help_text="Número de documento de identidad"
     )
 
-    tipo_documento = models.CharField(
-        max_length=5,
-        choices=TIPO_DOC_CHOICES,
-        default='',
-        blank=True,
-        help_text="Tipo de documento de identidad",
-    )
-    
     telefono = models.CharField(
         max_length=15, 
         blank=True,

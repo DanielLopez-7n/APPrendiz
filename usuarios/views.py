@@ -218,8 +218,6 @@ def ver_detalle_usuario(request, user_id):
         direccion_sistema = aprendiz.direccion_residencia or direccion_sistema
         correo_personal = aprendiz.correo_personal or correo_personal
         tipo_documento = aprendiz.get_tipo_documento_display()
-    elif perfil and perfil.tipo_documento:
-        tipo_documento = perfil.get_tipo_documento_display()
 
     context = {
         'titulo': f'Detalle de Usuario: {usuario.get_full_name()}',
@@ -424,6 +422,7 @@ def perfil_view(request):
             
             # 2. Guardamos datos del Perfil (Foto, Teléfono, Documento)
             perfil_guardado = form_perfil.save()
+            tipo_documento_seleccionado = form_perfil.cleaned_data.get('tipo_documento') or ''
             
             # 3. SINCRONIZACIÓN: si es instructor reflejamos datos personales clave
             if hasattr(usuario, 'instructor'):
@@ -432,8 +431,8 @@ def perfil_view(request):
                     usuario.instructor.direccion_residencia = perfil_guardado.direccion
                 if usuario.email:
                     usuario.instructor.correo_personal = usuario.email
-                if perfil_guardado.tipo_documento:
-                    usuario.instructor.tipo_documento = perfil_guardado.tipo_documento
+                if tipo_documento_seleccionado:
+                    usuario.instructor.tipo_documento = tipo_documento_seleccionado
                 usuario.instructor.save()
             elif hasattr(usuario, 'aprendiz'):
                 usuario.aprendiz.telefono = perfil_guardado.telefono
@@ -441,8 +440,8 @@ def perfil_view(request):
                     usuario.aprendiz.direccion_residencia = perfil_guardado.direccion
                 if usuario.email:
                     usuario.aprendiz.correo_personal = usuario.email
-                if perfil_guardado.tipo_documento:
-                    usuario.aprendiz.tipo_documento = perfil_guardado.tipo_documento
+                if tipo_documento_seleccionado:
+                    usuario.aprendiz.tipo_documento = tipo_documento_seleccionado
                 usuario.aprendiz.save()
             
             messages.success(request, 'Tu información personal se ha actualizado exitosamente.')
@@ -498,9 +497,6 @@ def perfil_view(request):
         tipo_documento = aprendiz.get_tipo_documento_display()
         context['ficha_actual'] = getattr(aprendiz.numero_ficha, 'numero', 'No asignada')
         context['programa_formacion'] = getattr(getattr(aprendiz.numero_ficha, 'programa', None), 'nombre', 'No asignado')
-    elif usuario.perfil.tipo_documento:
-        tipo_documento = usuario.perfil.get_tipo_documento_display()
-
     context.update({
         'documento_sistema': documento_sistema,
         'telefono_sistema': telefono_sistema,
