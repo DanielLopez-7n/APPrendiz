@@ -81,19 +81,20 @@
     </div>
 
     <div class="card-studio mb-4">
-        <form method="GET" action="" class="row g-3 align-items-center">
+        <form method="GET" action="{% url 'aprendices:listar_aprendices' %}" class="row g-3 align-items-center" id="filtroAprendicesForm">
             <div class="col-md-5">
                 <div class="filter-wrapper d-flex align-items-center">
                     <i class="bi bi-search text-success fs-5 ms-2 me-2"></i>
-                    <input type="text" name="q" class="input-studio" placeholder="Buscar por documento, nombre o ficha..." value="{{ request.GET.q }}">
+                    <input type="text" name="q" class="input-studio" placeholder="Buscar por documento, nombre, ficha o programa..." value="{{ query|default:request.GET.q }}">
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="filter-wrapper" style="border-left-color: #adb5bd;">
-                    <select name="modalidad" class="select-studio">
+                    <select name="modalidad" class="select-studio" id="modalidadFiltro">
                         <option value="">Todas las modalidades</option>
-                        <option value="Presencial" {% if request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
-                        <option value="Virtual" {% if request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
+                        <option value="Presencial" {% if modalidad == 'Presencial' or request.GET.modalidad == 'Presencial' %}selected{% endif %}>Presencial</option>
+                        <option value="Virtual" {% if modalidad == 'Virtual' or request.GET.modalidad == 'Virtual' %}selected{% endif %}>Virtual</option>
+                        <option value="A distancia" {% if modalidad == 'A distancia' or request.GET.modalidad == 'A distancia' %}selected{% endif %}>A distancia</option>
                     </select>
                 </div>
             </div>
@@ -231,6 +232,14 @@
     document.addEventListener("DOMContentLoaded", function() {
         const modales = document.querySelectorAll('.modal');
         modales.forEach(modal => { document.body.appendChild(modal); });
+
+        const selectModalidad = document.getElementById('modalidadFiltro');
+        const filtroForm = document.getElementById('filtroAprendicesForm');
+        if (selectModalidad && filtroForm) {
+            selectModalidad.addEventListener('change', function () {
+                filtroForm.submit();
+            });
+        }
     });
 </script>
 {% endblock %}
