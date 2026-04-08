@@ -104,6 +104,39 @@
         font-size: .9rem;
         margin-bottom: 4px;
     }
+
+    /* === Validación Visual en Tiempo Real === */
+    .input-group-studio.is-valid {
+        border-color: #39A900 !important;
+        background-color: #f6fff0;
+    }
+    .input-group-studio.is-valid i { color: #39A900; }
+    .input-group-studio.is-invalid {
+        border-color: #dc3545 !important;
+        background-color: #fff8f8;
+    }
+    .input-group-studio.is-invalid i { color: #dc3545; }
+    .campo-error-msg {
+        color: #dc3545;
+        font-size: 0.78rem;
+        font-weight: 500;
+        margin-top: -15px;
+        margin-bottom: 15px;
+        margin-left: 15px;
+        display: none;
+    }
+    .campo-error-msg.visible { display: block; }
+    .campo-error-msg i { margin-right: 4px; }
+
+    /* Animación sutil de sacudida para error */
+    @keyframes sacudir {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-4px); }
+        40%, 80% { transform: translateX(4px); }
+    }
+    .input-group-studio.sacudir {
+        animation: sacudir 0.4s ease;
+    }
 </style>
 {% endblock %}
 
@@ -161,7 +194,7 @@
                                 <option value="">--- Seleccione el Rol ---</option>
                                 <option value="aprendiz">Aprendiz SENA</option>
                                 {% if es_admin %}
-                                <option value="instructor">Instructor / Staff</option>
+                                <option value="instructor">Instructor / Administrativo</option>
                                 {% endif %}
                             </select>
                         </div>
@@ -292,6 +325,10 @@
             deshabilitarCampos(secAprendiz, true);
             deshabilitarCampos(secInstructor, true);
 
+            // Limpiamos validaciones visuales del panel oculto
+            limpiarValidaciones(secAprendiz);
+            limpiarValidaciones(secInstructor);
+
             if (rol === 'aprendiz') {
                 secAprendiz.style.display = 'block';
                 deshabilitarCampos(secAprendiz, false);
@@ -408,6 +445,305 @@
                     console.error('Problema con Fetch API Colombia:', error);
                     selectDepto.innerHTML = '<option value="">Error al cargar departamentos</option>';
                 });
+        }
+
+        // =====================================================
+        // VALIDACIONES EN TIEMPO REAL DEL FORMULARIO
+        // =====================================================
+
+        const DOMINIO_INSTITUCIONAL = '@soy.sena.edu.co';
+
+        // --- Utilidades de validación visual ---
+        function obtenerGrupo(input) {
+            return input.closest('.input-group-studio');
+        }
+
+        function obtenerOCrearMsgError(input) {
+            const grupo = obtenerGrupo(input);
+            if (!grupo) return null;
+            let msg = grupo.parentElement.querySelector('.campo-error-msg');
+            if (!msg) {
+                msg = document.createElement('small');
+                msg.className = 'campo-error-msg';
+                grupo.parentElement.insertBefore(msg, grupo.nextSibling);
+            }
+            return msg;
+        }
+
+        function marcarValido(input) {
+            const grupo = obtenerGrupo(input);
+            if (!grupo) return;
+            grupo.classList.remove('is-invalid', 'sacudir');
+            grupo.classList.add('is-valid');
+            const msg = obtenerOCrearMsgError(input);
+            if (msg) { msg.classList.remove('visible'); msg.textContent = ''; }
+        }
+
+        function marcarInvalido(input, mensaje, sacudir = false) {
+            const grupo = obtenerGrupo(input);
+            if (!grupo) return;
+            grupo.classList.remove('is-valid');
+            grupo.classList.add('is-invalid');
+            if (sacudir) {
+                grupo.classList.remove('sacudir');
+                void grupo.offsetWidth; // forzar reflow
+                grupo.classList.add('sacudir');
+            }
+            const msg = obtenerOCrearMsgError(input);
+            if (msg) {
+                msg.innerHTML = '<i class="bi bi-exclamation-circle"></i> ' + mensaje;
+                msg.classList.add('visible');
+            }
+        }
+
+        function limpiarEstado(input) {
+            const grupo = obtenerGrupo(input);
+            if (!grupo) return;
+            grupo.classList.remove('is-valid', 'is-invalid', 'sacudir');
+            const msg = obtenerOCrearMsgError(input);
+            if (msg) { msg.classList.remove('visible'); msg.textContent = ''; }
+        }
+
+        function limpiarValidaciones(contenedor) {
+            contenedor.querySelectorAll('.input-group-studio').forEach(g => {
+                g.classList.remove('is-valid', 'is-invalid', 'sacudir');
+            });
+            contenedor.querySelectorAll('.campo-error-msg').forEach(m => {
+                m.classList.remove('visible'); m.textContent = '';
+            });
+        }
+
+        // --- Funciones de restricción de entrada ---
+        function soloNumeros(input) {
+            input.addEventListener('input', function() {
+                const limpio = this.value.replace(/[^0-9]/g, '');
+                if (limpio !== this.value) this.value = limpio;
+            });
+        }
+
+        function soloLetras(input) {
+            input.addEventListener('input', function() {
+                const limpio = this.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'\-]/g, '');
+                if (limpio !== this.value) this.value = limpio;
+            });
+        }
+
+        function soloAlfanumerico(input) {
+            input.addEventListener('input', function() {
+                const limpio = this.value.replace(/[^A-Za-z0-9]/g, '');
+                if (limpio !== this.value) this.value = limpio;
+            });
+        }
+
+        // --- Funciones de validación por tipo de campo ---
+        function validarNombre(input, etiqueta, min = 2, max = 70) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (valor.length < min) { marcarInvalido(input, `${etiqueta} debe tener al menos ${min} caracteres.`); return false; }
+            if (valor.length > max) { marcarInvalido(input, `${etiqueta} no debe exceder ${max} caracteres.`); return false; }
+            if (/\d/.test(valor)) { marcarInvalido(input, `${etiqueta} no puede contener números.`); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarUsername(input, min = 4, max = 20) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (valor.length < min) { marcarInvalido(input, `Debe tener al menos ${min} caracteres.`); return false; }
+            if (valor.length > max) { marcarInvalido(input, `No debe exceder ${max} caracteres.`); return false; }
+            if (!/^[A-Za-z0-9]+$/.test(valor)) { marcarInvalido(input, 'Solo se permiten letras y números, sin espacios.'); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarCorreoInstitucional(input) {
+            const valor = input.value.trim().toLowerCase();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (valor.length > 70) { marcarInvalido(input, 'El correo no debe exceder 70 caracteres.'); return false; }
+            // Revisamos formato básico de email
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) {
+                marcarInvalido(input, 'Ingresa un correo electrónico válido.');
+                return false;
+            }
+            // Revisamos dominio institucional
+            if (!valor.endsWith(DOMINIO_INSTITUCIONAL)) {
+                marcarInvalido(input, 'El correo debe terminar en ' + DOMINIO_INSTITUCIONAL);
+                return false;
+            }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarDigitos(input, etiqueta, min = 6, max = 20) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (!/^\d+$/.test(valor)) { marcarInvalido(input, `${etiqueta} solo permite números.`); return false; }
+            if (valor.length < min) { marcarInvalido(input, `${etiqueta} debe tener al menos ${min} dígitos.`); return false; }
+            if (valor.length > max) { marcarInvalido(input, `${etiqueta} no debe exceder ${max} dígitos.`); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarTelefono(input, min = 7, max = 15) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return true; } // teléfono es opcional
+            if (!/^\d+$/.test(valor)) { marcarInvalido(input, 'Solo se permiten dígitos numéricos.'); return false; }
+            if (valor.length < min || valor.length > max) { marcarInvalido(input, `Debe tener entre ${min} y ${max} dígitos.`); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarCorreoPersonal(input) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return true; } // es opcional
+            if (valor.length > 70) { marcarInvalido(input, 'El correo no debe exceder 70 caracteres.'); return false; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) { marcarInvalido(input, 'Formato de correo inválido.'); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarTexto(input, etiqueta, min = 5, max = 70) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (valor.length < min) { marcarInvalido(input, `${etiqueta} debe tener al menos ${min} caracteres.`); return false; }
+            if (valor.length > max) { marcarInvalido(input, `${etiqueta} no debe exceder ${max} caracteres.`); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        function validarProfesion(input, min = 2, max = 70) {
+            const valor = input.value.trim();
+            if (!valor) { limpiarEstado(input); return false; }
+            if (valor.length < min) { marcarInvalido(input, `La profesión debe tener al menos ${min} caracteres.`); return false; }
+            if (valor.length > max) { marcarInvalido(input, `La profesión no debe exceder ${max} caracteres.`); return false; }
+            if (/^\d+$/.test(valor)) { marcarInvalido(input, 'La profesión no puede ser solo números.'); return false; }
+            marcarValido(input);
+            return true;
+        }
+
+        // --- Sección 1: Datos de Identidad y Acceso ---
+        const inputNombres = document.getElementById('id_first_name');
+        const inputApellidos = document.getElementById('id_last_name');
+        const inputUsername = document.getElementById('id_username');
+        const inputEmail = document.getElementById('id_email');
+
+        if (inputNombres) {
+            soloLetras(inputNombres);
+            inputNombres.addEventListener('input', () => validarNombre(inputNombres, 'El nombre'));
+            inputNombres.addEventListener('blur', () => validarNombre(inputNombres, 'El nombre'));
+        }
+        if (inputApellidos) {
+            soloLetras(inputApellidos);
+            inputApellidos.addEventListener('input', () => validarNombre(inputApellidos, 'El apellido'));
+            inputApellidos.addEventListener('blur', () => validarNombre(inputApellidos, 'El apellido'));
+        }
+        if (inputUsername) {
+            soloAlfanumerico(inputUsername);
+            inputUsername.addEventListener('input', () => validarUsername(inputUsername));
+            inputUsername.addEventListener('blur', () => validarUsername(inputUsername));
+        }
+        if (inputEmail) {
+            inputEmail.addEventListener('input', () => validarCorreoInstitucional(inputEmail));
+            inputEmail.addEventListener('blur', function() {
+                // Autocompletar dominio si el usuario solo escribió la parte local
+                let valor = this.value.trim().toLowerCase();
+                if (valor && !valor.includes('@')) {
+                    this.value = valor + DOMINIO_INSTITUCIONAL;
+                }
+                validarCorreoInstitucional(this);
+            });
+        }
+
+        // --- Sección 2: Perfil del Aprendiz ---
+        const inputDocumento = document.getElementById('id_documento');
+        const inputTelAprendiz = document.querySelector('#seccion_aprendiz #id_telefono');
+        const inputCorreoPersonalApr = document.querySelector('#seccion_aprendiz #id_correo_personal');
+        const inputDireccionApr = document.querySelector('#seccion_aprendiz #id_direccion_residencia');
+
+        if (inputDocumento) {
+            soloNumeros(inputDocumento);
+            inputDocumento.addEventListener('input', () => validarDigitos(inputDocumento, 'El documento', 6, 20));
+            inputDocumento.addEventListener('blur', () => validarDigitos(inputDocumento, 'El documento', 6, 20));
+        }
+        if (inputTelAprendiz) {
+            soloNumeros(inputTelAprendiz);
+            inputTelAprendiz.addEventListener('input', () => validarTelefono(inputTelAprendiz));
+            inputTelAprendiz.addEventListener('blur', () => validarTelefono(inputTelAprendiz));
+        }
+        if (inputCorreoPersonalApr) {
+            inputCorreoPersonalApr.addEventListener('input', () => validarCorreoPersonal(inputCorreoPersonalApr));
+            inputCorreoPersonalApr.addEventListener('blur', () => validarCorreoPersonal(inputCorreoPersonalApr));
+        }
+        if (inputDireccionApr) {
+            inputDireccionApr.addEventListener('blur', () => validarTexto(inputDireccionApr, 'La dirección', 5, 70));
+        }
+
+        // --- Sección 3: Perfil del Instructor ---
+        const inputCedula = document.getElementById('id_cedula');
+        const inputTelInstructor = document.querySelector('#seccion_instructor #id_telefono');
+        const inputCorreoPersonalIns = document.querySelector('#seccion_instructor #id_correo_personal');
+        const inputDireccionIns = document.querySelector('#seccion_instructor #id_direccion_residencia');
+        const inputProfesion = document.getElementById('id_profesion');
+
+        if (inputCedula) {
+            soloNumeros(inputCedula);
+            inputCedula.addEventListener('input', () => validarDigitos(inputCedula, 'La cédula', 6, 20));
+            inputCedula.addEventListener('blur', () => validarDigitos(inputCedula, 'La cédula', 6, 20));
+        }
+        if (inputTelInstructor) {
+            soloNumeros(inputTelInstructor);
+            inputTelInstructor.addEventListener('input', () => validarTelefono(inputTelInstructor));
+            inputTelInstructor.addEventListener('blur', () => validarTelefono(inputTelInstructor));
+        }
+        if (inputCorreoPersonalIns) {
+            inputCorreoPersonalIns.addEventListener('input', () => validarCorreoPersonal(inputCorreoPersonalIns));
+            inputCorreoPersonalIns.addEventListener('blur', () => validarCorreoPersonal(inputCorreoPersonalIns));
+        }
+        if (inputDireccionIns) {
+            inputDireccionIns.addEventListener('blur', () => validarTexto(inputDireccionIns, 'La dirección', 5, 70));
+        }
+        if (inputProfesion) {
+            inputProfesion.addEventListener('input', () => validarProfesion(inputProfesion));
+            inputProfesion.addEventListener('blur', () => validarProfesion(inputProfesion));
+        }
+
+        // --- Validación al enviar el formulario ---
+        const formDinamico = document.getElementById('formDinamico');
+        if (formDinamico) {
+            formDinamico.addEventListener('submit', function(e) {
+                let errores = 0;
+                const rol = selectRol.value;
+
+                // Validar sección 1 siempre
+                if (inputNombres && !validarNombre(inputNombres, 'El nombre')) errores++;
+                if (inputApellidos && !validarNombre(inputApellidos, 'El apellido')) errores++;
+                if (inputUsername && !validarUsername(inputUsername)) errores++;
+                if (inputEmail && !validarCorreoInstitucional(inputEmail)) errores++;
+
+                // Validar sección de perfil según rol
+                if (rol === 'aprendiz') {
+                    if (inputDocumento && !validarDigitos(inputDocumento, 'El documento', 6, 20)) errores++;
+                    if (inputTelAprendiz && !validarTelefono(inputTelAprendiz)) errores++;
+                    if (inputCorreoPersonalApr && !validarCorreoPersonal(inputCorreoPersonalApr)) errores++;
+                } else if (rol === 'instructor') {
+                    if (inputCedula && !validarDigitos(inputCedula, 'La cédula', 6, 20)) errores++;
+                    if (inputTelInstructor && !validarTelefono(inputTelInstructor)) errores++;
+                    if (inputCorreoPersonalIns && !validarCorreoPersonal(inputCorreoPersonalIns)) errores++;
+                    if (inputProfesion && !validarProfesion(inputProfesion)) errores++;
+                }
+
+                if (errores > 0) {
+                    e.preventDefault();
+                    // Sacudir el primer campo con error para llamar la atención
+                    const primerError = formDinamico.querySelector('.input-group-studio.is-invalid');
+                    if (primerError) {
+                        primerError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        primerError.classList.remove('sacudir');
+                        void primerError.offsetWidth;
+                        primerError.classList.add('sacudir');
+                    }
+                }
+            });
         }
     });
 </script>

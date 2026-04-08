@@ -372,7 +372,7 @@ class UsuarioForm(forms.ModelForm):
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombres'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellidos'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@misena.edu.co'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'usuario@soy.sena.edu.co'}),
             # Al username le ponemos placeholder más descriptivo
             'username': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -396,8 +396,13 @@ class UsuarioForm(forms.ModelForm):
         self.fields['email'].widget.attrs['maxlength'] = 70
 
     def clean_email(self):
-        """Validar que el correo no se repita"""
+        """Validar que el correo no se repita y tenga dominio institucional"""
         email = validate_email_length(self.cleaned_data.get('email'), max_len=70)
+        # Validar dominio institucional
+        if email and not email.lower().endswith('@soy.sena.edu.co'):
+            raise forms.ValidationError(
+                'El correo institucional debe terminar en @soy.sena.edu.co'
+            )
         # Si estamos editando (self.instance.pk existe), excluimos al usuario actual de la búsqueda
         if self.instance.pk:
             if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
