@@ -164,7 +164,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-2" style="border-radius: 12px;">
                         {% if user.is_staff %}
-                            <li><a class="dropdown-item rounded-2" href="{% url 'core:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
+                            <li><a class="dropdown-item rounded-2" href="{% url 'core:dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Panel de Control</a></li>
                         {% else %}
                             <li><a class="dropdown-item rounded-2" href="{% url 'aprendices:perfil_aprendiz' %}"><i class="bi bi-person-badge me-2"></i>Mi perfil</a></li>
                         {% endif %}
