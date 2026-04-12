@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-f!eu824!2z_#=)ys16l+^ow!w7b@qtg7g8gctu9)qw+6#k$=aa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'APPrendiz',
     'core',
-    'bootstrap5',
+    'django_bootstrap5',
     'usuarios',
     'aprendices',
     'empresas',
@@ -87,23 +87,16 @@ WSGI_APPLICATION = 'APPrendiz.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Configuración dinámica de Base de Datos
-if 'DATABASE_URL' in os.environ:
-    # 🌩️ EN PRODUCCIÓN (Render.com) usa PostgreSQL
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'masteruser',
+        'PASSWORD': 'apprendiz-db',
+        'HOST': 'db-apprendiz.c5oi6w6qens5.us-east-2.rds.amazonaws.com',
+        'PORT': '5432'
     }
-else:
-    # 💻 EN LOCAL (Tu compu) sigue usando SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
